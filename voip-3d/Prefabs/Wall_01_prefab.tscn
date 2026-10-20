@@ -1,0 +1,41 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/01_wall_01_seamless.glb" id="1"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/02_wall_01_seamless.glb" id="2"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/05_wall_01_seamless.glb" id="3"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/03_wall_01_seamless.glb" id="4"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/04_wall_01_seamless.glb" id="5"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/01_wall_01_end.glb" id="6"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/01_wall_01_start.glb" id="7"]
+
+[node name="Wall_01_prefab" type="Node3D"]
+
+[node name="01_wall_01_seamless" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, -0, -0, 0, -0, 1, -0, -1, -0, -0.12, 1.97, -29.3)
+
+[node name="02_wall_01_seamless" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, -0, -0, 0, -0, 1, -0, -1, -0, -0.12, 1.97, -13.3)
+
+[node name="05_wall_01_seamless" parent="." instance=ExtResource("3")]
+transform = Transform3D(1, -0, -0, 0, -0, 1, -0, -1, -0, -0.12, 1.97, 82.7)
+
+[node name="03_wall_01_seamless" parent="." instance=ExtResource("4")]
+transform = Transform3D(1, -0, -0, 0, -0, 1, -0, -1, -0, -0.12, 1.97, 2.7)
+
+[node name="04_wall_01_seamless" parent="." instance=ExtResource("5")]
+transform = Transform3D(1, -0, -0, 0, -0, 1, -0, -1, -0, -0.12, 1.97, 66.7)
+
+[node name="03_wall_01_seamless (1)" parent="." instance=ExtResource("4")]
+transform = Transform3D(1, -0, -0, -0, -0, 1, -0, -1, -0, -0.12, 1.97, 18.7)
+
+[node name="03_wall_01_seamless (3)" parent="." instance=ExtResource("4")]
+transform = Transform3D(1, -0, -0, -0, -0, 1, -0, -1, -0, -0.12, 1.97, 50.7)
+
+[node name="01_wall_01_end" parent="." instance=ExtResource("6")]
+transform = Transform3D(1, -0, -0, 0, -0, 1, -0, -1, -0, -0.12, 1.97, 82.7)
+
+[node name="03_wall_01_seamless (2)" parent="." instance=ExtResource("4")]
+transform = Transform3D(1, -0, -0, -0, -0, 1, -0, -1, -0, -0.12, 1.97, 34.7)
+
+[node name="01_wall_01_start" parent="." instance=ExtResource("7")]
+transform = Transform3D(1, -0, -0, 0, -0, 1, -0, -1, -0, -0.12, 1.97, -45.3)

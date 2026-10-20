@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://c8r2m4k6p8q1n"]
+
+[ext_resource type="Script" uid="uid://b6g5jkgleidmk" path="res://lobby_player.gd" id="1_lp"]
+[ext_resource type="PackedScene" uid="uid://da6j6124gu67a" path="res://audioManager.tscn" id="2_am"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_1"]
+mix_rate = 24000.0
+
+[node name="LobbyPlayer" type="CharacterBody3D" unique_id=217943791]
+script = ExtResource("1_lp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1537169015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="Label3D" type="Label3D" parent="." unique_id=1576563908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+billboard = 1
+double_sided = false
+text = "Player"
+outline_size = 8
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=323644774]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+stream = SubResource("AudioStreamGenerator_1")
+autoplay = true
+
+[node name="audioManager" parent="." unique_id=912448435 instance=ExtResource("2_am")]
+outputPath = NodePath("../AudioStreamPlayer3D")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="." unique_id=76328871]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 2.5, 0)
+spring_length = 4.5
+
+[node name="Camera3D" type="Camera3D" parent="SpringArm3D" unique_id=131195596]

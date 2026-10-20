@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://ccfgrt55f2jbc"]
+
+[ext_resource type="Script" uid="uid://ce4naq7cv37fh" path="res://testScene.gd" id="1_wixvr"]
+[ext_resource type="Theme" uid="uid://b3klx57slj0l3" path="res://themes/soft_retro/soft_retro.tres" id="2_theme"]
+
+[node name="Node3D" type="Node3D" unique_id=1732194874]
+script = ExtResource("1_wixvr")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=156355254]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=210526767]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Control" unique_id=1304396764]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -350.0
+offset_right = 190.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/Control/VBoxContainer" unique_id=64061988]
+layout_mode = 2
+text = "RETRO FOOTBALL CLUB"
+horizontal_alignment = 1
+
+[node name="IpLineEdit" type="LineEdit" parent="CanvasLayer/Control/VBoxContainer" unique_id=615587708]
+layout_mode = 2
+text = "127.0.0.1"
+placeholder_text = "Server IP Address"
+alignment = 1
+
+[node name="PortLineEdit" type="LineEdit" parent="CanvasLayer/Control/VBoxContainer" unique_id=1343475370]
+layout_mode = 2
+text = "12806"
+placeholder_text = "UDP port"
+alignment = 1
+max_length = 5
+virtual_keyboard_type = 2
+
+[node name="UsernameLineEdit" type="LineEdit" parent="CanvasLayer/Control/VBoxContainer" unique_id=1914046198]
+layout_mode = 2
+placeholder_text = "Username"
+alignment = 1
+max_length = 18
+
+[node name="GameModeOption" type="OptionButton" parent="CanvasLayer/Control/VBoxContainer" unique_id=1622442783]
+layout_mode = 2
+
+[node name="MatchRulesLabel" type="Label" parent="CanvasLayer/Control/VBoxContainer" unique_id=1023475374]
+visible = false
+layout_mode = 2
+text = "Each team: at least 1 goalkeeper and 1 field player; up to 1 goalkeeper and 10 field players (22 players total)."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="TeamOption" type="OptionButton" parent="CanvasLayer/Control/VBoxContainer" unique_id=1460928565]
+layout_mode = 2
+
+[node name="RoleOption" type="OptionButton" parent="CanvasLayer/Control/VBoxContainer" unique_id=1073581442]
+layout_mode = 2
+
+[node name="MatchDurationLabel" type="Label" parent="CanvasLayer/Control/VBoxContainer" unique_id=597988055]
+layout_mode = 2
+text = "Match duration (set by host)"
+horizontal_alignment = 1
+
+[node name="MatchDurationOption" type="OptionButton" parent="CanvasLayer/Control/VBoxContainer" unique_id=373422420]
+layout_mode = 2
+
+[node name="HostButton" type="Button" parent="CanvasLayer/Control/VBoxContainer" unique_id=2059325935]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Host Server"
+
+[node name="ConnectButton" type="Button" parent="CanvasLayer/Control/VBoxContainer" unique_id=1942295324]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+text = "Connect to Server"
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer/Control/VBoxContainer" unique_id=961004668]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="RosterLabel" type="Label" parent="CanvasLayer/Control/VBoxContainer" unique_id=2037701790]
+layout_mode = 2
+horizontal_alignment = 1
+
+[connection signal="button_down" from="CanvasLayer/Control/VBoxContainer/HostButton" to="." method="_on_host_button_down"]
+[connection signal="button_down" from="CanvasLayer/Control/VBoxContainer/ConnectButton" to="." method="_on_connect_to_server_button_down"]

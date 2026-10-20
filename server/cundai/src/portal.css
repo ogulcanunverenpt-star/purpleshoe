@@ -1,0 +1,90 @@
+.return-game-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: max-content;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--purple);
+  border-radius: 7px;
+  background: var(--purple);
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.return-game-button:hover {
+  background: var(--purple-dark);
+  color: #fff;
+}
+
+.return-game-button:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+}
+
+.return-game-button svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+.handoff-loading {
+  display: grid;
+  min-height: 100dvh;
+  place-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+}
+
+.loading-mark {
+  color: var(--purple);
+  font-size: 38px;
+  font-weight: 800;
+}
+
+@media (max-width: 800px) {
+  .return-game-button {
+    min-height: 32px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 420px) {
+  .chat-header {
+    gap: 5px;
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  .header-actions {
+    flex: 0 0 auto;
+    gap: 1px;
+  }
+
+  .header-actions .icon-button {
+    flex: 0 0 30px;
+    width: 30px;
+  }
+
+  .return-game-button {
+    gap: 3px;
+    min-height: 30px;
+    padding: 0 6px;
+    font-size: clamp(9px, 2.8vw, 11px);
+  }
+
+  .return-game-button svg {
+    width: 13px;
+    height: 13px;
+  }
+}

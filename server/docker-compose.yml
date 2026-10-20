@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: c2_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: c2_db
+      POSTGRES_USER: c2_user
+      POSTGRES_PASSWORD: c2_password_secret_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U c2_user -d c2_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: c2_mediamtx
+    restart: always
+    ports:
+      - "8554:8554"   # RTSP Stream Target
+      - "1935:1935"   # RTMP
+      - "8888:8888"   # HLS & Web Player
+      - "8889:8889"   # WebRTC
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: c2_server
+    restart: always
+    ports:
+      - "3000:3000"   # HTTP REST API & Socket.IO & Web UI
+      - "8000:8000"   # TCP Agent Listener
+    environment:
+      - PORT=3000
+      - TCP_PORT=8000
+      - AES_KEY=2f8d4c5a7e8b1f23d9a1c0b8d67f3f4c6a2b4d1e9c8f7a5d1c2b3e4f8a7d6c5b
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=c2_db
+      - POSTGRES_USER=c2_user
+      - POSTGRES_PASSWORD=c2_password_secret_123
+      - DATABASE_URL=postgres://c2_user:c2_password_secret_123@postgres:5432/c2_db
+      - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in .env}
+      - SESSION_SECRET=cundai-session-secret-key-32bytes
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mediamtx:
+        condition: service_started
+
+volumes:
+  postgres_data:

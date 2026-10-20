@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://AloneInTheDusk/Shaders/psx_beam.gdshader" id="1"]
+
+[resource]
+resource_name = "lamp_shaft"
+shader = ExtResource("1")
+shader_parameter/billboard = 0.0
+shader_parameter/use_mesh = 1.0
+shader_parameter/beam_length = 42.0
+shader_parameter/beam_width = 20.0
+shader_parameter/beam_color = Color(1, 0.78, 0.42, 1)
+shader_parameter/brightness = 0.55
+shader_parameter/bands = 3.0
+shader_parameter/falloff = 2.6
+shader_parameter/steps_per_second = 8.0
+shader_parameter/flicker = 0.08

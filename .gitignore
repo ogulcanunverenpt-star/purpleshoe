@@ -1,0 +1,19 @@
+# Godot generated files
+voip-3d/.godot/
+voip-3d/exported/
+
+# Node.js dependencies and generated builds
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Local environment and runtime data
+**/.env
+**/.env.*
+!**/.env.example
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/uploads/
+**/logs/
+*.log

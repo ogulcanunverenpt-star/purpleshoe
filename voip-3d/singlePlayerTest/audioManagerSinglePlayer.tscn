@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6uu3avfh5chb"]
+
+[ext_resource type="Script" path="res://singlePlayerTest/audioManagerSinglePlayer.gd" id="1_ibbv4"]
+
+[sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_531u5"]
+
+[node name="audioManagerSinglePlayer" type="Node"]
+script = ExtResource("1_ibbv4")
+
+[node name="input" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamMicrophone_531u5")
+autoplay = true
+stream_paused = true
+bus = &"Record"

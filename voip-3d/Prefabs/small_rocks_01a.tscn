@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/small_rocks_00.glb" id="1"]
+
+[node name="small_rocks_01a" type="Node3D"]
+
+[node name="small_rocks_00" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, -0, -0, -0, 1, 0, -0, 0, 1, -0, 0, 0)

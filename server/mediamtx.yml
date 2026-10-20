@@ -1,0 +1,29 @@
+# MediaMTX Configuration for RTSP, HLS, WebRTC, RTMP Streaming
+logLevel: info
+logDestinations: [stdout]
+
+# RTSP Server Configuration
+rtsp: yes
+rtspAddress: :8554
+protocols: [tcp, udp]
+
+# RTMP Server Configuration
+rtmp: yes
+rtmpAddress: :1935
+
+# HLS & Web Player Configuration
+hls: yes
+hlsAddress: :8888
+hlsAlwaysRemux: yes
+
+# WebRTC Configuration
+webrtc: yes
+webrtcAddress: :8889
+
+# Path Configuration
+paths:
+  all:
+    readUser: ""
+    readPass: ""
+    publishUser: ""
+    publishPass: ""

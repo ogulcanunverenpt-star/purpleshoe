@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/fence_03.glb" id="1"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/Fence_04.glb" id="2"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/Fence_03_leg.glb" id="3"]
+
+[node name="fence_03" type="Node3D"]
+
+[node name="fence_03_PRE" parent="." instance=ExtResource("1")]
+transform = Transform3D(1, -0, -0, -0, 1, 0, -0, 0, 1, -0, 0, 0)
+
+[node name="Fence_04" parent="." instance=ExtResource("2")]
+transform = Transform3D(-0.908408, -0.417807, -0.01522, -0.417514, 0.904668, 0.085195, -0.021826, 0.083747, -0.996248, -0.181899, -0.156039, -12.869999)
+
+[node name="Fence_03_leg" parent="." instance=ExtResource("3")]
+transform = Transform3D(0.747154, -0.623557, -0.230083, 0.176646, -0.147425, 0.973171, -0.640747, -0.767752, -0.000001, 0.702794, 0.361397, 1.510002)
+
+[node name="Fence_04_2" parent="." instance=ExtResource("2")]
+transform = Transform3D(0.973171, -0.230083, 0, 0.230083, 0.973171, 0, -0, -0, 1, -0.231145, 0.140589, -7.859949)
+
+[node name="Fence_03_leg_2" parent="." instance=ExtResource("3")]
+transform = Transform3D(0.904433, 0.359254, -0.230083, 0.213832, 0.084936, 0.973171, 0.369158, -0.929367, -0.000001, -0.88348, -0.01364, -3.799999)
+
+[node name="Fence_04_3" parent="." instance=ExtResource("2")]
+transform = Transform3D(0.227722, -0.929575, -0.289884, -0.973726, -0.217396, -0.067794, -0, 0.297706, -0.954658, -0.256751, 0.247568, -3.809998)
+
+[node name="Fence_03_leg_3" parent="." instance=ExtResource("3")]
+transform = Transform3D(0.933381, 0.027784, -0.357809, -0.064472, 0.99376, -0.091017, 0.353048, 0.108022, 0.929348, -0.65202, -0.123328, -16.88)

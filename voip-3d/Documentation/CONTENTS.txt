@@ -1,0 +1,42 @@
+CONTENTS -- Alone in the Dusk
+Maciej EmacEArt
+================================================================
+
+MODELS (total: 96, all .glb in Meshes/)
+  Fences                 21
+  Walls and wall tops    19
+  Covered bridges        18
+  Roads                  10
+  Rocks                   9
+  Signs and poles         6
+  Lamps                   4
+  Outdoor furniture       3
+  Other                   6   (Barrier, block, gate_ball,
+                               Tourist_trash, Trunk_01, Trunk_02)
+
+COVERED BRIDGES IN DETAIL (18)
+  Covered_bridge_01 .. Covered_bridge_04   four complete bridges
+  Bridge 03 modular set                    5 pieces
+  Bridge 04 modular set                    9 pieces, columns included
+  Each modular set keeps the positions the pieces had in the bridge:
+  drop them all at one point and the bridge builds itself back up.
+
+ASSETS
+  Object scenes (Prefabs):   10
+  Materials:                 15
+  Textures:                  14
+  Demo scenes:                2   (Demo, ShowroomAssets)
+  Shaders:                    5   (surfaces, terrain, light shafts,
+                                   sky, screen pass)
+  Setup script:               1   (psx_setup.gd, puts the look into a
+                                   project that has never seen the pack)
+  Player controller:          1 scene + 1 script
+
+PIXEL SIZE
+  One simulated pixel measures 4 cm across every surface in the pack,
+  ground and terrain included.
+
+TESTED ON
+  Godot 4.7.1, Forward+ renderer
+
+================================================================

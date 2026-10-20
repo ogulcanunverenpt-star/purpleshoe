@@ -1,0 +1,42 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/big_fence_03.glb" id="1"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/Curve_fence_leg_01.glb" id="2"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/Curve_fence_leg_02.glb" id="3"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/peg_leg_03.glb" id="4"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/big_fence_01.glb" id="5"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/big_fence_Leg_04.glb" id="6"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/big_fence_02.glb" id="7"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/big_fence_Leg_01.glb" id="8"]
+
+[node name="BigFence_prefab" type="Node3D"]
+
+[node name="big_fence_03" parent="." instance=ExtResource("1")]
+transform = Transform3D(-0.966311, 0, -0.257376, 0, 1, 0, 0.257376, -0, -0.966311, 47.244564, 0.27, -16.223011)
+
+[node name="Curve_fence_leg_01" parent="." instance=ExtResource("2")]
+transform = Transform3D(0.907463, 0.418111, -0.041146, 0, -0.097936, -0.995193, -0.420131, 0.903101, -0.088873, 49.96718, 0.37, -11.3896)
+
+[node name="Curve_fence_leg_02" parent="." instance=ExtResource("3")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 49.47974, 0.250001, -0.08914)
+
+[node name="peg_leg_03" parent="." instance=ExtResource("4")]
+transform = Transform3D(0.811192, 0.406764, 0.420131, -0.448243, 0.893912, 0, -0.37556, -0.188321, 0.907463, 50.745346, 1.71, -12.660292)
+
+[node name="big_fence_01" parent="." instance=ExtResource("5")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 51.40216, 0.160001, -2.720412)
+
+[node name="big_fence_03 (1)" parent="." instance=ExtResource("1")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 53.826717, 0.040001, 2.207075)
+
+[node name="big_fence_Leg_04 (1)" parent="." instance=ExtResource("6")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 43.18776, 0.28, -23.200365)
+
+[node name="big_fence_02" parent="." instance=ExtResource("7")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 50.072056, 0.030001, -8.925658)
+
+[node name="big_fence_Leg_04" parent="." instance=ExtResource("6")]
+transform = Transform3D(0.907463, 0.418521, 0.036743, 0, 0.087457, -0.996168, -0.420131, 0.903986, 0.079364, 53.017815, 0.430001, -7.347198)
+
+[node name="big_fence_Leg_01" parent="." instance=ExtResource("8")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 47.246674, 0.295591, -19.622211)

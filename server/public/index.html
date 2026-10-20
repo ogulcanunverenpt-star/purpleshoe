@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOIP-3D Konferans & Lobi</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0c0f17; color: #e0e6ed; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        header { background: #151a28; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #222d44; }
+        header h1 { font-size: 22px; color: #4ade80; letter-spacing: 1px; }
+        #user-info { font-size: 16px; color: #94a3b8; }
+        .container { display: flex; flex: 1; overflow: hidden; }
+
+        /* Auth Screen */
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0c0f17; display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .auth-card { background: #151a28; padding: 40px; border-radius: 12px; border: 1px solid #222d44; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .auth-card h2 { margin-bottom: 25px; color: #f8fafc; text-align: center; font-size: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #94a3b8; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px 15px; background: #0c0f17; border: 1px solid #222d44; border-radius: 6px; color: #fff; font-size: 16px; }
+        .btn { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #1d4ed8; }
+        .btn-secondary { background: #334155; margin-top: 10px; }
+        .btn-secondary:hover { background: #1e293b; }
+        .error-msg { color: #ef4444; font-size: 14px; margin-top: 10px; text-align: center; }
+
+        /* Main Dashboard */
+        .sidebar { width: 320px; background: #111622; border-right: 1px solid #222d44; display: flex; flex-direction: column; padding: 20px; }
+        .sidebar h3 { font-size: 16px; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .friends-list, .pending-list { flex: 1; overflow-y: auto; margin-bottom: 20px; }
+        .friend-item { padding: 10px 14px; background: #1a2234; border-radius: 6px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .friend-item:hover { background: #222d44; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; background: #0c0f17; padding: 25px; overflow-y: auto; }
+        .panel { background: #151a28; border: 1px solid #222d44; border-radius: 10px; padding: 25px; margin-bottom: 25px; }
+        .panel h2 { margin-bottom: 15px; color: #f8fafc; font-size: 20px; }
+
+        /* Chat Area */
+        .chat-container { display: flex; flex-direction: column; height: 350px; background: #0c0f17; border: 1px solid #222d44; border-radius: 8px; overflow: hidden; }
+        .chat-history { flex: 1; padding: 15px; overflow-y: auto; font-size: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-msg { background: #1a2234; padding: 10px 14px; border-radius: 6px; max-width: 75%; }
+        .chat-msg.self { background: #1e3a8a; align-self: flex-end; }
+        .chat-input-box { display: flex; padding: 12px; background: #151a28; border-top: 1px solid #222d44; }
+        .chat-input-box input { flex: 1; padding: 10px 14px; background: #0c0f17; border: 1px solid #222d44; border-radius: 6px; color: #fff; font-size: 15px; }
+        .chat-input-box button { width: 100px; margin-left: 10px; }
+
+        /* Room Creation */
+        .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .room-control { display: flex; flex-direction: column; gap: 6px; }
+        .room-control label { color: #94a3b8; font-size: 14px; }
+        .room-control select { padding: 12px; background: #0c0f17; border: 1px solid #222d44; border-radius: 6px; color: #fff; font-size: 16px; }
+
+        /* Top Notification Banner */
+        #top-banner { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #166534; color: #fff; padding: 15px 30px; border-radius: 8px; border: 1px solid #22c55e; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; gap: 20px; font-size: 16px; }
+        #top-banner button { padding: 8px 16px; background: #22c55e; border: none; border-radius: 4px; color: #fff; font-weight: bold; cursor: pointer; }
+        #top-banner button:hover { background: #16a34a; }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NOTIFICATION BANNER -->
+    <div id="top-banner">
+        <span id="banner-text">Oda Daveti Geldi!</span>
+        <button onclick="joinActiveInvite()">Hemen Katıl</button>
+    </div>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2 id="auth-title">VOIP-3D Giriş</h2>
+            <div class="form-group">
+                <label>Kullanıcı Adı</label>
+                <input type="text" id="username-input" placeholder="Kullanıcı adınızı girin">
+            </div>
+            <div class="form-group">
+                <label>Şifre</label>
+                <input type="password" id="password-input" placeholder="Şifrenizi girin">
+            </div>
+            <button class="btn" id="auth-submit-btn" onclick="handleAuth()">Giriş Yap</button>
+            <button class="btn btn-secondary" onclick="toggleAuthMode()">Kayıt Ol / Giriş Değiştir</button>
+            <div class="error-msg" id="auth-error"></div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <header>
+        <h1>VOIP-3D Konferans & Lobi</h1>
+        <div id="user-info">Giriş Yapılmadı | <a href="#" onclick="logout()" style="color: #ef4444; text-decoration: none;">Çıkış</a></div>
+    </header>
+
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h3>Arkadaşlar</h3>
+            <div class="friends-list" id="friends-list">
+                <!-- Dynamically populated -->
+            </div>
+            <h3>Gelen İstekler</h3>
+            <div class="pending-list" id="pending-list">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <input type="text" id="search-input" placeholder="Kullanıcı ara..." oninput="searchUsers()">
+            </div>
+            <div id="search-results" style="margin-top: 8px;"></div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main-content">
+            <!-- ROOM CREATION PANEL -->
+            <div class="panel">
+                <h2>Oda Oluştur (Serbest Vuruş / Maç)</h2>
+                <div class="room-grid">
+                    <div class="room-control">
+                        <label>Oyun Modu</label>
+                        <select id="mode-select">
+                            <option value="free_kick">Serbest Vuruş (2 Oyuncu)</option>
+                            <option value="match">Maç (4-14 Oyuncu)</option>
+                            <option value="conference">Konferans (20 Oyuncu)</option>
+                        </select>
+                    </div>
+                    <div class="room-control">
+                        <label>Maç Süresi</label>
+                        <select id="duration-select">
+                            <option value="5">5 Dakika</option>
+                            <option value="10" selected>10 Dakika</option>
+                            <option value="15">15 Dakika</option>
+                            <option value="30">30 Dakika</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="createRoom()">Oda Oluştur ve Davet Gönder</button>
+                <div id="room-status" style="margin-top: 10px; color: #4ade80; font-weight: 500;"></div>
+            </div>
+
+            <!-- CHAT PANEL -->
+            <div class="panel" style="flex: 1; display: flex; flex-direction: column;">
+                <h2 id="chat-title">Sohbet</h2>
+                <div class="chat-container">
+                    <div class="chat-history" id="chat-history">
+                        <div style="color: #64748b; text-align: center; margin-top: auto; margin-bottom: auto;">Sohbet başlatmak için soldan bir arkadaşa tıklayın.</div>
+                    </div>
+                    <div class="chat-input-box">
+                        <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." onkeypress="if(event.key === 'Enter') sendChat()">
+                        <button class="btn" onclick="sendChat()">Gönder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isRegisterMode = false;
+        let token = localStorage.getItem('voip_token') || '';
+        let currentUser = localStorage.getItem('voip_user') || '';
+        let ws = null;
+        let activeChatFriend = '';
+        let currentInvite = null;
+        const chats = {}; // friend -> array of messages
+
+        window.onload = () => {
+            if (token && currentUser) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('user-info').innerHTML = `Giriş Yapıldı: <b>${currentUser}</b> | <a href="#" onclick="logout()" style="color: #ef4444; text-decoration: none;">Çıkış</a>`;
+                connectWebSocket();
+            }
+        };
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('auth-title').innerText = isRegisterMode ? 'VOIP-3D Kayıt Ol' : 'VOIP-3D Giriş';
+            document.getElementById('auth-submit-btn').innerText = isRegisterMode ? 'Kayıt Ol' : 'Giriş Yap';
+        }
+
+        async function handleAuth() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            const errEl = document.getElementById('auth-error');
+            errEl.innerText = '';
+
+            if (!username || !password) {
+                errEl.innerText = 'Kullanıcı adı ve şifre zorunludur.';
+                return;
+            }
+
+            const endpoint = isRegisterMode ? '/api/register' : '/api/login';
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (data.success || data.token) {
+                    token = data.token;
+                    currentUser = data.username || username;
+                    localStorage.setItem('voip_token', token);
+                    localStorage.setItem('voip_user', currentUser);
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('user-info').innerHTML = `Giriş Yapıldı: <b>${currentUser}</b> | <a href="#" onclick="logout()" style="color: #ef4444; text-decoration: none;">Çıkış</a>`;
+                    connectWebSocket();
+                } else {
+                    errEl.innerText = data.error || 'İşlem başarısız oldu.';
+                }
+            } catch (e) {
+                errEl.innerText = 'Sunucu bağlantı hatası.';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('voip_token');
+            localStorage.removeItem('voip_user');
+            if (ws) ws.close();
+            location.reload();
+        }
+
+        function connectWebSocket() {
+            const proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+            ws = new WebSocket(proto + location.host + '/ws');
+
+            ws.onopen = () => {
+                ws.send(JSON.stringify({ type: 'auth', token }));
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'sync_state') {
+                    renderFriends(data.friends || []);
+                    renderPending(data.pending_requests || []);
+                } else if (data.type === 'friend_request' || data.type === 'friend_accepted') {
+                    // Refresh via sync or re-auth
+                    ws.send(JSON.stringify({ type: 'auth', token }));
+                } else if (data.type === 'chat_message') {
+                    const other = data.local_echo ? data.recipient : data.sender;
+                    if (!chats[other]) chats[other] = [];
+                    chats[other].push({ sender: data.sender, message: data.message, local: data.local_echo });
+                    if (activeChatFriend === other) renderChatHistory();
+                } else if (data.type === 'room_invite') {
+                    currentInvite = data;
+                    showTopBanner(`${data.from} sizi ${data.mode} odasına davet etti!`);
+                }
+            };
+        }
+
+        function renderFriends(friends) {
+            const list = document.getElementById('friends-list');
+            list.innerHTML = '';
+            if (friends.length === 0) {
+                list.innerHTML = '<div style="color: #64748b; font-size: 14px;">Henüz arkadaşınız yok.</div>';
+                return;
+            }
+            friends.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'friend-item';
+                div.innerHTML = `<span>${f}</span> <button class="btn" style="padding: 4px 10px; font-size: 12px; width: auto;" onclick="openChat('${f}')">Sohbet</button>`;
+                list.appendChild(div);
+            });
+        }
+
+        function renderPending(pending) {
+            const list = document.getElementById('pending-list');
+            list.innerHTML = '';
+            if (pending.length === 0) {
+                list.innerHTML = '<div style="color: #64748b; font-size: 14px;">Bekleyen istek yok.</div>';
+                return;
+            }
+            pending.forEach(p => {
+                const sender = p.sender || p;
+                const div = document.createElement('div');
+                div.className = 'friend-item';
+                div.innerHTML = `<span>${sender}</span> <div><button class="btn" style="padding: 4px 8px; font-size: 12px; width: auto; background: #16a34a;" onclick="respondFriend('${sender}', true)">Kabul</button> <button class="btn" style="padding: 4px 8px; font-size: 12px; width: auto; background: #dc2626;" onclick="respondFriend('${sender}', false)">Red</button></div>`;
+                list.appendChild(div);
+            });
+        }
+
+        async function searchUsers() {
+            const term = document.getElementById('search-input').value.trim();
+            const resContainer = document.getElementById('search-results');
+            resContainer.innerHTML = '';
+            if (!term) return;
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'search_users', term }));
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'search_results') {
+                        resContainer.innerHTML = '';
+                        data.users.forEach(u => {
+                            if (u.username === currentUser) return;
+                            const div = document.createElement('div');
+                            div.className = 'friend-item';
+                            div.innerHTML = `<span>${u.username}</span> <button class="btn" style="padding: 4px 10px; font-size: 12px; width: auto;" onclick="sendFriendRequest('${u.username}')">Ekle</button>`;
+                            resContainer.appendChild(div);
+                        });
+                    }
+                };
+            }
+        }
+
+        function sendFriendRequest(target) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'friend_request', targetUsername: target }));
+                alert('Arkadaşlık isteği gönderildi!');
+            }
+        }
+
+        function respondFriend(target, accept) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'friend_respond', targetUsername: target, accept }));
+            }
+        }
+
+        function openChat(friend) {
+            activeChatFriend = friend;
+            document.getElementById('chat-title').innerText = `Sohbet: ${friend}`;
+            renderChatHistory();
+        }
+
+        function renderChatHistory() {
+            const history = document.getElementById('chat-history');
+            history.innerHTML = '';
+            const msgs = chats[activeChatFriend] || [];
+            if (msgs.length === 0) {
+                history.innerHTML = `<div style="color: #64748b; text-align: center; margin-top: auto; margin-bottom: auto;">${activeChatFriend} ile sohbetiniz yok.</div>`;
+                return;
+            }
+            msgs.forEach(m => {
+                const div = document.createElement('div');
+                div.className = `chat-msg ${m.local ? 'self' : ''}`;
+                div.innerHTML = `<b>${m.sender}:</b> ${m.message}`;
+                history.appendChild(div);
+            });
+            history.scrollTop = history.scrollHeight;
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg || !activeChatFriend || !ws) return;
+            input.value = '';
+            ws.send(JSON.stringify({ type: 'send_chat', recipient: activeChatFriend, message: msg }));
+        }
+
+        function createRoom() {
+            const mode = document.getElementById('mode-select').value;
+            const minutes = parseInt(document.getElementById('duration-select').value);
+            const statusEl = document.getElementById('room-status');
+            statusEl.innerText = 'Oda oluşturuluyor ve sunucu başlatılıyor...';
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'create_room', mode, match_minutes: minutes, invitees: [] }));
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'room_created') {
+                        statusEl.innerText = `Oda açıldı! Host adresi: ${data.host}:${data.port}`;
+                        // Bridge to Godot if inside WebView
+                        if (window.GodotBridge && window.GodotBridge.joinRoom) {
+                            window.GodotBridge.joinRoom(data.host, data.port, data.token, data.mode);
+                        }
+                    }
+                };
+            }
+        }
+
+        function showTopBanner(text) {
+            document.getElementById('banner-text').innerText = text;
+            document.getElementById('top-banner').style.display = 'flex';
+        }
+
+        function joinActiveInvite() {
+            document.getElementById('top-banner').style.display = 'none';
+            if (currentInvite && window.GodotBridge && window.GodotBridge.joinRoom) {
+                window.GodotBridge.joinRoom(currentInvite.host, currentInvite.port, currentInvite.token, currentInvite.mode);
+            }
+        }
+    </script>
+</body>
+</html>

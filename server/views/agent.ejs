@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <title>Agent <%= agentId %> | AgenPower Firewall</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body { background-color: #0d0d0d; color: #e0e0e0; font-family: monospace; }
+    h2 { color: #00ff99; font-family: monospace; }
+    pre { font-size: 0.85rem; }
+    .card { background-color: #1a1a1a; }
+    .list-group-item { background-color: #1a1a1a; color: #ccc; }
+    .btn { font-family: monospace; }
+    .glow { text-shadow: 0 0 5px #0f0, 0 0 10px #0f0; }
+    img.proc-icon { width: 20px; height: 20px; border-radius: 3px; margin-right: 6px; }
+    #log-box { max-height:400px; overflow-y:auto; color:#00ff00; background:#000; padding:10px; border-radius:6px; }
+  </style>
+</head>
+<body>
+
+<div class="container py-4">
+  <a href="/" class="btn btn-secondary mb-3">&larr; Back to Dashboard</a>
+  <h2 class="glow">Agent: <%= agentId %></h2>
+
+  <!-- Agent Control Card -->
+  <div class="card mb-3 border-info">
+    <div class="card-body">
+      <h5 class="text-info mb-3">Agent Control</h5>
+      <div class="mb-3">
+        <button class="btn btn-info me-2" onclick="sendCmd('PERSIST')">Make Persistent</button>
+        <button class="btn btn-danger" onclick="sendCmd('UNPERSIST')">Remove Persistence</button>
+      </div>
+
+      <!-- Run Shell Command -->
+      <div class="card mb-3 border-primary">
+        <div class="card-body">
+          <h5 class="text-primary">Run Shell Command</h5>
+          <div class="input-group mb-2">
+            <input id="cmd-input" class="form-control bg-dark text-light" placeholder="e.g. dir, netstat -an, uptime" onkeypress="if(event.key==='Enter') runCmd()">
+            <button class="btn btn-primary" onclick="runCmd()">Run Command</button>
+          </div>
+          <pre id="cmd-output" class="bg-dark text-light p-3" style="display: none;"></pre>
+        </div>
+      </div>
+
+      <!-- Upload & Run Executable File -->
+      <div class="card mb-3 border-success">
+        <div class="card-body">
+          <h5 class="text-success">Upload & Execute Binary / Script</h5>
+          <div class="input-group mb-2">
+            <input type="file" id="upload-file-input" class="form-control bg-dark text-light">
+            <button class="btn btn-success" onclick="uploadAndRun()">Upload & Execute</button>
+          </div>
+          <pre id="upload-output" class="bg-dark text-light p-3" style="display: none;"></pre>
+        </div>
+      </div>
+
+      <!-- Run Existing Remote File Path -->
+      <div class="card mb-3 border-warning">
+        <div class="card-body">
+          <h5 class="text-warning">Execute Existing Remote File</h5>
+          <div class="input-group mb-2">
+            <input id="file-input" class="form-control bg-dark text-light" placeholder="e.g. /data/local/tmp/sample_tool_arm64 or c:\path\app.exe" onkeypress="if(event.key==='Enter') runFile()">
+            <button class="btn btn-warning" onclick="runFile()">Run File Path</button>
+          </div>
+          <pre id="file-output" class="bg-dark text-light p-3" style="display: none;"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Buttons -->
+  <div class="btn-group mb-4">
+    <button class="btn btn-outline-info" onclick="sendCmd('WHITELIST')">Whitelist</button>
+    <button class="btn btn-outline-warning" onclick="sendCmd('BLOCKLIST')">Blocklist</button>
+    <button class="btn btn-outline-primary" onclick="sendCmd('PSLIST')">Pslist</button>
+    <button class="btn btn-outline-success" onclick="sendCmd('RELOAD_WHITELIST')">Reload</button>
+    <button class="btn btn-outline-danger" onclick="sendCmd('PING')">Ping</button>
+  </div>
+
+  <!-- Whitelist Card -->
+  <div class="card mb-3 border-success">
+    <div class="card-body">
+      <h5 class="text-success">Whitelist</h5>
+      <div class="input-group mb-3">
+        <input id="wl-input" class="form-control bg-dark text-light" placeholder="Type to search whitelist...">
+      </div>
+      <ul id="wl-list" class="list-group list-group-flush mb-2"></ul>
+      <div class="input-group mb-3">
+        <input id="wl-input2" class="form-control bg-dark text-light" placeholder="Process name to add (e.g. notepad.exe)">
+        <button class="btn btn-success" onclick="addWl()">Add to Whitelist</button>
+      </div>
+      <div class="d-flex justify-content-between align-items-center">
+        <button class="btn btn-sm btn-secondary" id="wl-prev" onclick="changeWlPage(-1)" disabled>Previous</button>
+        <span id="wl-page-info">Page 1 of 1</span>
+        <button class="btn btn-sm btn-secondary" id="wl-next" onclick="changeWlPage(1)" disabled>Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blocklist Card -->
+  <div class="card mb-3 border-danger">
+    <div class="card-body">
+      <h5 class="text-danger">Blocklist</h5>
+      <div class="input-group mb-3">
+        <input id="blocked-input" class="form-control bg-dark text-light" placeholder="example.com or IP to search or add">
+        <button class="btn btn-warning" onclick="addBlocked()">Block IP/Domain</button>
+      </div>
+      <table class="table table-dark table-striped" id="blocked-list">
+        <thead>
+          <tr>
+            <th>IP</th>
+            <th>Location</th>
+            <th>Domain</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="d-flex justify-content-between align-items-center">
+        <button class="btn btn-sm btn-secondary" id="bl-prev" onclick="changeBlPage(-1)" disabled>Previous</button>
+        <span id="bl-page-info">Page 1 of 1</span>
+        <button class="btn btn-sm btn-secondary" id="bl-next" onclick="changeBlPage(1)" disabled>Next</button>
+      </div>
+    </div>
+  </div>  
+
+  <!-- Process List Card -->
+  <div class="card mb-3 bg-dark border-secondary">
+    <div class="card-body">
+      <h5>Running Processes</h5>
+      <input type="text" id="process-search" class="form-control mb-3 bg-dark text-light" placeholder="Search by Name, Path, or Company...">
+      <table class="table table-dark table-striped" id="pslist-table">
+        <thead>
+          <tr>
+            <th>Icon</th>
+            <th>Name</th>
+            <th>PID</th>
+            <th>Path</th>
+            <th>Company</th>
+            <th>End Process</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Installed Apps Card -->
+  <div class="card mb-3 border-info">
+    <div class="card-body">
+      <h5 class="text-info">Installed Apps</h5>
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn btn-outline-primary" onclick="loadInstalledApps()">Refresh Apps</button>
+        <input type="text" id="installed-app-search" class="form-control bg-dark text-light border-secondary" placeholder="🔍 Search Installed Apps..." onkeyup="filterInstalledApps()">
+      </div>
+      <table class="table table-dark table-striped" id="installed-table">
+        <thead>
+          <tr>
+            <th>Icon</th>
+            <th>Name</th>
+            <th>Path</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Logs Box Card -->
+  <div class="card border-secondary">
+    <div class="card-body">
+      <h5 class="text-light">Agent Logs</h5>
+      <input type="text" id="log-search-input" class="form-control mb-2 bg-dark text-light border-secondary" placeholder="🔍 Search Logs..." onkeyup="filterLogs()">
+      <pre id="log-box"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+  const socket = io();
+  const agentId = "<%= agentId %>";
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  const logBox = document.getElementById("log-box");
+
+  function log(msg) {
+    logBox.innerHTML += msg + "\n";
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function sendCmd(cmd) {
+    fetch('/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken
+      },
+      credentials: 'include',
+      body: JSON.stringify({ agent: agentId, action: cmd, _csrf: csrfToken })
+    });
+    log(`[>] Sent command: ${cmd}`);
+    refreshAll();
+  }
+
+  async function runCmd() {
+    try {
+      const cmdInput = document.getElementById("cmd-input").value.trim();
+      if (!cmdInput) {
+        alert("Please enter a command");
+        return;
+      }
+
+      const payloadObj = {
+        command: cmdInput,
+        agent: agentId,
+        _csrf: csrfToken
+      };
+      log(`[>] Running command: ${cmdInput}`);
+
+      const response = await fetch('/runcmd/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken
+        },
+        credentials: 'include',
+        body: JSON.stringify(payloadObj)
+      });
+
+      const result = await response.json();
+      console.log(`Server response for RUN_CMD:`, result);
+      if (result.ok && result.responses) {
+        const outText = result.responses.map(r => `[${r.agent}] ${r.output}`).join('\n');
+        document.getElementById("cmd-output").textContent = outText;
+        document.getElementById("cmd-output").style.display = "block";
+        log(`[<] Command Result:\n${outText}`);
+      } else {
+        alert(`Error: ${result.error || 'Failed to run command'}`);
+      }
+    } catch (err) {
+      console.error(`Error sending RUN_CMD:`, err);
+      alert(`Error running command: ${err.message}`);
+      document.getElementById("cmd-output").textContent = `Error: ${err.message}`;
+      document.getElementById("cmd-output").style.display = "block";
+    }
+  }
+
+  async function runFile() {
+    try {
+      const fileInput = document.getElementById("file-input").value.trim();
+      if (!fileInput) {
+        alert("Please enter a file path");
+        return;
+      }
+
+      const payloadObj = {
+        filePath: fileInput,
+        agent: agentId,
+        _csrf: csrfToken
+      };
+      log(`[>] Executing file/binary: ${fileInput}`);
+
+      const response = await fetch('/runfile/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken
+        },
+        credentials: 'include',
+        body: JSON.stringify(payloadObj)
+      });
+
+      const result = await response.json();
+      console.log(`Server response for RUN_FILE:`, result);
+      if (result.ok && result.responses) {
+        const outText = result.responses.map(r => `[${r.agent}] ${r.output}`).join('\n');
+        document.getElementById("file-output").textContent = outText;
+        document.getElementById("file-output").style.display = "block";
+        log(`[<] Binary Execution Result:\n${outText}`);
+      } else {
+        alert(`Error: ${result.error || 'Failed to execute file'}`);
+      }
+    } catch (err) {
+      console.error(`Error sending RUN_FILE:`, err);
+      alert(`Error running file: ${err.message}`);
+      document.getElementById("file-output").textContent = `Error: ${err.message}`;
+      document.getElementById("file-output").style.display = "block";
+    }
+  }
+
+  async function uploadAndRun() {
+    try {
+      const fileInput = document.getElementById("upload-file-input");
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Please select a binary or script file to upload");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("agent", agentId);
+      formData.append("_csrf", csrfToken);
+
+      log(`[>] Uploading '${file.name}' (${file.size} bytes) and executing on agent...`);
+
+      const response = await fetch('/upload_and_run/', {
+        method: 'POST',
+        headers: { 'X-CSRF-Token': csrfToken },
+        credentials: 'include',
+        body: formData
+      });
+
+      const result = await response.json();
+      console.log(`Server response for upload_and_run:`, result);
+
+      if (result.ok && result.responses) {
+        const outText = result.responses.map(r => `[${r.agent}] ${r.output}`).join('\n');
+        document.getElementById("upload-output").textContent = outText;
+        document.getElementById("upload-output").style.display = "block";
+        log(`[<] Upload & Execution Result:\n${outText}`);
+      } else {
+        alert(`Error: ${result.error || 'Failed to upload and run file'}`);
+      }
+    } catch (err) {
+      console.error(`Error in uploadAndRun:`, err);
+      alert(`Error running file: ${err.message}`);
+      document.getElementById("upload-output").textContent = `Error: ${err.message}`;
+      document.getElementById("upload-output").style.display = "block";
+    }
+  }
+
+  function filterInstalledApps() {
+    const query = document.getElementById("installed-app-search").value.toLowerCase().trim();
+    const rows = document.querySelectorAll("#installed-table tbody tr");
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = (!query || text.includes(query)) ? "" : "none";
+    });
+  }
+
+  function filterLogs() {
+    const query = document.getElementById("log-search-input").value.toLowerCase().trim();
+    const rawText = logBox.getAttribute("data-raw") || logBox.innerText;
+    if (!logBox.getAttribute("data-raw")) {
+      logBox.setAttribute("data-raw", rawText);
+    }
+    if (!query) {
+      logBox.innerText = logBox.getAttribute("data-raw");
+      return;
+    }
+    const lines = logBox.getAttribute("data-raw").split("\n");
+    const filtered = lines.filter(l => l.toLowerCase().includes(query)).join("\n");
+    logBox.innerText = filtered;
+  }
+
+  async function killbypid(pide) {
+    const pidNum = Number(pide);
+    if (isNaN(pidNum) || pidNum <= 0) {
+      console.error(`Invalid PID value: ${pide}`);
+      alert(`Invalid PID: ${pide}`);
+      return;
+    }
+
+    log(`[>] Killing PID ${pidNum}...`);
+    await fetch('/killbypid/', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pid: pidNum, _csrf: csrfToken })
+    });
+    sendCmd("PSLIST");
+    setTimeout(refreshPslist, 3000);
+  }
+
+  socket.on("execResult", (data) => {
+    if (data.agent === agentId) {
+      const outputEl = document.getElementById("cmd-output");
+      outputEl.textContent = data.output || "No output";
+      outputEl.style.display = "block";
+    }
+  });
+
+  function mapRemoteToHttp(remote) {
+    if (!remote) return null;
+    const ip = remote.split(":")[0];
+    return `//${ip}:8080`;
+  }
+
+  const itemsPerPage = 5;
+  let allWhitelist = [];
+  let currentWlPage = 1;
+
+  async function addWl() {
+    const p = document.getElementById('wl-input2').value.trim();
+    if (!p) return;
+    await fetch('/whitelist/add', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ process: p, _csrf: csrfToken })
+    });
+    document.getElementById('wl-input2').value = '';
+    refreshWhitelist();
+  }
+
+  async function removeWl(proc) {
+    await fetch('/whitelist/remove', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ process: proc, _csrf: csrfToken })
+    });
+    refreshWhitelist();
+  }
+
+  async function refreshWhitelist() {
+    try {
+      const remote = mapRemoteToHttp("<%=agent.remote%>");
+      if (!remote) return;
+      const res = await axios.get(remote + "/whitelist.json");
+
+      allWhitelist = Array.isArray(res.data) ? res.data : [];
+      const seen = new Set();
+      allWhitelist = allWhitelist.filter(p => {
+        const key = p.trim().toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      document.getElementById("wl-input").value = '';
+      currentWlPage = 1;
+      updateWhitelist(allWhitelist);
+    } catch (err) {
+      console.error("Whitelist fetch error:", err);
+    }
+  }
+
+  function updateWhitelist(items) {
+    const wl = document.getElementById("wl-list");
+    wl.innerHTML = '';
+
+    const searchTerm = document.getElementById("wl-input").value.toLowerCase().trim();
+    const filteredItems = searchTerm
+      ? items.filter(p => p.toLowerCase().includes(searchTerm))
+      : items;
+
+    const totalItems = filteredItems.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    currentWlPage = Math.min(currentWlPage, Math.max(1, totalPages));
+    const start = (currentWlPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = filteredItems.slice(start, end);
+
+    pageItems.forEach(p => {
+      wl.innerHTML += `
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>${p}</span>
+          <button class="btn btn-sm btn-danger" onclick="removeWl('${p}')">Delete</button>
+        </li>`;
+    });
+
+    document.getElementById("wl-page-info").textContent = `Page ${currentWlPage} of ${totalPages || 1}`;
+    document.getElementById("wl-prev").disabled = currentWlPage <= 1;
+    document.getElementById("wl-next").disabled = currentWlPage >= totalPages;
+  }
+
+  function changeWlPage(delta) {
+    currentWlPage += delta;
+    updateWhitelist(allWhitelist);
+  }
+
+  document.getElementById("wl-input").addEventListener("input", () => {
+    currentWlPage = 1;
+    updateWhitelist(allWhitelist);
+  });
+
+  let allBlocklist = [];
+  let currentBlPage = 1;
+
+  async function refreshBlocklist() {
+    try {
+      const remote = mapRemoteToHttp("<%=agent.remote%>");
+      if (!remote) return;
+      const res = await axios.get(remote + "/blocked.json");
+
+      allBlocklist = Array.isArray(res.data) ? res.data : [];
+      allBlocklist = allBlocklist.map(ip => ({ ip, location: 'Unknown', domain: 'N/A' }));
+
+      document.getElementById("blocked-input").value = '';
+      currentBlPage = 1;
+      updateBlocklist(allBlocklist);
+    } catch (err) {
+      console.error("Blocklist fetch error:", err);
+    }
+  }
+
+  function updateBlocklist(items) {
+    const tbody = document.querySelector("#blocked-list tbody");
+    tbody.innerHTML = '';
+
+    const searchTerm = document.getElementById("blocked-input").value.toLowerCase().trim();
+    const filteredItems = searchTerm
+      ? items.filter(item =>
+          item.ip.toLowerCase().includes(searchTerm) ||
+          item.location.toLowerCase().includes(searchTerm) ||
+          item.domain.toLowerCase().includes(searchTerm)
+        )
+      : items;
+
+    const totalItems = filteredItems.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    currentBlPage = Math.min(currentBlPage, Math.max(1, totalPages));
+    const start = (currentBlPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = filteredItems.slice(start, end);
+
+    pageItems.forEach(item => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${item.ip}</td>
+          <td>${item.location}</td>
+          <td>${item.domain}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="removeBlocked('${item.ip}')">Delete</button></td>
+        </tr>`;
+    });
+
+    document.getElementById("bl-page-info").textContent = `Page ${currentBlPage} of ${totalPages || 1}`;
+    document.getElementById("bl-prev").disabled = currentBlPage <= 1;
+    document.getElementById("bl-next").disabled = currentBlPage >= totalPages;
+  }
+
+  function changeBlPage(delta) {
+    currentBlPage += delta;
+    updateBlocklist(allBlocklist);
+  }
+
+  document.getElementById("blocked-input").addEventListener("input", () => {
+    currentBlPage = 1;
+    updateBlocklist(allBlocklist);
+  });
+
+  async function addBlocked() {
+    const raw = document.getElementById("blocked-input").value.trim();
+    if (!raw) return alert("Please enter a domain or IP.");
+
+    let input = raw.replace(/:\d+$/, "").split("%")[0];
+
+    try {
+      await axios.post("/blocked/add", { domain: input, _csrf: csrfToken });
+      console.log(`Blocked entry sent: ${input}`);
+      refreshBlocklist();
+    } catch (err) {
+      console.error("Add blocklist POST error:", err);
+      alert("Error adding blocklist entry: " + (err.message || err));
+    }
+  }
+
+  async function removeBlocked(ip) {
+    await fetch('/blocked/remove', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ip, _csrf: csrfToken })
+    });
+    refreshBlocklist();
+  }
+
+  let allProcesses = [];
+
+  async function refreshPslist() {
+    try {
+      const remote = mapRemoteToHttp("<%=agent.remote%>");
+      if (!remote) return;
+      const res = await axios.get(remote + "/pslist.json");
+      const data = res.data;
+
+      allProcesses = [];
+      const seen = new Set();
+      if (data.running) {
+        data.running.forEach(proc => {
+          const key = `${(proc.Name || '').toLowerCase()}|${(proc.Path || '').toLowerCase()}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            allProcesses.push(proc);
+          }
+        });
+      }
+
+      document.getElementById("process-search").value = '';
+      updateProcessTable(allProcesses);
+    } catch (err) {
+      console.error("Pslist fetch error:", err);
+    }
+  }
+
+  function updateProcessTable(processes) {
+    const tbody = document.querySelector("#pslist-table tbody");
+    tbody.innerHTML = '';
+
+    processes.forEach(proc => {
+      const icon = proc.IconBase64
+        ? `<img class='proc-icon' src='data:image/png;base64,${proc.IconBase64}' width="20" height="20">`
+        : '';
+      const pid = proc.Id && Number(proc.Id) > 0 ? Number(proc.Id) : null;
+      const killButton = pid ? `<button class="btn btn-sm btn-danger" onclick="killbypid('${pid}')">KILL</button>` : '';
+      tbody.innerHTML += `
+        <tr>
+          <td>${icon}</td>
+          <td>${proc.Name || ''}</td>
+          <td>${pid || ''}</td>
+          <td>${proc.Path || ''}</td>
+          <td>${proc.Company || ''}</td>
+          <td>${killButton}</td>
+        </tr>`;
+    });
+  }
+
+  document.getElementById("process-search").addEventListener("input", (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    const filteredProcesses = allProcesses.filter(proc => {
+      return (
+        (proc.Name || '').toLowerCase().includes(searchTerm) ||
+        (proc.Path || '').toLowerCase().includes(searchTerm) ||
+        (proc.Company || '').toLowerCase().includes(searchTerm)
+      );
+    });
+    updateProcessTable(filteredProcesses);
+  });
+
+  async function loadInstalledApps() {
+    try {
+      const remote = mapRemoteToHttp("<%=agent.remote%>");
+      if (!remote) return;
+      const res = await axios.get(remote + "/pslist.json");
+      const j = res.data;
+
+      if (!j.installed || !Array.isArray(j.installed)) {
+        return alert("No installed apps found");
+      }
+
+      const tbody = document.querySelector("#installed-table tbody");
+      tbody.innerHTML = "";
+
+      const seen = new Set();
+      j.installed.forEach(app => {
+        const name = app.DisplayName?.trim();
+        const exe = app.exe?.trim();
+        const icon = app.IconBase64;
+        if (!name || !exe || seen.has(name)) return;
+        seen.add(name);
+
+        const tr = document.createElement("tr");
+
+        const tdIcon = document.createElement("td");
+        if (icon) {
+          const img = document.createElement("img");
+          img.src = `data:image/png;base64,${icon}`;
+          img.className = "proc-icon";
+          tdIcon.appendChild(img);
+        } else {
+          tdIcon.textContent = "🗂️";
+        }
+
+        const tdName = document.createElement("td");
+        tdName.textContent = name;
+
+        const tdPath = document.createElement("td");
+        tdPath.textContent = exe;
+
+        const tdAction = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.className = "btn btn-success btn-sm";
+        btn.textContent = "Whitelist";
+        btn.onclick = () => addInstalledApp(exe);
+        tdAction.appendChild(btn);
+
+        tr.appendChild(tdIcon);
+        tr.appendChild(tdName);
+        tr.appendChild(tdPath);
+        tr.appendChild(tdAction);
+
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error("Installed apps fetch error:", err);
+    }
+  }
+
+  async function addInstalledApp(exePath) {
+    if (!exePath) return;
+    const proc = exePath.toLowerCase().endsWith(".exe")
+      ? exePath.split("\\").pop()
+      : (exePath.split("\\").pop() + ".exe");
+
+    await fetch("/whitelist/add", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ process: proc, _csrf: csrfToken })
+    });
+
+    console.log("Added to whitelist:", proc);
+  }
+
+  function refreshAll() {
+    refreshWhitelist();
+    refreshPslist();
+    refreshBlocklist();
+  }
+
+  socket.on("jsonUpdate", (payload) => {
+    if (payload.agent !== agentId) return;
+
+    if (payload.file.includes("pslist.json")) {
+      log("[*] Process list updated (" + (payload.data ? payload.data.length : 0) + " items)");
+    } else if (payload.file.includes("whitelist.json")) {
+      log("[*] Whitelist updated");
+    } else if (payload.file.includes("blocked.json")) {
+      log("[*] Blocklist updated");
+    }
+  });
+
+  // Periodically refresh data
+  setInterval(refreshAll, 15000);
+</script>
+
+</body>
+</html>

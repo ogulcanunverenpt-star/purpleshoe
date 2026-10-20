@@ -1,0 +1,694 @@
+[gd_scene format=4 uid="uid://xypvc12u02rf"]
+
+[ext_resource type="Script" uid="uid://ty88sy5xtk0u" path="res://match_preview.gd" id="1_0wfp1"]
+[ext_resource type="PackedScene" uid="uid://brq2cgdfdh8ft" path="res://football_goal.glb" id="2_fj7yv"]
+[ext_resource type="PackedScene" uid="uid://chsi55w43euwd" path="res://gdbot.glb" id="3_player_preview"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_t1cdb"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_kx2dr"]
+sky_material = SubResource("ProceduralSkyMaterial_t1cdb")
+
+[sub_resource type="Environment" id="Environment_rqxcu"]
+background_mode = 2
+sky = SubResource("Sky_kx2dr")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fj7yv"]
+albedo_color = Color(0.12, 0.32, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tlwt5"]
+albedo_color = Color(0.91, 0.91, 0.84, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_aqk2v"]
+size = Vector3(0.12, 0.025, 105)
+
+[sub_resource type="BoxMesh" id="BoxMesh_036b0"]
+size = Vector3(0.12, 0.025, 105)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dwbse"]
+size = Vector3(68, 0.025, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pkg7o"]
+size = Vector3(68, 0.025, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gbfbk"]
+size = Vector3(68, 0.025, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_centerwhite"]
+shading_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ioo17"]
+_surfaces = [{
+"aabb": AABB(-9.1775, 0, -9.1775, 18.355, 1e-05, 18.355),
+"format": 34359742465,
+"index_count": 576,
+"index_data": PackedByteArray("AAACAAEAAQACAAMAAgAEAAMAAwAEAAUABAAGAAUABQAGAAcABgAIAAcABwAIAAkACAAKAAkACQAKAAsACgAMAAsACwAMAA0ADAAOAA0ADQAOAA8ADgAQAA8ADwAQABEAEAASABEAEQASABMAEgAUABMAEwAUABUAFAAWABUAFQAWABcAFgAYABcAFwAYABkAGAAaABkAGQAaABsAGgAcABsAGwAcAB0AHAAeAB0AHQAeAB8AHgAgAB8AHwAgACEAIAAiACEAIQAiACMAIgAkACMAIwAkACUAJAAmACUAJQAmACcAJgAoACcAJwAoACkAKAAqACkAKQAqACsAKgAsACsAKwAsAC0ALAAuAC0ALQAuAC8ALgAwAC8ALwAwADEAMAAyADEAMQAyADMAMgA0ADMAMwA0ADUANAA2ADUANQA2ADcANgA4ADcANwA4ADkAOAA6ADkAOQA6ADsAOgA8ADsAOwA8AD0APAA+AD0APQA+AD8APgBAAD8APwBAAEEAQABCAEEAQQBCAEMAQgBEAEMAQwBEAEUARABGAEUARQBGAEcARgBIAEcARwBIAEkASABKAEkASQBKAEsASgBMAEsASwBMAE0ATABOAE0ATQBOAE8ATgBQAE8ATwBQAFEAUABSAFEAUQBSAFMAUgBUAFMAUwBUAFUAVABWAFUAVQBWAFcAVgBYAFcAVwBYAFkAWABaAFkAWQBaAFsAWgBcAFsAWwBcAF0AXABeAF0AXQBeAF8AXgBgAF8AXwBgAGEAYABiAGEAYQBiAGMAYgBkAGMAYwBkAGUAZABmAGUAZQBmAGcAZgBoAGcAZwBoAGkAaABqAGkAaQBqAGsAagBsAGsAawBsAG0AbABuAG0AbQBuAG8AbgBwAG8AbwBwAHEAcAByAHEAcQByAHMAcgB0AHMAcwB0AHUAdAB2AHUAdQB2AHcAdgB4AHcAdwB4AHkAeAB6AHkAeQB6AHsAegB8AHsAewB8AH0AfAB+AH0AfQB+AH8AfgCAAH8AfwCAAIEAgACCAIEAgQCCAIMAggCEAIMAgwCEAIUAhACGAIUAhQCGAIcAhgCIAIcAhwCIAIkAiACKAIkAiQCKAIsAigCMAIsAiwCMAI0AjACOAI0AjQCOAI8AjgCQAI8AjwCQAJEAkACSAJEAkQCSAJMAkgCUAJMAkwCUAJUAlACWAJUAlQCWAJcAlgCYAJcAlwCYAJkAmACaAJkAmQCaAJsAmgCcAJsAmwCcAJ0AnACeAJ0AnQCeAJ8AngCgAJ8AnwCgAKEAoACiAKEAoQCiAKMAogCkAKMAowCkAKUApACmAKUApQCmAKcApgCoAKcApwCoAKkAqACqAKkAqQCqAKsAqgCsAKsAqwCsAK0ArACuAK0ArQCuAK8ArgCwAK8ArwCwALEAsACyALEAsQCyALMAsgC0ALMAswC0ALUAtAC2ALUAtQC2ALcAtgC4ALcAtwC4ALkAuAC6ALkAuQC6ALsAugC8ALsAuwC8AL0AvAC+AL0AvQC+AL8AvgDAAL8AvwDAAMEA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 194,
+"vertex_data": PackedByteArray("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")
+}]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wse8f"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 0.025
+radial_segments = 16
+
+[sub_resource type="BoxMesh" id="BoxMesh_ic0uy"]
+size = Vector3(40.3, 0.025, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_k3n1d"]
+size = Vector3(0.12, 0.025, 16.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2o6r5"]
+size = Vector3(0.12, 0.025, 16.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_70uel"]
+size = Vector3(18.32, 0.025, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hiqwa"]
+size = Vector3(0.12, 0.025, 5.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2u3nc"]
+size = Vector3(0.12, 0.025, 5.5)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_udxuc"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 0.025
+radial_segments = 16
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ikiii"]
+_surfaces = [{
+"aabb": AABB(-7.334467, 0, 5.48347, 14.668934, 1e-05, 3.6940298),
+"format": 34359742465,
+"index_count": 288,
+"index_data": PackedByteArray("AAACAAEAAQACAAMAAgAEAAMAAwAEAAUABAAGAAUABQAGAAcABgAIAAcABwAIAAkACAAKAAkACQAKAAsACgAMAAsACwAMAA0ADAAOAA0ADQAOAA8ADgAQAA8ADwAQABEAEAASABEAEQASABMAEgAUABMAEwAUABUAFAAWABUAFQAWABcAFgAYABcAFwAYABkAGAAaABkAGQAaABsAGgAcABsAGwAcAB0AHAAeAB0AHQAeAB8AHgAgAB8AHwAgACEAIAAiACEAIQAiACMAIgAkACMAIwAkACUAJAAmACUAJQAmACcAJgAoACcAJwAoACkAKAAqACkAKQAqACsAKgAsACsAKwAsAC0ALAAuAC0ALQAuAC8ALgAwAC8ALwAwADEAMAAyADEAMQAyADMAMgA0ADMAMwA0ADUANAA2ADUANQA2ADcANgA4ADcANwA4ADkAOAA6ADkAOQA6ADsAOgA8ADsAOwA8AD0APAA+AD0APQA+AD8APgBAAD8APwBAAEEAQABCAEEAQQBCAEMAQgBEAEMAQwBEAEUARABGAEUARQBGAEcARgBIAEcARwBIAEkASABKAEkASQBKAEsASgBMAEsASwBMAE0ATABOAE0ATQBOAE8ATgBQAE8ATwBQAFEAUABSAFEAUQBSAFMAUgBUAFMAUwBUAFUAVABWAFUAVQBWAFcAVgBYAFcAVwBYAFkAWABaAFkAWQBaAFsAWgBcAFsAWwBcAF0AXABeAF0AXQBeAF8AXgBgAF8AXwBgAGEA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 98,
+"vertex_data": PackedByteArray("4EvpQAAAAACWeK9A9LPqQAAAAABqh7BAz1riQAAAAADBVrhALbjjQAAAAABFc7lAgRPbQAAAAACx7sBAo2XcQAAAAAB5GMJAvHjTQAAAAAAgPclAIL/UQAAAAAC6c8pAZY3LQAAAAADiPtFAkcfMQAAAAADYgdJAgVTDQAAAAADs8NhA+4HEQAAAAADCP9pAMNG6QAAAAABQUOBAiPG7QAAAAACGquFAswayQAAAAAA8WudAeRmzQAAAAABQv+hAYvioQAAAAAADDO5ALv2pQAAAAABte+9AsamfQAAAAAAZY/RAH6CgQAAAAABL3PVALB6WQAAAAAATXfpA3gWXQAAAAAB/3/tAdFmMQAAAAACp9/9AEjKNQAAAAABdwQBBRF+CQAAAAABemAJBfCiDQAAAAADuYQNBzmZwQAAAAAAkAwVB2tlxQAAAAABw0AVBf7NbQAAAAAA+OwdBlwZdQAAAAAD2CwhBeqxGQAAAAADSPwlBHt9HQAAAAACoEwpBxVkxQAAAAAAbEAtBf2syQAAAAAC95gtBfMMbQAAAAABpqwxB5rMcQAAAAACHhA1B3fEFQAAAAAAeEQ5BmcAGQAAAAABk7A5BadrfPwAAAAC0QA9B6TPhPwAAAADOHRBBz3uzPwAAAAC1ORBB1ZC0PwAAAABPGBFB09iGPwAAAADD+xBB86iHPwAAAACJ2xFB7QQ0PwAAAACVhhFBxxo1PwAAAAAxZxJBQCe0PgAAAAD12RFBTj21PgAAAAARuxJBdP8gJgAAAADC9RFB8vchJgAAAAAK1xJBQCe0vgAAAAD12RFBTj21vgAAAAARuxJB7QQ0vwAAAACVhhFBxxo1vwAAAAAxZxJB09iGvwAAAADD+xBB86iHvwAAAACJ2xFBz3uzvwAAAAC1ORBB1ZC0vwAAAABPGBFBadrfvwAAAAC0QA9B6TPhvwAAAADOHRBB3fEFwAAAAAAeEQ5BmcAGwAAAAABk7A5BfMMbwAAAAABpqwxB5rMcwAAAAACHhA1BxVkxwAAAAAAbEAtBf2sywAAAAAC95gtBeqxGwAAAAADSPwlBHt9HwAAAAACoEwpBf7NbwAAAAAA+OwdBlwZdwAAAAAD2CwhBzmZwwAAAAAAkAwVB2tlxwAAAAABw0AVBRF+CwAAAAABemAJBfCiDwAAAAADuYQNBdFmMwAAAAACp9/9AEjKNwAAAAABdwQBBLB6WwAAAAAATXfpA3gWXwAAAAAB/3/tAsamfwAAAAAAZY/RAH6CgwAAAAABL3PVAYviowAAAAAADDO5ALv2pwAAAAABte+9AswaywAAAAAA8WudAeRmzwAAAAABQv+hAMNG6wAAAAABQUOBAiPG7wAAAAACGquFAgVTDwAAAAADs8NhA+4HEwAAAAADCP9pAZY3LwAAAAADiPtFAkcfMwAAAAADYgdJAvHjTwAAAAAAgPclAIL/UwAAAAAC6c8pAgRPbwAAAAACx7sBAo2XcwAAAAAB5GMJAz1riwAAAAADBVrhALbjjwAAAAABFc7lA4EvpwAAAAACWeK9A9LPqwAAAAABqh7BA")
+}]
+
+[sub_resource type="BoxMesh" id="BoxMesh_cbp6q"]
+size = Vector3(40.3, 0.025, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_26xuy"]
+size = Vector3(0.12, 0.025, 16.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bc84e"]
+size = Vector3(0.12, 0.025, 16.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wukud"]
+size = Vector3(18.32, 0.025, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_il2jm"]
+size = Vector3(0.12, 0.025, 5.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wjb0r"]
+size = Vector3(0.12, 0.025, 5.5)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_mc2jv"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 0.025
+radial_segments = 16
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_bo7i5"]
+_surfaces = [{
+"aabb": AABB(-7.334467, 0, -9.1775, 14.668934, 1e-05, 3.6940298),
+"format": 34359742465,
+"index_count": 288,
+"index_data": PackedByteArray("AAACAAEAAQACAAMAAgAEAAMAAwAEAAUABAAGAAUABQAGAAcABgAIAAcABwAIAAkACAAKAAkACQAKAAsACgAMAAsACwAMAA0ADAAOAA0ADQAOAA8ADgAQAA8ADwAQABEAEAASABEAEQASABMAEgAUABMAEwAUABUAFAAWABUAFQAWABcAFgAYABcAFwAYABkAGAAaABkAGQAaABsAGgAcABsAGwAcAB0AHAAeAB0AHQAeAB8AHgAgAB8AHwAgACEAIAAiACEAIQAiACMAIgAkACMAIwAkACUAJAAmACUAJQAmACcAJgAoACcAJwAoACkAKAAqACkAKQAqACsAKgAsACsAKwAsAC0ALAAuAC0ALQAuAC8ALgAwAC8ALwAwADEAMAAyADEAMQAyADMAMgA0ADMAMwA0ADUANAA2ADUANQA2ADcANgA4ADcANwA4ADkAOAA6ADkAOQA6ADsAOgA8ADsAOwA8AD0APAA+AD0APQA+AD8APgBAAD8APwBAAEEAQABCAEEAQQBCAEMAQgBEAEMAQwBEAEUARABGAEUARQBGAEcARgBIAEcARwBIAEkASABKAEkASQBKAEsASgBMAEsASwBMAE0ATABOAE0ATQBOAE8ATgBQAE8ATwBQAFEAUABSAFEAUQBSAFMAUgBUAFMAUwBUAFUAVABWAFUAVQBWAFcAVgBYAFcAVwBYAFkAWABaAFkAWQBaAFsAWgBcAFsAWwBcAF0AXABeAF0AXQBeAF8AXgBgAF8AXwBgAGEA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 98,
+"vertex_data": PackedByteArray("9LPqQAAAAABqh7DA4EvpQAAAAACWeK/ALbjjQAAAAABFc7nAz1riQAAAAADBVrjAo2XcQAAAAAB5GMLAgRPbQAAAAACx7sDAIL/UQAAAAAC6c8rAvHjTQAAAAAAgPcnAkcfMQAAAAADYgdLAZY3LQAAAAADiPtHA+4HEQAAAAADCP9rAgVTDQAAAAADs8NjAiPG7QAAAAACGquHAMNG6QAAAAABQUODAeRmzQAAAAABQv+jAswayQAAAAAA8WufALv2pQAAAAABte+/AYvioQAAAAAADDO7AH6CgQAAAAABL3PXAsamfQAAAAAAZY/TA3gWXQAAAAAB/3/vALB6WQAAAAAATXfrAEjKNQAAAAABdwQDBdFmMQAAAAACp9//AfCiDQAAAAADuYQPBRF+CQAAAAABemALB2tlxQAAAAABw0AXBzmZwQAAAAAAkAwXBlwZdQAAAAAD2CwjBf7NbQAAAAAA+OwfBHt9HQAAAAACoEwrBeqxGQAAAAADSPwnBf2syQAAAAAC95gvBxVkxQAAAAAAbEAvB5rMcQAAAAACHhA3BfMMbQAAAAABpqwzBmcAGQAAAAABk7A7B3fEFQAAAAAAeEQ7B6TPhPwAAAADOHRDBadrfPwAAAAC0QA/B1ZC0PwAAAABPGBHBz3uzPwAAAAC1ORDB86iHPwAAAACJ2xHB09iGPwAAAADD+xDBxxo1PwAAAAAxZxLB7QQ0PwAAAACVhhHBTj21PgAAAAARuxLBQCe0PgAAAAD12RHB8vchJgAAAAAK1xLBdP8gJgAAAADC9RHBTj21vgAAAAARuxLBQCe0vgAAAAD12RHBxxo1vwAAAAAxZxLB7QQ0vwAAAACVhhHB86iHvwAAAACJ2xHB09iGvwAAAADD+xDB1ZC0vwAAAABPGBHBz3uzvwAAAAC1ORDB6TPhvwAAAADOHRDBadrfvwAAAAC0QA/BmcAGwAAAAABk7A7B3fEFwAAAAAAeEQ7B5rMcwAAAAACHhA3BfMMbwAAAAABpqwzBf2sywAAAAAC95gvBxVkxwAAAAAAbEAvBHt9HwAAAAACoEwrBeqxGwAAAAADSPwnBlwZdwAAAAAD2CwjBf7NbwAAAAAA+OwfB2tlxwAAAAABw0AXBzmZwwAAAAAAkAwXBfCiDwAAAAADuYQPBRF+CwAAAAABemALBEjKNwAAAAABdwQDBdFmMwAAAAACp9//A3gWXwAAAAAB/3/vALB6WwAAAAAATXfrAH6CgwAAAAABL3PXAsamfwAAAAAAZY/TALv2pwAAAAABte+/AYviowAAAAAADDO7AeRmzwAAAAABQv+jAswaywAAAAAA8WufAiPG7wAAAAACGquHAMNG6wAAAAABQUODA+4HEwAAAAADCP9rAgVTDwAAAAADs8NjAkcfMwAAAAADYgdLAZY3LwAAAAADiPtHAIL/UwAAAAAC6c8rAvHjTwAAAAAAgPcnAo2XcwAAAAAB5GMLAgRPbwAAAAACx7sDALbjjwAAAAABFc7nAz1riwAAAAADBVrjA9LPqwAAAAABqh7DA4EvpwAAAAACWeK/A")
+}]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_4h6ng"]
+_surfaces = [{
+"aabb": AABB(5.954648e-17, 0, -1.0275, 1.0275, 1e-05, 1.0275),
+"format": 34359742465,
+"index_count": 72,
+"index_data": PackedByteArray("AAACAAEAAQACAAMAAgAEAAMAAwAEAAUABAAGAAUABQAGAAcABgAIAAcABwAIAAkACAAKAAkACQAKAAsACgAMAAsACwAMAA0ADAAOAA0ADQAOAA8ADgAQAA8ADwAQABEAEAASABEAEQASABMAEgAUABMAEwAUABUAFAAWABUAFQAWABcAFgAYABcAFwAYABkA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 26,
+"vertex_data": PackedByteArray("H4WDPwAAAAAAAACAw/V4PwAAAAAAAAAAFGWCPwAAAACdVQm+g9R2PwAAAACz+wG+vxN+PwAAAADWKIi+FXpwPwAAAAAG34C+bARzPwAAAAB1Usm+UAJmPwAAAAC1i76+oMxjPwAAAAAfhQO/DptXPwAAAADD9fi+BK9QPwAAAADsICC/ZINFPwAAAACojhe/U/85PwAAAABT/zm/kwowPwAAAACTCjC/7CAgPwAAAAAEr1C/qI4XPwAAAABkg0W/H4UDPwAAAACgzGO/w/X4PgAAAAAOm1e/dVLJPgAAAABsBHO/tYu+PgAAAABQAma/1iiIPgAAAAC/E36/Bt+APgAAAAAVenC/nVUJPgAAAAAUZYK/s/sBPgAAAACD1Ha/9hGRJAAAAAAfhYO/Ck6JJAAAAADD9Xi/")
+}]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_o3ebs"]
+_surfaces = [{
+"aabb": AABB(-1.0275, 0, 1.1909296e-16, 1.0275, 1e-05, 1.0275),
+"format": 34359742465,
+"index_count": 72,
+"index_data": PackedByteArray("AAACAAEAAQACAAMAAgAEAAMAAwAEAAUABAAGAAUABQAGAAcABgAIAAcABwAIAAkACAAKAAkACQAKAAsACgAMAAsACwAMAA0ADAAOAA0ADQAOAA8ADgAQAA8ADwAQABEAEAASABEAEQASABMAEgAUABMAEwAUABUAFAAWABUAFQAWABcAFgAYABcAFwAYABkA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 26,
+"vertex_data": PackedByteArray("Ck6JJAAAAADD9Xg/9hGRJAAAAAAfhYM/s/sBvgAAAACD1HY/nVUJvgAAAAAUZYI/Bt+AvgAAAAAVenA/1iiIvgAAAAC/E34/tYu+vgAAAABQAmY/dVLJvgAAAABsBHM/w/X4vgAAAAAOm1c/H4UDvwAAAACgzGM/qI4XvwAAAABkg0U/7CAgvwAAAAAEr1A/kwowvwAAAACTCjA/U/85vwAAAABT/zk/ZINFvwAAAACojhc/BK9QvwAAAADsICA/DptXvwAAAADD9fg+oMxjvwAAAAAfhQM/UAJmvwAAAAC1i74+bARzvwAAAAB1Usk+FXpwvwAAAAAG34A+vxN+vwAAAADWKIg+g9R2vwAAAACz+wE+FGWCvwAAAACdVQk+w/V4vwAAAAAKTgklH4WDvwAAAAD2EREl")
+}]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_k83mh"]
+_surfaces = [{
+"aabb": AABB(-1.0275, 0, -1.0275, 1.0275, 1e-05, 1.0275),
+"format": 34359742465,
+"index_count": 72,
+"index_data": PackedByteArray("AAACAAEAAQACAAMAAgAEAAMAAwAEAAUABAAGAAUABQAGAAcABgAIAAcABwAIAAkACAAKAAkACQAKAAsACgAMAAsACwAMAA0ADAAOAA0ADQAOAA8ADgAQAA8ADwAQABEAEAASABEAEQASABMAEgAUABMAEwAUABUAFAAWABUAFQAWABcAFgAYABcAFwAYABkA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 26,
+"vertex_data": PackedByteArray("9hGRJAAAAAAfhYO/Ck6JJAAAAADD9Xi/nVUJvgAAAAAUZYK/s/sBvgAAAACD1Ha/1iiIvgAAAAC/E36/Bt+AvgAAAAAVenC/dVLJvgAAAABsBHO/tYu+vgAAAABQAma/H4UDvwAAAACgzGO/w/X4vgAAAAAOm1e/7CAgvwAAAAAEr1C/qI4XvwAAAABkg0W/U/85vwAAAABT/zm/kwowvwAAAACTCjC/BK9QvwAAAADsICC/ZINFvwAAAACojhe/oMxjvwAAAAAfhQO/DptXvwAAAADD9fi+bARzvwAAAAB1Usm+UAJmvwAAAAC1i76+vxN+vwAAAADWKIi+FXpwvwAAAAAG34C+FGWCvwAAAACdVQm+g9R2vwAAAACz+wG+H4WDvwAAAAD2ERGlw/V4vwAAAAAKTgml")
+}]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_qktwf"]
+_surfaces = [{
+"aabb": AABB(5.954648e-17, 0, 0, 1.0275, 1e-05, 1.0275),
+"format": 34359742465,
+"index_count": 72,
+"index_data": PackedByteArray("AAACAAEAAQACAAMAAgAEAAMAAwAEAAUABAAGAAUABQAGAAcABgAIAAcABwAIAAkACAAKAAkACQAKAAsACgAMAAsACwAMAA0ADAAOAA0ADQAOAA8ADgAQAA8ADwAQABEAEAASABEAEQASABMAEgAUABMAEwAUABUAFAAWABUAFQAWABcAFgAYABcAFwAYABkA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 26,
+"vertex_data": PackedByteArray("w/V4PwAAAAAAAAAAH4WDPwAAAAAAAAAAg9R2PwAAAACz+wE+FGWCPwAAAACdVQk+FXpwPwAAAAAG34A+vxN+PwAAAADWKIg+UAJmPwAAAAC1i74+bARzPwAAAAB1Usk+DptXPwAAAADD9fg+oMxjPwAAAAAfhQM/ZINFPwAAAACojhc/BK9QPwAAAADsICA/kwowPwAAAACTCjA/U/85PwAAAABT/zk/qI4XPwAAAABkg0U/7CAgPwAAAAAEr1A/w/X4PgAAAAAOm1c/H4UDPwAAAACgzGM/tYu+PgAAAABQAmY/dVLJPgAAAABsBHM/Bt+APgAAAAAVenA/1iiIPgAAAAC/E34/s/sBPgAAAACD1HY/nVUJPgAAAAAUZYI/Ck6JJAAAAADD9Xg/9hGRJAAAAAAfhYM/")
+}]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bh8nc"]
+albedo_color = Color(0.9, 0.92, 0.87, 1)
+metallic = 0.28
+roughness = 0.36
+
+[sub_resource type="BoxMesh" id="BoxMesh_jjr1n"]
+size = Vector3(0.16, 2.44, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gggvi"]
+size = Vector3(0.16, 2.44, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_w44yn"]
+size = Vector3(7.32, 0.16, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_match_goal_post"]
+size = Vector3(0.16, 2.44, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_match_goal_crossbar"]
+size = Vector3(7.32, 0.16, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6ah6f"]
+size = Vector3(8.32, 2.84, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_g1i3r"]
+size = Vector3(0.08, 2.44, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_my276"]
+size = Vector3(0.08, 2.44, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yx0jh"]
+size = Vector3(7.32, 0.08, 5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1ew0l"]
+shading_mode = 0
+albedo_color = Color(0.08, 0.34, 0.95, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ryup7"]
+size = Vector3(7, 0.03, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ytpkv"]
+albedo_color = Color(0.9, 0.92, 0.87, 1)
+metallic = 0.28
+roughness = 0.36
+
+[sub_resource type="BoxMesh" id="BoxMesh_jas3d"]
+size = Vector3(0.16, 2.44, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7htu6"]
+size = Vector3(0.16, 2.44, 0.16)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7qk3m"]
+size = Vector3(7.32, 0.16, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xpnt2"]
+size = Vector3(8.32, 2.84, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ruyqm"]
+size = Vector3(0.08, 2.44, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fnoqa"]
+size = Vector3(0.08, 2.44, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nx736"]
+size = Vector3(7.32, 0.08, 5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_55kwu"]
+shading_mode = 0
+albedo_color = Color(0.9, 0.08, 0.12, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_f3o6s"]
+size = Vector3(7, 0.03, 0.12)
+
+[node name="match" type="Node3D" unique_id=1175705770]
+script = ExtResource("1_0wfp1")
+
+[node name="GameController" type="Node" parent="." unique_id=1671020393]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=648065610]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=785989405]
+environment = SubResource("Environment_rqxcu")
+
+[node name="players" type="Node3D" parent="." unique_id=571373586]
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="players" unique_id=1859750601]
+_spawnable_scenes = PackedStringArray("uid://cp8m5k5wxyt60")
+spawn_path = NodePath("..")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1322399119]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+visible = false
+size = Vector3(44, 1, 58)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1176615479]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 7, 21)
+current = true
+
+[node name="MatchEnvironment" type="Node3D" parent="." unique_id=654154534]
+
+[node name="MatchPitchGround" type="CSGBox3D" parent="MatchEnvironment" unique_id=18405143]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(68, 1, 105)
+material = SubResource("StandardMaterial3D_fj7yv")
+
+[node name="TouchlineLeft" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1484954864]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, 0.012, 0)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_aqk2v")
+
+[node name="TouchlineRight" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1846327982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0.012, 0)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_036b0")
+
+[node name="EndlineNear" type="MeshInstance3D" parent="MatchEnvironment" unique_id=357564559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, -52.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_dwbse")
+
+[node name="EndlineFar" type="MeshInstance3D" parent="MatchEnvironment" unique_id=767270305]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, 52.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_pkg7o")
+
+[node name="HalfwayLine" type="MeshInstance3D" parent="MatchEnvironment" unique_id=955846483]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, 0)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_gbfbk")
+
+[node name="CenterCircle" type="MeshInstance3D" parent="MatchEnvironment" unique_id=590986314]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+material_override = SubResource("StandardMaterial3D_centerwhite")
+mesh = SubResource("ArrayMesh_ioo17")
+
+[node name="CenterSpot" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1235934989]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("CylinderMesh_wse8f")
+
+[node name="PenaltyBoxTop-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1861204114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, -36)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_ic0uy")
+
+[node name="PenaltyBoxLeft-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1379054525]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.15, 0.012, -44.25)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_k3n1d")
+
+[node name="PenaltyBoxRight-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=2097972623]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.15, 0.012, -44.25)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_2o6r5")
+
+[node name="SixYardTop-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1443258251]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, -47)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_70uel")
+
+[node name="SixYardLeft-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=152260134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.16, 0.012, -49.75)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_hiqwa")
+
+[node name="SixYardRight-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1475640667]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.16, 0.012, -49.75)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_2u3nc")
+
+[node name="PenaltySpot-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=237698696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -41.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("CylinderMesh_udxuc")
+
+[node name="PenaltyArc-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1645266096]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, -41.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("ArrayMesh_ikiii")
+
+[node name="PenaltyBoxTop1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1690513405]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, 36)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_cbp6q")
+
+[node name="PenaltyBoxLeft1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1489020868]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.15, 0.012, 44.25)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_26xuy")
+
+[node name="PenaltyBoxRight1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1395775209]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.15, 0.012, 44.25)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_bc84e")
+
+[node name="SixYardTop1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=666318969]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.012, 47)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_wukud")
+
+[node name="SixYardLeft1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1151501689]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.16, 0.012, 49.75)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_il2jm")
+
+[node name="SixYardRight1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1575733258]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.16, 0.012, 49.75)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("BoxMesh_wjb0r")
+
+[node name="PenaltySpot1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=2017260826]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 41.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("CylinderMesh_mc2jv")
+
+[node name="PenaltyArc1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1899101826]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 41.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("ArrayMesh_bo7i5")
+
+[node name="CornerArc-1_0_-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=655088362]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, 0.025, -52.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("ArrayMesh_4h6ng")
+
+[node name="CornerArc-1_0_1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=459269826]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, 0.025, 52.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("ArrayMesh_o3ebs")
+
+[node name="CornerArc1_0_-1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1591925157]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0.025, -52.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("ArrayMesh_k83mh")
+
+[node name="CornerArc1_0_1_0" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1375725588]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0.025, 52.5)
+material_override = SubResource("StandardMaterial3D_tlwt5")
+mesh = SubResource("ArrayMesh_qktwf")
+
+[node name="BlueGoal" parent="MatchEnvironment" unique_id=1004534200 instance=ExtResource("2_fj7yv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 52.5)
+
+[node name="BlueGoalPostLeft" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1169078190]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.66, 1.22, 52.5)
+visible = false
+material_override = SubResource("StandardMaterial3D_bh8nc")
+mesh = SubResource("BoxMesh_jjr1n")
+
+[node name="BlueGoalPostRight" type="MeshInstance3D" parent="MatchEnvironment" unique_id=813659320]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.66, 1.22, 52.5)
+visible = false
+material_override = SubResource("StandardMaterial3D_bh8nc")
+mesh = SubResource("BoxMesh_gggvi")
+
+[node name="BlueGoalCrossbar" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1253821543]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.44, 52.5)
+visible = false
+material_override = SubResource("StandardMaterial3D_bh8nc")
+mesh = SubResource("BoxMesh_w44yn")
+
+[node name="BlueGoalPostLeftCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=198938783]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.66, 1.22, 52.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MatchEnvironment/BlueGoalPostLeftCollision" unique_id=1804794197]
+shape = SubResource("BoxShape3D_match_goal_post")
+
+[node name="BlueGoalPostRightCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=760121789]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.66, 1.22, 52.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MatchEnvironment/BlueGoalPostRightCollision" unique_id=1588217139]
+shape = SubResource("BoxShape3D_match_goal_post")
+
+[node name="BlueGoalCrossbarCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=1977560694]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.44, 52.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MatchEnvironment/BlueGoalCrossbarCollision" unique_id=631154367]
+shape = SubResource("BoxShape3D_match_goal_crossbar")
+
+[node name="BlueGoalBackStopCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=2092182131]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.22, 57.5)
+
+[node name="@CollisionShape3D@2" type="CollisionShape3D" parent="MatchEnvironment/BlueGoalBackStopCollision" unique_id=1258366197]
+shape = SubResource("BoxShape3D_6ah6f")
+
+[node name="BlueNetSide-1_0Collision" type="StaticBody3D" parent="MatchEnvironment" unique_id=1827084736]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.66, 1.22, 55)
+
+[node name="@CollisionShape3D@3" type="CollisionShape3D" parent="MatchEnvironment/BlueNetSide-1_0Collision" unique_id=1169192003]
+shape = SubResource("BoxShape3D_g1i3r")
+
+[node name="BlueNetSide1_0Collision" type="StaticBody3D" parent="MatchEnvironment" unique_id=1243155748]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.66, 1.22, 55)
+
+[node name="@CollisionShape3D@4" type="CollisionShape3D" parent="MatchEnvironment/BlueNetSide1_0Collision" unique_id=626955792]
+shape = SubResource("BoxShape3D_my276")
+
+[node name="BlueNetRoofCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=326473888]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.44, 55)
+
+[node name="@CollisionShape3D@5" type="CollisionShape3D" parent="MatchEnvironment/BlueNetRoofCollision" unique_id=1424661409]
+shape = SubResource("BoxShape3D_yx0jh")
+
+[node name="BlueGoalTeamMarker" type="MeshInstance3D" parent="MatchEnvironment" unique_id=251303473]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, 47.3)
+material_override = SubResource("StandardMaterial3D_1ew0l")
+mesh = SubResource("BoxMesh_ryup7")
+
+[node name="BlueKeeperSpawn" type="Marker3D" parent="MatchEnvironment" unique_id=1078926516]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 49.5)
+
+[node name="EditorPreview" parent="MatchEnvironment/BlueKeeperSpawn" unique_id=1153790247 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedGoal" parent="MatchEnvironment" unique_id=281718234 instance=ExtResource("2_fj7yv")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 1.2, -52.5)
+
+[node name="RedGoalPostLeft" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1368570845]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.66, 1.22, -52.5)
+visible = false
+material_override = SubResource("StandardMaterial3D_ytpkv")
+mesh = SubResource("BoxMesh_jas3d")
+
+[node name="RedGoalPostRight" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1394174558]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.66, 1.22, -52.5)
+visible = false
+material_override = SubResource("StandardMaterial3D_ytpkv")
+mesh = SubResource("BoxMesh_7htu6")
+
+[node name="RedGoalCrossbar" type="MeshInstance3D" parent="MatchEnvironment" unique_id=1317552451]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.44, -52.5)
+visible = false
+material_override = SubResource("StandardMaterial3D_ytpkv")
+mesh = SubResource("BoxMesh_7qk3m")
+
+[node name="RedGoalPostLeftCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=1768757552]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.66, 1.22, -52.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MatchEnvironment/RedGoalPostLeftCollision" unique_id=905641906]
+shape = SubResource("BoxShape3D_match_goal_post")
+
+[node name="RedGoalPostRightCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=1538658092]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.66, 1.22, -52.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MatchEnvironment/RedGoalPostRightCollision" unique_id=506431875]
+shape = SubResource("BoxShape3D_match_goal_post")
+
+[node name="RedGoalCrossbarCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=1375431173]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.44, -52.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MatchEnvironment/RedGoalCrossbarCollision" unique_id=368285646]
+shape = SubResource("BoxShape3D_match_goal_crossbar")
+
+[node name="RedGoalBackStopCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=477298538]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.22, -57.5)
+
+[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="MatchEnvironment/RedGoalBackStopCollision" unique_id=63966423]
+shape = SubResource("BoxShape3D_xpnt2")
+
+[node name="RedNetSide-1_0Collision" type="StaticBody3D" parent="MatchEnvironment" unique_id=1793469371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.66, 1.22, -55)
+
+[node name="@CollisionShape3D@7" type="CollisionShape3D" parent="MatchEnvironment/RedNetSide-1_0Collision" unique_id=600739182]
+shape = SubResource("BoxShape3D_ruyqm")
+
+[node name="RedNetSide1_0Collision" type="StaticBody3D" parent="MatchEnvironment" unique_id=1278791525]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.66, 1.22, -55)
+
+[node name="@CollisionShape3D@8" type="CollisionShape3D" parent="MatchEnvironment/RedNetSide1_0Collision" unique_id=455654526]
+shape = SubResource("BoxShape3D_fnoqa")
+
+[node name="RedNetRoofCollision" type="StaticBody3D" parent="MatchEnvironment" unique_id=2017975109]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.44, -55)
+
+[node name="@CollisionShape3D@9" type="CollisionShape3D" parent="MatchEnvironment/RedNetRoofCollision" unique_id=715651200]
+shape = SubResource("BoxShape3D_nx736")
+
+[node name="RedGoalTeamMarker" type="MeshInstance3D" parent="MatchEnvironment" unique_id=936171873]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.035, -47.3)
+material_override = SubResource("StandardMaterial3D_55kwu")
+mesh = SubResource("BoxMesh_f3o6s")
+
+[node name="RedKeeperSpawn" type="Marker3D" parent="MatchEnvironment" unique_id=328478869]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, -49.5)
+
+[node name="EditorPreview" parent="MatchEnvironment/RedKeeperSpawn" unique_id=1094747353 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="PlayerSpawns" type="Node3D" parent="MatchEnvironment" unique_id=210260146]
+
+[node name="BlueFieldPlayer0" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1687152793]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 10)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer0" unique_id=468334866 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="BlueFieldPlayer1" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=96617572]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 8)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer1" unique_id=1763508290 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 6.240715, 0, 0)
+
+[node name="BlueFieldPlayer2" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1487840513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 8)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer2" unique_id=1573569443 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 13.002687, 0, 0)
+
+[node name="BlueFieldPlayer3" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1920975567]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 10)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer3" unique_id=3615732 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 11.187767, 0, 27.946182)
+
+[node name="BlueFieldPlayer4" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=677562554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 23)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer4" unique_id=1922288343 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="BlueFieldPlayer5" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=113947997]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 26)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer5" unique_id=1608851293 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="BlueFieldPlayer6" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1992955589]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 23)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer6" unique_id=1354005797 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="BlueFieldPlayer7" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=436560459]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 36)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer7" unique_id=1009917148 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="BlueFieldPlayer8" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=450732457]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 43)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer8" unique_id=991594935 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0.037052155, 0, -10.86541)
+
+[node name="BlueFieldPlayer9" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=823749292]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 36)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer9" unique_id=571390679 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, -4.0875397)
+
+[node name="RedFieldPlayer0" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=53991549]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -16, 0, -10)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer0" unique_id=1251828864 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedFieldPlayer1" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=258202172]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -5, 0, -8)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer1" unique_id=508937402 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedFieldPlayer2" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1709476664]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 5, 0, -8)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer2" unique_id=2072749901 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -1.0967255e-05, 0, 33.034737)
+
+[node name="RedFieldPlayer3" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1789542604]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 16, 0, -10)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer3" unique_id=1898881786 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedFieldPlayer4" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=339645771]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -12, 0, -23)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer4" unique_id=81631680 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedFieldPlayer5" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=862628895]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, -26)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer5" unique_id=1377322563 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedFieldPlayer6" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=540617655]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 12, 0, -23)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer6" unique_id=674799516 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedFieldPlayer7" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1720926288]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -14, 0, -36)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer7" unique_id=298619698 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedFieldPlayer8" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1791146551]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, -43)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer8" unique_id=1441885000 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="RedFieldPlayer9" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=523837006]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 14, 0, -36)
+
+[node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer9" unique_id=2041204228 instance=ExtResource("3_player_preview")]
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)

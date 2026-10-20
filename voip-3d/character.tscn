@@ -1,0 +1,259 @@
+[gd_scene format=3 uid="uid://cp8m5k5wxyt60"]
+
+[ext_resource type="PackedScene" uid="uid://da6j6124gu67a" path="res://audioManager.tscn" id="1_a207m"]
+[ext_resource type="Script" uid="uid://drsc4l2yat065" path="res://character.gd" id="1_jdxc6"]
+[ext_resource type="Script" uid="uid://cdtyne0nwc0js" path="res://virtual_joystick.gd" id="3_joystick"]
+[ext_resource type="PackedScene" path="res://gdbot.glb" id="4_gdbot"]
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_jg0he"]
+mix_rate = 24000.0
+buffer_length = 0.15
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_mqgo7"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:team")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath(".:role")
+properties/3/spawn = true
+properties/3/replication_mode = 1
+properties/4/path = NodePath(".:username")
+properties/4/spawn = true
+properties/4/replication_mode = 1
+properties/5/path = NodePath(".:controller_peer_id")
+properties/5/spawn = true
+properties/5/replication_mode = 1
+properties/6/path = NodePath(".:field_slot")
+properties/6/spawn = true
+properties/6/replication_mode = 1
+properties/7/path = NodePath(".:is_ai")
+properties/7/spawn = true
+properties/7/replication_mode = 1
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6fmgu"]
+radius = 0.32
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_p7lxq"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f5r3w"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0um0r"]
+material = SubResource("StandardMaterial3D_f5r3w")
+size = Vector3(0.5, 0.2, 0.2)
+
+[node name="character" type="CharacterBody3D" unique_id=911236329]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_jdxc6")
+
+[node name="GDBot" parent="." instance=ExtResource("4_gdbot")]
+
+[node name="audioManager" parent="." unique_id=957738033 instance=ExtResource("1_a207m")]
+outputPath = NodePath("../AudioStreamPlayer3D")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1554201577]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.7)
+stream = SubResource("AudioStreamGenerator_jg0he")
+autoplay = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1204631657]
+replication_config = SubResource("SceneReplicationConfig_mqgo7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=768926989]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_6fmgu")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=505220988]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+visible = false
+mesh = SubResource("CapsuleMesh_p7lxq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D" unique_id=655865751]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -0.5)
+visible = false
+mesh = SubResource("BoxMesh_0um0r")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=902852594]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -0.604013)
+
+[node name="NameTag" type="Label3D" parent="." unique_id=169773251]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.35, 0)
+billboard = 1
+font_size = 36
+outline_size = 8
+
+[node name="MobileUI" type="CanvasLayer" parent="." unique_id=280096196]
+visible = false
+
+[node name="MovementJoystick" type="Control" parent="MobileUI" unique_id=2086886133]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -184.0
+offset_right = 184.0
+offset_bottom = -24.0
+grow_vertical = 0
+script = ExtResource("3_joystick")
+
+[node name="AimJoystick" type="Control" parent="MobileUI"]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -184.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 184.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("3_joystick")
+
+[node name="AimLabel" type="Label" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -184.0
+offset_top = 188.0
+offset_right = -24.0
+offset_bottom = 216.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+text = "AIM / CAMERA"
+
+[node name="ShotBtn" type="Button" parent="MobileUI" unique_id=1483784354]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -140.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "SHOOT"
+
+[node name="CurveLeftBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -162.0
+offset_top = -88.0
+offset_right = -82.0
+offset_bottom = -44.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "FALSO -"
+
+[node name="CurveRightBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -78.0
+offset_top = -88.0
+offset_right = 2.0
+offset_bottom = -44.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "FALSO +"
+
+[node name="PassBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -220.0
+offset_right = -190.0
+offset_bottom = -174.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "PASS"
+
+[node name="ThroughBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -184.0
+offset_top = -220.0
+offset_right = -94.0
+offset_bottom = -174.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "THROUGH BALL"
+
+[node name="CrossBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -272.0
+offset_right = -190.0
+offset_bottom = -226.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "ORTA"
+
+[node name="TackleBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -184.0
+offset_top = -272.0
+offset_right = -94.0
+offset_bottom = -226.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "TACKLE"
+
+[node name="JumpBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -240.0
+offset_top = -380.0
+offset_right = -80.0
+offset_bottom = -290.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "ZIPLA"
+
+[node name="SprintBtn" type="Button" parent="MobileUI"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 198.0
+offset_top = -110.0
+offset_right = 288.0
+offset_bottom = -64.0
+grow_vertical = 0
+text = "DEPAR"

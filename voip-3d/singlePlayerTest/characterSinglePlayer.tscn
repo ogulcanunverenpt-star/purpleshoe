@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://c6ro25wkp6hqr"]
+
+[ext_resource type="Script" path="res://singlePlayerTest/characterSinglePlayer.gd" id="1_7x1es"]
+[ext_resource type="PackedScene" uid="uid://b6uu3avfh5chb" path="res://singlePlayerTest/audioManagerSinglePlayer.tscn" id="2_txvp1"]
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_jg0he"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6fmgu"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_p7lxq"]
+
+[node name="characterSinglePlayer" type="CharacterBody3D"]
+collision_layer = 2
+script = ExtResource("1_7x1es")
+
+[node name="audioManagerSinglePlayer" parent="." instance=ExtResource("2_txvp1")]
+outputPath = NodePath("../AudioStreamPlayer3D")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.7)
+stream = SubResource("AudioStreamGenerator_jg0he")
+autoplay = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("CapsuleShape3D_6fmgu")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("CapsuleMesh_p7lxq")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -0.604013)
+current = true

@@ -1,0 +1,6145 @@
+{
+ "mode": "chunk",
+ "title": "Openworld",
+ "grid": {
+  "cell_size": 20
+ },
+ "start_cell": [
+  0,
+  0
+ ],
+ "goal": {
+  "type": "reach_cell",
+  "target": [
+   0,
+   12
+  ]
+ },
+ "default_npc_model": "characters/kk_Rogue.glb",
+ "terrain": {
+  "amplitude": 7.0,
+  "frequency": 0.005,
+  "seed": 91,
+  "octaves": 3,
+  "material": "grass",
+  "resolution": 10
+ },
+ "sky": {
+  "loop": true,
+  "cycle": [
+   {
+    "time": "day",
+    "weather": "rain",
+    "seconds": 75
+   },
+   {
+    "time": "sunset",
+    "weather": "cloudy",
+    "seconds": 28
+   },
+   {
+    "time": "night",
+    "weather": "clear",
+    "seconds": 50
+   },
+   {
+    "time": "sunrise",
+    "weather": "rain",
+    "seconds": 28
+   }
+  ]
+ },
+ "cells": [
+  {
+   "cell": [
+    -2,
+    -2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 15,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 6,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    -2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    },
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 15,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    -2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 10,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 11,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 12,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    -2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 15,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 6,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    -2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 14,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 6,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    -1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 14,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    -1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 9,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    -1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 11,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    },
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 14,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    -1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 9,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    -1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 14,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 9,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    0
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    },
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 15,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 13,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    0
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 8,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 12,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 6,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    0
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      0,
+      0
+     ],
+     "footprint": [
+      3.2,
+      3.2
+     ],
+     "height": 16.0,
+     "profile": "taper",
+     "batter": 0.6,
+     "cap": "pyramidion",
+     "roof_height": 4.0,
+     "material": "limestone",
+     "roof_material": "steel",
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 15,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    0
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 11,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ],
+   "npc": {
+    "id": "mira",
+    "name": "Mira",
+    "pos": [
+     6,
+     -6
+    ],
+    "model": "characters/kk_Rogue_Hooded.glb",
+    "persona": "You are Mira, an upbeat downtown tour guide in a bustling modern city of glass towers. You love the traffic, the crowds, the neon at night. Answer the traveler warmly in ONE short sentence, and if it fits, point them north up the tree-lined boulevard to the old town.",
+    "lines": [
+     "Mira: Welcome to Downtown! Glass towers, traffic, the whole buzz.",
+     "Mira: Head north up the boulevard and you'll reach the old town."
+    ]
+   }
+  },
+  {
+   "cell": [
+    2,
+    0
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    },
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 10,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 10,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 13,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 10,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 8,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 11,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ],
+   "npc": {
+    "id": "jonah",
+    "name": "Jonah",
+    "pos": [
+     -6,
+     6
+    ],
+    "model": "characters/kk_Rogue.glb",
+    "persona": "You are Jonah, a friendly street-food vendor on a downtown corner. Cheerful, a little sales-y. Answer in ONE short sentence.",
+    "lines": [
+     "Jonah: Fresh from the cart! Best lunch in the district.",
+     "Jonah: You can drive across the whole world, you know - grab that car."
+    ]
+   }
+  },
+  {
+   "cell": [
+    0,
+    1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 14,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 14,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 16,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 9,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 15,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    1
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 8,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 12,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 6,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 15,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 6,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 12,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 6,
+     "floor_height": 3.4,
+     "profile": "setback",
+     "cap": "flat",
+     "material": "concrete",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box",
+     "steps": 3,
+     "shrink": 0.8
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 6,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 14,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 9,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 13,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      7
+     ],
+     "footprint": [
+      6.5,
+      6.5
+     ],
+     "floors": 7,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    2
+   ],
+   "ground": "asphalt",
+   "roads": [
+    {
+     "dir": "x",
+     "width": 7
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 8.0
+   },
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.5,
+     "speed": 1.3
+    }
+   ],
+   "structures": [
+    {
+     "pos": [
+      -7,
+      -7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 13,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      7,
+      -7
+     ],
+     "footprint": [
+      7.0,
+      7.0
+     ],
+     "floors": 14,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "steel",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    },
+    {
+     "pos": [
+      -7,
+      7
+     ],
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 15,
+     "floor_height": 3.4,
+     "profile": "vertical",
+     "cap": "flat",
+     "material": "glass",
+     "facade": {
+      "type": "windows",
+      "glow": [
+       1.0,
+       0.9,
+       0.65
+      ],
+      "lit": 1.9
+     },
+     "collider": "box"
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      3.0,
+      3.0
+     ],
+     "sound": "crowd"
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      -3.0,
+      -3.0
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -3.2,
+      6.5
+     ]
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    3
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 10
+    },
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 8
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    3
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 11
+    },
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 9
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 10
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    3
+   ],
+   "ground": "grass",
+   "roads": [
+    {
+     "dir": "ns",
+     "width": 8
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 9.0
+   },
+   "rows": [
+    {
+     "from": [
+      -7,
+      -10
+     ],
+     "to": [
+      -7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/CommonTree_1.glb"
+     }
+    },
+    {
+     "from": [
+      7,
+      -10
+     ],
+     "to": [
+      7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/BirchTree_2.glb"
+     }
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.2
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    3
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 9
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    3
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 6
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    4
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 10
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 10
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    4
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 9
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 7
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    4
+   ],
+   "ground": "grass",
+   "roads": [
+    {
+     "dir": "ns",
+     "width": 8
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 9.0
+   },
+   "rows": [
+    {
+     "from": [
+      -7,
+      -10
+     ],
+     "to": [
+      -7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/CommonTree_1.glb"
+     }
+    },
+    {
+     "from": [
+      7,
+      -10
+     ],
+     "to": [
+      7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/BirchTree_2.glb"
+     }
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.2
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    4
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 11
+    },
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 7
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    4
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 12
+    },
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 9
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    5
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 9
+    },
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 9
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 6
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    5
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 11
+    },
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 9
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 6
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "pos": [
+      0,
+      0
+     ],
+     "sound": "country"
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    5
+   ],
+   "ground": "grass",
+   "roads": [
+    {
+     "dir": "ns",
+     "width": 8
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 9.0
+   },
+   "rows": [
+    {
+     "from": [
+      -7,
+      -10
+     ],
+     "to": [
+      -7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/CommonTree_1.glb"
+     }
+    },
+    {
+     "from": [
+      7,
+      -10
+     ],
+     "to": [
+      7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/BirchTree_2.glb"
+     }
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.2
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    5
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 10
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 8
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    5
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 8
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    6
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 9
+    },
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 9
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 6
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    6
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 10
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    6
+   ],
+   "ground": "grass",
+   "roads": [
+    {
+     "dir": "ns",
+     "width": 8
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 9.0
+   },
+   "rows": [
+    {
+     "from": [
+      -7,
+      -10
+     ],
+     "to": [
+      -7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/CommonTree_1.glb"
+     }
+    },
+    {
+     "from": [
+      7,
+      -10
+     ],
+     "to": [
+      7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/BirchTree_2.glb"
+     }
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.2
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    6
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 9
+    },
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 7
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ],
+   "npc": {
+    "id": "rell",
+    "name": "Rell",
+    "pos": [
+     0,
+     0
+    ],
+    "model": "characters/kk_Rogue.glb",
+    "persona": "You are Rell, a laid-back wanderer resting in the rolling countryside between the city and the old town. Calm, a little poetic about the hills and the open road. Answer in ONE short sentence.",
+    "lines": [
+     "Rell: Nice out here, isn't it? The hills just keep rolling.",
+     "Rell: City's behind you, the old town's over the rise ahead."
+    ]
+   }
+  },
+  {
+   "cell": [
+    2,
+    6
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 9
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 8
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    7
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 11
+    },
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 9
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    7
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 9
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 7
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    7
+   ],
+   "ground": "grass",
+   "roads": [
+    {
+     "dir": "ns",
+     "width": 8
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 9.0
+   },
+   "rows": [
+    {
+     "from": [
+      -7,
+      -10
+     ],
+     "to": [
+      -7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/CommonTree_1.glb"
+     }
+    },
+    {
+     "from": [
+      7,
+      -10
+     ],
+     "to": [
+      7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/BirchTree_2.glb"
+     }
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.2
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    7
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 14
+    },
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 8
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    7
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 13
+    },
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 9
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 8
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    8
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 11
+    },
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 8
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    8
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 10
+    },
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 6
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    8
+   ],
+   "ground": "grass",
+   "roads": [
+    {
+     "dir": "ns",
+     "width": 8
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 9.0
+   },
+   "rows": [
+    {
+     "from": [
+      -7,
+      -10
+     ],
+     "to": [
+      -7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/CommonTree_1.glb"
+     }
+    },
+    {
+     "from": [
+      7,
+      -10
+     ],
+     "to": [
+      7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/BirchTree_2.glb"
+     }
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.2
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    8
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 9
+    },
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 7
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    8
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 11
+    },
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 9
+    }
+   ],
+   "props": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "pos": [
+      2,
+      -2
+     ],
+     "sound": "birds"
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    9
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 12
+    },
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 10
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 9
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 1,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    9
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 9
+    },
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 9
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    9
+   ],
+   "ground": "grass",
+   "roads": [
+    {
+     "dir": "ns",
+     "width": 8
+    }
+   ],
+   "traffic": {
+    "set": [
+     "props/kk_city/car_sedan.glb",
+     "props/kk_city/car_taxi.glb",
+     "props/kk_city/car_hatchback.glb",
+     "props/kk_city/car_stationwagon.glb"
+    ],
+    "count": 2,
+    "speed": 9.0
+   },
+   "rows": [
+    {
+     "from": [
+      -7,
+      -10
+     ],
+     "to": [
+      -7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/CommonTree_1.glb"
+     }
+    },
+    {
+     "from": [
+      7,
+      -10
+     ],
+     "to": [
+      7,
+      10
+     ],
+     "spacing": 6.0,
+     "part": {
+      "url": "props/q_unature/BirchTree_2.glb"
+     }
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue.glb",
+      "characters/kk_Rogue_Hooded.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.2
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    9
+   ],
+   "ground": "dirt",
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 9
+    },
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 8
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    9
+   ],
+   "ground": "grass",
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 10
+    },
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 10
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    10
+   ],
+   "ground": "sandstone",
+   "structures": [
+    {
+     "footprint": [
+      7.0,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      7.5,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 180,
+     "collider": "box",
+     "pos": [
+      -6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      5.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 7
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 6
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    10
+   ],
+   "ground": "sandstone",
+   "structures": [
+    {
+     "footprint": [
+      7.0,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 7
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 7
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    10
+   ],
+   "ground": "dirt",
+   "structures": [
+    {
+     "footprint": [
+      7.5,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      5.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 4
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    10
+   ],
+   "ground": "sandstone",
+   "structures": [
+    {
+     "footprint": [
+      7.5,
+      5.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      5.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_1.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 4
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    10
+   ],
+   "ground": "sandstone",
+   "structures": [
+    {
+     "footprint": [
+      6.0,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      7.5,
+      5.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 5
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    11
+   ],
+   "ground": "dirt",
+   "structures": [
+    {
+     "footprint": [
+      7.0,
+      5.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 180,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 180,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      -6,
+      -6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 8
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 4
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    11
+   ],
+   "ground": "dirt",
+   "structures": [
+    {
+     "footprint": [
+      7.0,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      -6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 4
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 4
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    11
+   ],
+   "ground": "dirt",
+   "structures": [
+    {
+     "footprint": [
+      7.0,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 7
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 4
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    11
+   ],
+   "ground": "grass",
+   "structures": [
+    {
+     "footprint": [
+      6.0,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 180,
+     "collider": "box",
+     "pos": [
+      -6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      7.5,
+      5.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 4
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 7
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    11
+   ],
+   "ground": "dirt",
+   "structures": [
+    {
+     "footprint": [
+      6.0,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 180,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 5
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    12
+   ],
+   "ground": "sandstone",
+   "structures": [
+    {
+     "footprint": [
+      6.0,
+      5.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      5.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 4
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 4
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    12
+   ],
+   "ground": "grass",
+   "structures": [
+    {
+     "footprint": [
+      6.0,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      5.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 5
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    12
+   ],
+   "ground": "sandstone",
+   "landmark": {
+    "url": "/cloud-uhd0t0dyh3pylvbcsftn/models/fountain.glb",
+    "collider": "mesh",
+    "sound": "crowd",
+    "scale": 2.0
+   },
+   "rings": [
+    {
+     "half": [
+      8.0,
+      8.0
+     ],
+     "spacing": 7.5,
+     "part": {
+      "structure": {
+       "footprint": [
+        6.0,
+        6.5
+       ],
+       "floors": 1,
+       "floor_height": 3.0,
+       "profile": "vertical",
+       "cap": "hip",
+       "roof_height": 3.0,
+       "material": "stucco",
+       "roof_material": "roof_tile",
+       "rot": 90,
+       "collider": "box"
+      }
+     }
+    }
+   ],
+   "props": [
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      4,
+      4
+     ]
+    },
+    {
+     "url": "props/kk_city/bench.glb",
+     "pos": [
+      -4,
+      -4
+     ]
+    },
+    {
+     "url": "props/q_street/Streetlight_Single.glb",
+     "pos": [
+      6,
+      -6
+     ]
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 3,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 7.0,
+     "speed": 1.1
+    }
+   ],
+   "npc": {
+    "id": "bram",
+    "name": "Old Bram",
+    "pos": [
+     7,
+     0
+    ],
+    "model": "characters/kk_Rogue_Hooded.glb",
+    "persona": "You are Old Bram, a warm elderly townsman in the cozy old timber quarter, proud of the plaza fountain and the tree-lined boulevard. A little nostalgic. Answer in ONE short sentence.",
+    "lines": [
+     "Bram: You made it to the old town - welcome, traveler.",
+     "Bram: This fountain's older than the whole city down the road."
+    ]
+   }
+  },
+  {
+   "cell": [
+    1,
+    12
+   ],
+   "ground": "dirt",
+   "structures": [
+    {
+     "footprint": [
+      7.5,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_2_A_Color1.glb",
+     "count": 6
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    12
+   ],
+   "ground": "dirt",
+   "structures": [
+    {
+     "footprint": [
+      7.5,
+      5.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 180,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.5,
+      5.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      -6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_2.glb",
+     "count": 4
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 6
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    13
+   ],
+   "ground": "sandstone",
+   "structures": [
+    {
+     "footprint": [
+      7.0,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      5.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 180,
+     "collider": "box",
+     "pos": [
+      -6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      7.5,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_5.glb",
+     "count": 5
+    },
+    {
+     "url": "props/kk_nature/Bush_1_A_Color1.glb",
+     "count": 4
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    13
+   ],
+   "ground": "sandstone",
+   "structures": [
+    {
+     "footprint": [
+      6.0,
+      5.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 180,
+     "collider": "box",
+     "pos": [
+      6,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.0,
+      6.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.5,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      -6,
+      -6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/BirchTree_4.glb",
+     "count": 5
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 7
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    13
+   ],
+   "ground": "dirt",
+   "structures": [
+    {
+     "footprint": [
+      7.5,
+      6.5
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "timber",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      6.0,
+      6.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "wood",
+     "roof_material": "roof_tile",
+     "rot": 0,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 5
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 6
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    13
+   ],
+   "ground": "grass",
+   "structures": [
+    {
+     "footprint": [
+      7.5,
+      6.0
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "gable",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      -6,
+      -6
+     ]
+    },
+    {
+     "footprint": [
+      7.5,
+      6.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      6,
+      -6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 5
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 5
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    13
+   ],
+   "ground": "grass",
+   "structures": [
+    {
+     "footprint": [
+      7.0,
+      5.0
+     ],
+     "floors": 2,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 270,
+     "collider": "box",
+     "pos": [
+      0,
+      6
+     ]
+    },
+    {
+     "footprint": [
+      7.5,
+      6.5
+     ],
+     "floors": 1,
+     "floor_height": 3.0,
+     "profile": "vertical",
+     "cap": "hip",
+     "roof_height": 3.0,
+     "material": "stucco",
+     "roof_material": "roof_tile",
+     "rot": 90,
+     "collider": "box",
+     "pos": [
+      -6,
+      6
+     ]
+    }
+   ],
+   "scatter": [
+    {
+     "url": "props/q_unature/CommonTree_3.glb",
+     "count": 6
+    },
+    {
+     "url": "props/kk_nature/Bush_1_D_Color1.glb",
+     "count": 5
+    }
+   ],
+   "populate": [
+    {
+     "set": [
+      "characters/kk_Rogue_Hooded.glb",
+      "characters/kk_Mage.glb",
+      "characters/kk_Knight.glb"
+     ],
+     "count": 2,
+     "vary": true,
+     "behaviour": "wander",
+     "rig": "kaykit",
+     "radius": 6.0,
+     "speed": 1.1
+    }
+   ]
+  }
+ ]
+}

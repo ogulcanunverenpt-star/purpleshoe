@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="tr" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>2FA Kurulumu</title>
+</head>
+<body>
+  <h2>Google Authenticator Kurulumu</h2>
+  <p>Telefonundaki Google Authenticator / Authy uygulamasını aç, bu QR kodu tara:</p>
+  
+  <img src="<%= qr %>" alt="QR Code">
+  
+  
+  
+  <form action="/verify" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label for="token">Uygulamadaki 6 haneli kod:</label>
+    <input type="text" id="token" name="token" required>
+    <button type="submit">Doğrula</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Player/player.gd" id="1"]
+
+[sub_resource type="CapsuleShape3D" id="Body"]
+radius = 0.9
+height = 5.4
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1")
+world_scale = 3.0
+gravity_scale = 1.0
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+shape = SubResource("Body")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.95, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+current = true
+fov = 60.0
+near = 0.15
+far = 1800.0
+

@@ -1,0 +1,22 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cl2rjg3ntojc3"]
+
+[ext_resource type="Shader" uid="uid://bqc2dhbpj43dp" path="res://AloneInTheDusk/Shaders/psx_terrain.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://cul00avpc8oxu" path="res://AloneInTheDusk/Textures/terrain_splat_0.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://dajkqxxcspr53" path="res://AloneInTheDusk/Textures/sand_106.tga" id="3"]
+[ext_resource type="Texture2D" uid="uid://dar8h3d0cha7t" path="res://AloneInTheDusk/Textures/Sand_107.tga" id="4"]
+[ext_resource type="Texture2D" uid="uid://c7da3wjmvjl6e" path="res://AloneInTheDusk/Textures/Cliffs029_S.jpg" id="5"]
+
+[resource]
+resource_name = "terrain"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/depth_push = 0.06
+shader_parameter/splat = ExtResource("2")
+shader_parameter/albedo_r = ExtResource("3")
+shader_parameter/albedo_g = ExtResource("4")
+shader_parameter/albedo_b = ExtResource("5")
+shader_parameter/ground_tint = Color(0.72, 0.66, 0.6, 1)
+shader_parameter/terrain_metres = 500.0
+shader_parameter/tile_metres = 5.0
+shader_parameter/ground_texel_metres = 0.08
+shader_parameter/texel_reference_resolution = 128.0

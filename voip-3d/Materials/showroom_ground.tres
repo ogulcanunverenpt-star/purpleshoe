@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c0q23ich5xqyr"]
+
+[ext_resource type="Shader" uid="uid://cus1qo7ar7uia" path="res://AloneInTheDusk/Shaders/psx_material.gdshader" id="1"]
+[ext_resource type="Texture2D" uid="uid://dajkqxxcspr53" path="res://AloneInTheDusk/Textures/sand_106.tga" id="2"]
+
+[resource]
+resource_name = "showroom_ground"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/albedo_texture = ExtResource("2")
+shader_parameter/albedo_tint = Color(0.72, 0.66, 0.6, 1)
+shader_parameter/alpha_cutoff = 0.0
+shader_parameter/uv_scale = Vector2(56, 44)
+shader_parameter/uv_offset = Vector2(0, 0)
+shader_parameter/depth_nudge = 0.0
+shader_parameter/local_texture_resolution = 178.0
+shader_parameter/local_colour_levels = -1.0

@@ -1,0 +1,379 @@
+[gd_scene format=3 uid="uid://b7v8m23k4l5p6"]
+
+[ext_resource type="Script" uid="uid://tvsmfeh2dybu" path="res://lobby.gd" id="1_lobby"]
+[ext_resource type="Theme" uid="uid://b3klx57slj0l3" path="res://themes/soft_retro/soft_retro.tres" id="2_theme"]
+
+[node name="Lobby" type="Control" unique_id=456457387]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_lobby")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=633042548]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=989253534]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="AuthPanel" type="Control" parent="CanvasLayer/Control" unique_id=1355066609]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/AuthPanel" unique_id=1846373295]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.05
+anchor_right = 0.95
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Title" type="Label" parent="CanvasLayer/Control/AuthPanel/VBox" unique_id=1434116885]
+layout_mode = 2
+text = "PurpleShoe"
+horizontal_alignment = 1
+
+[node name="UsernameEdit" type="LineEdit" parent="CanvasLayer/Control/AuthPanel/VBox" unique_id=1554350320]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+placeholder_text = "Username"
+alignment = 1
+
+[node name="PasswordEdit" type="LineEdit" parent="CanvasLayer/Control/AuthPanel/VBox" unique_id=239366830]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+placeholder_text = "Password"
+alignment = 1
+secret = true
+
+[node name="LoginBtn" type="Button" parent="CanvasLayer/Control/AuthPanel/VBox" unique_id=1697278329]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Log In"
+
+[node name="RegisterBtn" type="Button" parent="CanvasLayer/Control/AuthPanel/VBox" unique_id=177677025]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Register"
+
+[node name="AuthStatusLabel" type="Label" parent="CanvasLayer/Control/AuthPanel/VBox" unique_id=1109198523]
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="MainPanel" type="Control" parent="CanvasLayer/Control" unique_id=1664232269]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="CanvasLayer/Control/MainPanel" unique_id=22505703]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 15.0
+offset_top = 10.0
+offset_right = -15.0
+offset_bottom = 60.0
+grow_horizontal = 2
+
+[node name="UserInfoLabel" type="Label" parent="CanvasLayer/Control/MainPanel/Header" unique_id=747231665]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "User: -"
+vertical_alignment = 1
+
+[node name="ReturnToGameBtn" type="Button" parent="CanvasLayer/Control/MainPanel/Header"]
+custom_minimum_size = Vector2(160, 50)
+layout_mode = 2
+text = "Return to Game"
+visible = false
+
+[node name="LogoutBtn" type="Button" parent="CanvasLayer/Control/MainPanel/Header" unique_id=167397862]
+custom_minimum_size = Vector2(140, 50)
+layout_mode = 2
+text = "Log Out"
+
+[node name="TabContainer" type="TabContainer" parent="CanvasLayer/Control/MainPanel" unique_id=779508142]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 70.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 0
+
+[node name="Friends" type="Control" parent="CanvasLayer/Control/MainPanel/TabContainer" unique_id=90045754]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends" unique_id=977792373]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 15.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="LeftVBox" type="VBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox" unique_id=201240673]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox" unique_id=715344755]
+layout_mode = 2
+text = "FRIENDS"
+
+[node name="OnlineTitle" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox"]
+layout_mode = 2
+text = "ONLINE PLAYERS"
+
+[node name="OnlineUsersScroll" type="ScrollContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+
+[node name="OnlineUsersVBox" type="VBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox/OnlineUsersScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FriendsScroll" type="ScrollContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox" unique_id=743492170]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FriendsVBox" type="VBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox/FriendsScroll" unique_id=873405847]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PendingTitle" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox" unique_id=1309433949]
+layout_mode = 2
+text = "INCOMING REQUESTS"
+
+[node name="PendingVBox" type="VBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox" unique_id=519650481]
+layout_mode = 2
+
+[node name="SearchHBox" type="HBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox" unique_id=292981004]
+layout_mode = 2
+
+[node name="SearchInput" type="LineEdit" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox/SearchHBox" unique_id=332146087]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search users..."
+
+[node name="SearchBtn" type="Button" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox/SearchHBox" unique_id=496191817]
+custom_minimum_size = Vector2(100, 56)
+layout_mode = 2
+text = "Ara"
+
+[node name="SearchResultsVBox" type="VBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox" unique_id=904607860]
+layout_mode = 2
+
+[node name="ChatVBox" type="VBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox" unique_id=20128851]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="FriendTitleLabel" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/ChatVBox" unique_id=1298749799]
+layout_mode = 2
+text = "Select a friend to start chatting"
+
+[node name="ChatHistory" type="TextEdit" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/ChatVBox" unique_id=1380298672]
+layout_mode = 2
+size_flags_vertical = 3
+editable = false
+
+[node name="InputHBox" type="HBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/ChatVBox" unique_id=270047691]
+layout_mode = 2
+
+[node name="ChatInput" type="LineEdit" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/ChatVBox/InputHBox" unique_id=1256445687]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Write a message..."
+
+[node name="SendBtn" type="Button" parent="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/ChatVBox/InputHBox" unique_id=1694565551]
+custom_minimum_size = Vector2(130, 56)
+layout_mode = 2
+text = "Send"
+
+[node name="CreateRoom" type="Control" parent="CanvasLayer/Control/MainPanel/TabContainer" unique_id=1401286040]
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom" unique_id=546812873]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="IntroLabel" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "Create a room; friends can accept your invite even after returning to the lobby."
+autowrap_mode = 2
+
+[node name="ModeLabel" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox" unique_id=1063696647]
+layout_mode = 2
+text = "SELECT GAME MODE"
+
+[node name="ModeOption" type="OptionButton" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox" unique_id=786751757]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="DurationLabel" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox" unique_id=1688890929]
+layout_mode = 2
+text = "MATCH DURATION"
+
+[node name="DurationOption" type="OptionButton" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox" unique_id=1206789912]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="FriendsLabel" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox" unique_id=197646250]
+layout_mode = 2
+text = "SELECT FRIENDS TO INVITE"
+
+[node name="FriendsScroll" type="ScrollContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox" unique_id=561593830]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CheckboxesVBox" type="VBoxContainer" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox/FriendsScroll" unique_id=1061955259]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RequestRoomBtn" type="Button" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox" unique_id=1852455350]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+text = "CREATE ROOM · SEND INVITES"
+
+[node name="RoomStatusLabel" type="Label" parent="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox" unique_id=756019101]
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="InviteModal" type="Window" parent="CanvasLayer/Control" unique_id=397128698]
+title = "Room Invitation"
+initial_position = 2
+size = Vector2i(620, 320)
+visible = false
+transient = true
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/InviteModal" unique_id=1196898139]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="InviteLabel" type="Label" parent="CanvasLayer/Control/InviteModal/VBox" unique_id=2145980629]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Invitation from X!"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/InviteModal/VBox" unique_id=1259807704]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="AcceptBtn" type="Button" parent="CanvasLayer/Control/InviteModal/VBox/HBox" unique_id=1934344278]
+custom_minimum_size = Vector2(180, 60)
+layout_mode = 2
+text = "Kabul Et"
+
+[node name="DeclineBtn" type="Button" parent="CanvasLayer/Control/InviteModal/VBox/HBox" unique_id=2041650361]
+custom_minimum_size = Vector2(180, 60)
+layout_mode = 2
+text = "Reddet"
+
+[node name="RoleModal" type="Window" parent="CanvasLayer/Control" unique_id=61082408]
+title = "Select Role"
+initial_position = 2
+size = Vector2i(600, 340)
+visible = false
+transient = true
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/RoleModal" unique_id=1585199513]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/Control/RoleModal/VBox" unique_id=2017710423]
+layout_mode = 2
+text = "Choose Role and Team"
+horizontal_alignment = 1
+
+[node name="RoleOption" type="OptionButton" parent="CanvasLayer/Control/RoleModal/VBox" unique_id=1932546446]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+
+[node name="TeamOption" type="OptionButton" parent="CanvasLayer/Control/RoleModal/VBox" unique_id=1910394912]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+
+[node name="JoinRoomBtn" type="Button" parent="CanvasLayer/Control/RoleModal/VBox" unique_id=1102686820]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Join Room"
+
+[connection signal="pressed" from="CanvasLayer/Control/AuthPanel/VBox/LoginBtn" to="." method="_on_login_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/AuthPanel/VBox/RegisterBtn" to="." method="_on_register_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/MainPanel/Header/LogoutBtn" to="." method="_on_logout_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/MainPanel/Header/ReturnToGameBtn" to="." method="_on_return_to_game_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/LeftVBox/SearchHBox/SearchBtn" to="." method="_on_search_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/MainPanel/TabContainer/Friends/HBox/ChatVBox/InputHBox/SendBtn" to="." method="_on_chat_send_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/MainPanel/TabContainer/CreateRoom/VBox/RequestRoomBtn" to="." method="_on_request_room_btn_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/InviteModal/VBox/HBox/AcceptBtn" to="." method="_on_accept_invite_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/InviteModal/VBox/HBox/DeclineBtn" to="." method="_on_decline_invite_pressed"]
+[connection signal="pressed" from="CanvasLayer/Control/RoleModal/VBox/JoinRoomBtn" to="." method="_on_join_room_btn_pressed"]

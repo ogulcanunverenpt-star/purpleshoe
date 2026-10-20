@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://df8ogl8fhta65"]
+
+[ext_resource type="Shader" uid="uid://cus1qo7ar7uia" path="res://AloneInTheDusk/Shaders/psx_material.gdshader" id="1"]
+[ext_resource type="Texture2D" path="res://AloneInTheDusk/Textures/props_cb_albedo.png" id="2"]
+
+[resource]
+resource_name = "props_atlas"
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/albedo_texture = ExtResource("2")
+shader_parameter/albedo_tint = Color(0.641509, 0.641509, 0.641509, 1)
+shader_parameter/alpha_cutoff = 0.0
+shader_parameter/uv_scale = Vector2(1, 1)
+shader_parameter/uv_offset = Vector2(0, 0)
+shader_parameter/depth_nudge = 0.0
+shader_parameter/local_texture_resolution = 832.0
+shader_parameter/local_colour_levels = -1.0

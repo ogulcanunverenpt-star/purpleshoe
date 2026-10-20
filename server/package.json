@@ -1,0 +1,39 @@
+{
+  "name": "firewall-ui",
+  "version": "1.0.0",
+  "description": "Firewall agent için log server ve process.txt yönetim arayüzü",
+  "main": "server.js",
+  "scripts": {
+    "start": "node cluster.js",
+    "start:pm2": "pm2-runtime start ecosystem.config.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "seninkanka",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.3.0",
+    "cookie-parser": "^1.4.7",
+    "cookie-session": "^2.1.1",
+    "csurf": "^1.11.0",
+    "dotenv": "^18.0.5",
+    "ejs": "^6.0.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.7.0",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.3.0",
+    "multer": "^2.4.0",
+    "pg": "^8.13.1",
+    "pm2": "^7.0.4",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.4",
+    "speakeasy": "^2.0.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "keywords": []
+}

@@ -1,0 +1,45 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/size_sign.glb" id="1"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/Curve_fence_02.glb" id="2"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/Curve_fence_leg_02.glb" id="3"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/Covered_bridge_02.glb" id="4"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/Curve_fence_leg_01.glb" id="5"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/small_rocks_00.glb" id="6"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/small_rocks_01.glb" id="7"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Meshes/small_rocks_03.glb" id="8"]
+
+[node name="Bridge_prefab" type="Node3D"]
+
+[node name="size_sign" parent="." instance=ExtResource("1")]
+transform = Transform3D(-0.640683, -0, 0.767805, -0, 1, 0, -0.767805, -0, -0.640683, 4.257798, 0.28, 10.499776)
+
+[node name="Curve_fence_02 (1)" parent="." instance=ExtResource("2")]
+transform = Transform3D(-0.858628, -0.021171, -0.512162, 0, 0.999147, -0.041301, 0.512599, -0.035462, -0.857896, 16.780752, 0.130001, 25.419205)
+
+[node name="Curve_fence_leg_02 (2)" parent="." instance=ExtResource("3")]
+transform = Transform3D(0.754917, 0, -0.65582, 0, 1, 0, 0.65582, -0, 0.754917, 15.935411, 0.020001, 14.082857)
+
+[node name="Covered_bridge_02 (1)" parent="." instance=ExtResource("4")]
+transform = Transform3D(-0.806079, -0, 0.591807, -0, 1, 0, -0.591807, -0, -0.806079, -4.574781, -0.119999, 28.705425)
+
+[node name="Curve_fence_leg_01 (3)" parent="." instance=ExtResource("5")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 8.79549, -0.06, 5.679919)
+
+[node name="Curve_fence_02 (2)" parent="." instance=ExtResource("2")]
+transform = Transform3D(-0.938751, -0, 0.344597, -0, 1, 0, -0.344597, -0, -0.938751, -3.303564, -0.26, 4.585289)
+
+[node name="small_rocks_00" parent="." instance=ExtResource("6")]
+transform = Transform3D(1, -0, -0, -0, 1, 0, -0, 0, 1, -0, 0, 0)
+
+[node name="small_rocks_01" parent="." instance=ExtResource("7")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 14.079368, 0.060001, 19.319717)
+
+[node name="Curve_fence_leg_01 (2)" parent="." instance=ExtResource("5")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 6.082214, 0.11, 8.252813)
+
+[node name="small_rocks_03" parent="." instance=ExtResource("8")]
+transform = Transform3D(0.907463, -0, 0.420131, 0, 1, 0, -0.420131, -0, 0.907463, 16.932522, -0.039999, 23.778814)
+
+[node name="Curve_fence_leg_01 (4)" parent="." instance=ExtResource("5")]
+transform = Transform3D(-0.830563, -0, 0.556924, -0, 1, 0, -0.556924, 0, -0.830563, 13.743956, 0.040001, 16.6821)

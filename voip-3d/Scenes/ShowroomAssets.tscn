@@ -1,0 +1,510 @@
+[gd_scene format=3 uid="uid://c8k3ab3c4ld2c"]
+
+[ext_resource type="PackedScene" uid="uid://mgridxk61mmi" path="res://AloneInTheDusk/Meshes/Lamp_02.glb" id="1"]
+[ext_resource type="PackedScene" uid="uid://b0tamtghdd52e" path="res://AloneInTheDusk/Meshes/lamp_01.glb" id="2"]
+[ext_resource type="PackedScene" uid="uid://bgftxw7nr8njg" path="res://AloneInTheDusk/Meshes/Lamp_broken_02.glb" id="3"]
+[ext_resource type="PackedScene" uid="uid://b0v0oy3crl5n0" path="res://AloneInTheDusk/Meshes/Telegraph_pole.glb" id="4"]
+[ext_resource type="PackedScene" uid="uid://6k2tbse5uvej" path="res://AloneInTheDusk/Meshes/Lamp_broken_01.glb" id="5"]
+[ext_resource type="PackedScene" uid="uid://77pkv5xd6j5g" path="res://AloneInTheDusk/Meshes/Telegraph_pole_02.glb" id="6"]
+[ext_resource type="PackedScene" uid="uid://dqo5e07skwq3j" path="res://AloneInTheDusk/Meshes/Curve_fence_leg_02.glb" id="7"]
+[ext_resource type="PackedScene" uid="uid://buu85jla6iwql" path="res://AloneInTheDusk/Meshes/Curve_fence_leg_01.glb" id="8"]
+[ext_resource type="PackedScene" uid="uid://bhke2ri2dcaq0" path="res://AloneInTheDusk/Meshes/big_fence_01.glb" id="9"]
+[ext_resource type="PackedScene" uid="uid://dm3mp0hslc7ub" path="res://AloneInTheDusk/Meshes/Fence_01.glb" id="10"]
+[ext_resource type="PackedScene" uid="uid://1sflpxvpr0md" path="res://AloneInTheDusk/Meshes/Fence_05.glb" id="11"]
+[ext_resource type="PackedScene" uid="uid://dlmt333h1fkrb" path="res://AloneInTheDusk/Meshes/fence_03.glb" id="12"]
+[ext_resource type="PackedScene" uid="uid://boawokbqs0th0" path="res://AloneInTheDusk/Meshes/Curve_fence_01.glb" id="13"]
+[ext_resource type="PackedScene" uid="uid://gwpj3jrs4ljk" path="res://AloneInTheDusk/Meshes/fence_02_beam.glb" id="14"]
+[ext_resource type="PackedScene" uid="uid://bxxhfh0stmsom" path="res://AloneInTheDusk/Meshes/Fence_03_leg.glb" id="15"]
+[ext_resource type="PackedScene" uid="uid://b6mmny0m1bb1" path="res://AloneInTheDusk/Meshes/Fence_01_leg.glb" id="16"]
+[ext_resource type="PackedScene" uid="uid://bkthxdjuum3m2" path="res://AloneInTheDusk/Meshes/Fence_04.glb" id="17"]
+[ext_resource type="PackedScene" uid="uid://c61vvrv2gispv" path="res://AloneInTheDusk/Meshes/Curve_fence_02.glb" id="18"]
+[ext_resource type="PackedScene" uid="uid://ctervwbx4i6f7" path="res://AloneInTheDusk/Meshes/big_fence_03.glb" id="19"]
+[ext_resource type="PackedScene" uid="uid://7bdqkfhncc5k" path="res://AloneInTheDusk/Meshes/Fence_02.glb" id="20"]
+[ext_resource type="PackedScene" uid="uid://cvhx62lgr5r5p" path="res://AloneInTheDusk/Meshes/big_fence_02.glb" id="21"]
+[ext_resource type="PackedScene" uid="uid://b1f3dvqw8cfop" path="res://AloneInTheDusk/Meshes/peg_leg_03.glb" id="22"]
+[ext_resource type="PackedScene" uid="uid://c3umicx2kitrb" path="res://AloneInTheDusk/Meshes/Fence_02_leg.glb" id="23"]
+[ext_resource type="PackedScene" uid="uid://c6y11b36rnmpn" path="res://AloneInTheDusk/Meshes/1_road_02_start_uphill.glb" id="24"]
+[ext_resource type="PackedScene" uid="uid://rs3m6ke8um30" path="res://AloneInTheDusk/Meshes/3_road_02_seamless.glb" id="25"]
+[ext_resource type="PackedScene" uid="uid://k6ce6q56lmdj" path="res://AloneInTheDusk/Meshes/4_road_02_end_downHill.glb" id="26"]
+[ext_resource type="PackedScene" uid="uid://d0v8vi57rp46g" path="res://AloneInTheDusk/Meshes/5_road_02_bend.glb" id="27"]
+[ext_resource type="PackedScene" uid="uid://exkcwpspg0jw" path="res://AloneInTheDusk/Meshes/2_road_02_start_downHill.glb" id="28"]
+[ext_resource type="PackedScene" uid="uid://ddl8n7iewwnt8" path="res://AloneInTheDusk/Meshes/Sign_01.glb" id="29"]
+[ext_resource type="PackedScene" uid="uid://ceakk58h3j5ms" path="res://AloneInTheDusk/Meshes/sh_Sign.glb" id="30"]
+[ext_resource type="PackedScene" uid="uid://uu40c0th2nct" path="res://AloneInTheDusk/Meshes/Sign_02.glb" id="31"]
+[ext_resource type="PackedScene" uid="uid://ded6upowl62s1" path="res://AloneInTheDusk/Meshes/size_sign.glb" id="32"]
+[ext_resource type="PackedScene" uid="uid://df16l37wlnchn" path="res://AloneInTheDusk/Meshes/wall_01_corner_01.glb" id="33"]
+[ext_resource type="PackedScene" uid="uid://74nuw5n8ja87" path="res://AloneInTheDusk/Meshes/03_wall_01_seamless.glb" id="34"]
+[ext_resource type="PackedScene" uid="uid://bcggbelnssec3" path="res://AloneInTheDusk/Meshes/02_wall_01_seamless.glb" id="35"]
+[ext_resource type="PackedScene" uid="uid://cfc3nxhvdikn" path="res://AloneInTheDusk/Meshes/wall_01_corner_02.glb" id="36"]
+[ext_resource type="PackedScene" uid="uid://b7bul0c0ps4tl" path="res://AloneInTheDusk/Meshes/05_wall_01_seamless.glb" id="37"]
+[ext_resource type="PackedScene" uid="uid://bch7y13blxdvp" path="res://AloneInTheDusk/Meshes/01_wall_01_start.glb" id="38"]
+[ext_resource type="PackedScene" uid="uid://cpul7168brv3u" path="res://AloneInTheDusk/Meshes/04_wall_01_seamless.glb" id="39"]
+[ext_resource type="PackedScene" uid="uid://bgc0ed6rfiiel" path="res://AloneInTheDusk/Meshes/01_wall_01_end.glb" id="40"]
+[ext_resource type="PackedScene" uid="uid://bbw4qhn8by2os" path="res://AloneInTheDusk/Meshes/01_wall_01_seamless.glb" id="41"]
+[ext_resource type="PackedScene" uid="uid://solugr26pcv0" path="res://AloneInTheDusk/Meshes/Barrier.glb" id="42"]
+[ext_resource type="PackedScene" uid="uid://b6ie6hbflxj6s" path="res://AloneInTheDusk/Meshes/gate_ball.glb" id="43"]
+[ext_resource type="PackedScene" uid="uid://dy4xirpsor7hh" path="res://AloneInTheDusk/Meshes/small_rocks_02.glb" id="44"]
+[ext_resource type="PackedScene" uid="uid://0qbq5pt31ave" path="res://AloneInTheDusk/Meshes/Trunk_01.glb" id="45"]
+[ext_resource type="PackedScene" uid="uid://tn37rnype5na" path="res://AloneInTheDusk/Meshes/rocks_04.glb" id="46"]
+[ext_resource type="PackedScene" uid="uid://dtbtqico0mcr4" path="res://AloneInTheDusk/Meshes/small_rocks_04.glb" id="47"]
+[ext_resource type="PackedScene" uid="uid://bqpi20ucl1f8c" path="res://AloneInTheDusk/Meshes/small_rocks_00.glb" id="48"]
+[ext_resource type="PackedScene" uid="uid://cxqqdbtopx143" path="res://AloneInTheDusk/Meshes/small_rocks_01.glb" id="49"]
+[ext_resource type="PackedScene" uid="uid://qklfxuo5kyaq" path="res://AloneInTheDusk/Meshes/rocks_03.glb" id="50"]
+[ext_resource type="PackedScene" uid="uid://baj2v3p51ydaf" path="res://AloneInTheDusk/Meshes/Trunk_02.glb" id="51"]
+[ext_resource type="PackedScene" uid="uid://btq30sdwo77ro" path="res://AloneInTheDusk/Meshes/rocks_big.glb" id="52"]
+[ext_resource type="PackedScene" uid="uid://cfvk48nh3ifbw" path="res://AloneInTheDusk/Meshes/rocks_02.glb" id="53"]
+[ext_resource type="PackedScene" uid="uid://dxyjnebo8tgij" path="res://AloneInTheDusk/Meshes/small_rocks_03.glb" id="54"]
+[ext_resource type="PackedScene" uid="uid://c3i4sx80vijkc" path="res://AloneInTheDusk/Meshes/lowWallToplowWallTop_03_seamless.glb" id="55"]
+[ext_resource type="PackedScene" uid="uid://chiyq4qe1tn3p" path="res://AloneInTheDusk/Meshes/lowWallToplowWallTop_03_corner_01.glb" id="56"]
+[ext_resource type="PackedScene" uid="uid://bmhmrybqd3poa" path="res://AloneInTheDusk/Meshes/lowWallToplowWallTop_03_corner_02.glb" id="57"]
+[ext_resource type="PackedScene" uid="uid://be71gjtwgegt7" path="res://AloneInTheDusk/Meshes/lowWallToplowWallTop_03_long.glb" id="58"]
+[ext_resource type="PackedScene" uid="uid://dm4xs4vak1db1" path="res://AloneInTheDusk/Meshes/3_road_01_seamles.glb" id="59"]
+[ext_resource type="PackedScene" uid="uid://d1psetwtc7u3q" path="res://AloneInTheDusk/Meshes/2_road_01_start_downhill.glb" id="60"]
+[ext_resource type="PackedScene" uid="uid://dnurwt4ijms35" path="res://AloneInTheDusk/Meshes/4_road_01_end_downhill.glb" id="61"]
+[ext_resource type="PackedScene" uid="uid://ce4ska00i63yd" path="res://AloneInTheDusk/Meshes/5_road_01_bend.glb" id="62"]
+[ext_resource type="PackedScene" uid="uid://bq85nkuak7b2p" path="res://AloneInTheDusk/Meshes/1_road_01_start_uphill.glb" id="63"]
+[ext_resource type="PackedScene" uid="uid://ccyq1ymabm8xd" path="res://AloneInTheDusk/Meshes/wallTop_02_seamless.glb" id="64"]
+[ext_resource type="PackedScene" uid="uid://da45axysv5q8v" path="res://AloneInTheDusk/Meshes/wallTop_02_end.glb" id="65"]
+[ext_resource type="PackedScene" uid="uid://ljce6uniwwcj" path="res://AloneInTheDusk/Meshes/wallTop_02_long.glb" id="66"]
+[ext_resource type="PackedScene" uid="uid://tgql6uxs5o6g" path="res://AloneInTheDusk/Meshes/wallTop_02_corner_01.glb" id="67"]
+[ext_resource type="PackedScene" uid="uid://wab4d5njy1tn" path="res://AloneInTheDusk/Meshes/wallTop_02_corner_02.glb" id="68"]
+[ext_resource type="PackedScene" uid="uid://n3afhxh0pipl" path="res://AloneInTheDusk/Meshes/wallTop_02_start.glb" id="69"]
+[ext_resource type="PackedScene" uid="uid://vbq2bvc17hgw" path="res://AloneInTheDusk/Meshes/massive_bench_02.glb" id="70"]
+[ext_resource type="PackedScene" uid="uid://bnfw66ptspvsn" path="res://AloneInTheDusk/Meshes/block.glb" id="71"]
+[ext_resource type="PackedScene" uid="uid://vbeuonmkljcw" path="res://AloneInTheDusk/Meshes/Tourist_trash.glb" id="72"]
+[ext_resource type="PackedScene" uid="uid://d1qya3l2lusqp" path="res://AloneInTheDusk/Meshes/massive_tabble_01.glb" id="73"]
+[ext_resource type="PackedScene" uid="uid://c106goh4x4qgg" path="res://AloneInTheDusk/Meshes/massive_bench_01.glb" id="74"]
+[ext_resource type="PackedScene" uid="uid://mk2ibi61v8eh" path="res://AloneInTheDusk/Meshes/Covered_bridge_02.glb" id="75"]
+[ext_resource type="Material" path="res://AloneInTheDusk/Materials/showroom_ground.tres" id="77_x6hap"]
+[ext_resource type="PackedScene" uid="uid://v3dvajfvkvf8" path="res://AloneInTheDusk/Meshes/Covered_bridge_01.glb" id="78"]
+[ext_resource type="PackedScene" uid="uid://d7ladupuwc8q" path="res://AloneInTheDusk/Meshes/Covered_bridge_03.glb" id="79"]
+[ext_resource type="PackedScene" uid="uid://c62d3yj2m3eqd" path="res://AloneInTheDusk/Meshes/Covered_bridge_04.glb" id="80"]
+[ext_resource type="PackedScene" uid="uid://bodmo123i5wub" path="res://AloneInTheDusk/Meshes/1_b3_first_left.glb" id="81"]
+[ext_resource type="PackedScene" uid="uid://dvwkwlyjxih54" path="res://AloneInTheDusk/Meshes/2_b3_first_left_02.glb" id="82"]
+[ext_resource type="PackedScene" uid="uid://cvmtrwnva0ngi" path="res://AloneInTheDusk/Meshes/3_b3_seamless.glb" id="83"]
+[ext_resource type="PackedScene" uid="uid://q8pmpuofbthx" path="res://AloneInTheDusk/Meshes/4_b3_end_right_01.glb" id="84"]
+[ext_resource type="PackedScene" uid="uid://o875cxh6rok1" path="res://AloneInTheDusk/Meshes/5_b3_end_right_02.glb" id="85"]
+[ext_resource type="PackedScene" uid="uid://dv5vgvhwh7hed" path="res://AloneInTheDusk/Meshes/0_b4_footbridge.glb" id="86"]
+[ext_resource type="PackedScene" uid="uid://cgcafmwq2pwri" path="res://AloneInTheDusk/Meshes/1_b4_first_left.glb" id="87"]
+[ext_resource type="PackedScene" uid="uid://dl3ux4lx23m7b" path="res://AloneInTheDusk/Meshes/2_b4_left_seamless.glb" id="88"]
+[ext_resource type="PackedScene" uid="uid://c00gfg84sprqv" path="res://AloneInTheDusk/Meshes/3_b4_middle.glb" id="89"]
+[ext_resource type="PackedScene" uid="uid://drjjfy1oe3cjo" path="res://AloneInTheDusk/Meshes/4_b4_right_seamless.glb" id="90"]
+[ext_resource type="PackedScene" uid="uid://db1tfmkqdkejm" path="res://AloneInTheDusk/Meshes/5_b4_right_right.glb" id="91"]
+[ext_resource type="PackedScene" uid="uid://ciuufng4j0csd" path="res://AloneInTheDusk/Meshes/Column_bridge_04_01.glb" id="92"]
+[ext_resource type="PackedScene" uid="uid://cue736jrfugu0" path="res://AloneInTheDusk/Meshes/Column_bridge_04_02.glb" id="93"]
+[ext_resource type="PackedScene" uid="uid://djxdgp5pkeohb" path="res://AloneInTheDusk/Meshes/Column_bridge_04_03.glb" id="94"]
+[ext_resource type="Material" path="res://AloneInTheDusk/Materials/psx_screen.tres" id="psx_screen_mat"]
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
+sky_top_color = Color(0.06, 0.07, 0.12, 1)
+sky_horizon_color = Color(0.42, 0.3, 0.24, 1)
+sky_curve = 0.22
+sky_energy_multiplier = 0.8
+ground_bottom_color = Color(0.1, 0.08, 0.08, 1)
+ground_horizon_color = Color(0.42, 0.3, 0.24, 1)
+ground_curve = 0.08
+sun_angle_max = 24.0
+sun_curve = 0.08
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("SkyMat")
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.16, 0.2, 0.34, 1)
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 2.2
+tonemap_mode = 3
+tonemap_exposure = 1.7
+tonemap_white = 2.4
+glow_enabled = true
+glow_intensity = 0.42
+glow_strength = 0.9
+glow_bloom = 0.12
+glow_hdr_threshold = 0.95
+fog_enabled = true
+fog_light_color = Color(0.1, 0.12, 0.18, 1)
+fog_sun_scatter = 0.22
+fog_density = 0.007
+fog_aerial_perspective = 0.35
+fog_sky_affect = 0.85
+adjustment_enabled = true
+adjustment_contrast = 1.06
+adjustment_saturation = 0.78
+
+[sub_resource type="BoxMesh" id="BoxMesh_6rmrv"]
+size = Vector3(280, 2, 220)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rgygn"]
+size = Vector3(280, 2, 220)
+
+[node name="ShowroomAssets" type="Node3D" unique_id=962898885]
+
+[node name="Pole" type="Node3D" parent="." unique_id=1317980029]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.56, -17.953125, 73.265625)
+
+[node name="Lamp_02" parent="Pole" unique_id=737904481 instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.16, 18.012577, 14.6)
+
+[node name="lamp_01" parent="Pole" unique_id=599331763 instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.22, 18.05888, -3.51)
+
+[node name="Lamp_broken_02" parent="Pole" unique_id=1578337687 instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50.71, 18.131304, -1.08)
+
+[node name="Telegraph_pole" parent="Pole" unique_id=778296566 instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 58.32, 17.953127, -3.23)
+
+[node name="Lamp_broken_01" parent="Pole" unique_id=1725192908 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.89, 18.015202, -2.57)
+
+[node name="Telegraph_pole_02" parent="Pole" unique_id=386341910 instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 68.87, 17.953125, -3.27)
+
+[node name="Fences" type="Node3D" parent="." unique_id=202507870]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.78, -14.65, 49.050438)
+
+[node name="Curve_fence_leg_02" parent="Fences" unique_id=709648980 instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.88, 14.708903, -11.8)
+
+[node name="Curve_fence_leg_01" parent="Fences" unique_id=190041582 instance=ExtResource("8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.85, 14.739066, -9.36)
+
+[node name="big_fence_01" parent="Fences" unique_id=2003753286 instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.9, 15.240166, 0)
+
+[node name="Fence_01" parent="Fences" unique_id=1437793972 instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.57, 14.6, 0)
+
+[node name="Fence_05" parent="Fences" unique_id=158871361 instance=ExtResource("11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.82, 14.6, 0)
+
+[node name="fence_03" parent="Fences" unique_id=1453210301 instance=ExtResource("12")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.73, 14.734129, 0)
+
+[node name="Curve_fence_01" parent="Fences" unique_id=1837233437 instance=ExtResource("13")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.88, 15.076037, 0)
+
+[node name="fence_02_beam" parent="Fences" unique_id=780548004 instance=ExtResource("14")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.98, 14.650001, 0)
+
+[node name="Fence_03_leg" parent="Fences" unique_id=817451182 instance=ExtResource("15")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 14.665725, -12.09)
+
+[node name="Fence_01_leg" parent="Fences" unique_id=556793224 instance=ExtResource("16")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.16, 14.6553, -9.3)
+
+[node name="Fence_04" parent="Fences" unique_id=524897552 instance=ExtResource("17")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.752418, 0)
+
+[node name="Curve_fence_02" parent="Fences" unique_id=230640983 instance=ExtResource("18")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.71, 14.975631, 0)
+
+[node name="big_fence_03" parent="Fences" unique_id=1524045655 instance=ExtResource("19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.95, 14.90029, 0)
+
+[node name="Fence_02" parent="Fences" unique_id=1214537469 instance=ExtResource("20")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.24, 14.6, 1.76)
+
+[node name="big_fence_02" parent="Fences" unique_id=1268817392 instance=ExtResource("21")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.7, 14.7903185, 0)
+
+[node name="peg_leg_03" parent="Fences" unique_id=532777047 instance=ExtResource("22")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.79, 16.433392, -9.15)
+
+[node name="Fence_02_leg" parent="Fences" unique_id=1020959759 instance=ExtResource("23")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.65, 14.6, -11.75)
+
+[node name="Roads_02" type="Node3D" parent="." unique_id=979199695]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -132.02702, -33.08488, 51.746178)
+
+[node name="1_road_02_start_uphill" parent="Roads_02" unique_id=512767991 instance=ExtResource("24")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.147026, 41.5, 30.5)
+
+[node name="3_road_02_seamless" parent="Roads_02" unique_id=1969713821 instance=ExtResource("25")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.317024, 40, -1.5)
+
+[node name="4_road_02_end_downHill" parent="Roads_02" unique_id=810989561 instance=ExtResource("26")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.317024, 38.4, -9.5)
+
+[node name="3_road_02_seamless_2" parent="Roads_02" unique_id=1753586293 instance=ExtResource("25")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.317024, 40, 14.5)
+
+[node name="5_road_02_bend" parent="Roads_02" unique_id=1228489707 instance=ExtResource("27")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.316147, 38.4, -9.5)
+
+[node name="3_road_02_seamless_3" parent="Roads_02" unique_id=2043177243 instance=ExtResource("25")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.317024, 40, 6.5)
+
+[node name="2_road_02_start_downHill" parent="Roads_02" unique_id=642740605 instance=ExtResource("28")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.317024, 40, 22.5)
+
+[node name="Sign" type="Node3D" parent="." unique_id=1640942270]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.074514, -10.981152, 74.198044)
+
+[node name="Sign_01" parent="Sign" unique_id=95218606 instance=ExtResource("29")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.45, 11.011213, -26.69)
+
+[node name="sh_Sign" parent="Sign" unique_id=2090963106 instance=ExtResource("30")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2, 10.981152, -33.58)
+
+[node name="Sign_02" parent="Sign" unique_id=4896403 instance=ExtResource("31")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.13, 10.981153, -26.69)
+
+[node name="size_sign" parent="Sign" unique_id=1265082407 instance=ExtResource("32")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.87, 10.981152, -26.87)
+
+[node name="Wals_01" type="Node3D" parent="." unique_id=1761928064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.433594, -2.824219, 59.695313)
+
+[node name="wall_01_corner_01" parent="Wals_01" unique_id=187669741 instance=ExtResource("33")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -169.7, 18.88857, 73.6)
+
+[node name="03_wall_01_seamless" parent="Wals_01" unique_id=733847235 instance=ExtResource("34")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -100.6, 2.8242218, 73.6)
+
+[node name="02_wall_01_seamless" parent="Wals_01" unique_id=1425659048 instance=ExtResource("35")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -77.7, 2.8242216, 73.6)
+
+[node name="wall_01_corner_02" parent="Wals_01" unique_id=1631488169 instance=ExtResource("36")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -35, 2.824219, 73.6)
+
+[node name="05_wall_01_seamless" parent="Wals_01" unique_id=404270293 instance=ExtResource("37")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -141.1, 2.824221, 73.6)
+
+[node name="01_wall_01_start" parent="Wals_01" unique_id=518719102 instance=ExtResource("38")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -56.7, 2.824234, 73.6)
+
+[node name="04_wall_01_seamless" parent="Wals_01" unique_id=1862786519 instance=ExtResource("39")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -120.9, 2.824221, 73.6)
+
+[node name="01_wall_01_end" parent="Wals_01" unique_id=152943066 instance=ExtResource("40")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -148.5, 18.899315, 73.6)
+
+[node name="01_wall_01_seamless" parent="Wals_01" unique_id=1847925384 instance=ExtResource("41")]
+transform = Transform3D(2e-06, 0, -1, 0, 1, 0, 1, 0, 2e-06, -100.6, 2.8242218, 73.6)
+
+[node name="Other" type="Node3D" parent="." unique_id=1929922214]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.0625, -9.828125, 76.609375)
+
+[node name="Barrier" parent="Other" unique_id=475813836 instance=ExtResource("42")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 35.046326, 9.873929, -36.52)
+
+[node name="gate_ball" parent="Other" unique_id=1325906520 instance=ExtResource("43")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3, 9.836914, -28.45)
+
+[node name="Directional Light" type="Node3D" parent="." unique_id=209990346]
+transform = Transform3D(-0.869606, -0.279222, 0.40721, 0.019134, -0.843175, -0.537299, 0.493375, -0.459447, 0.738573, -8.18, 3, 34.6)
+
+[node name="Nature" type="Node3D" parent="." unique_id=868318146]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.78, -14.65, 49.050438)
+
+[node name="small_rocks_02" parent="Nature" unique_id=450403337 instance=ExtResource("44")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.94, 14.710259, 28.71)
+
+[node name="Trunk_01" parent="Nature" unique_id=2142475534 instance=ExtResource("45")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.99, 14.735362, 17.67)
+
+[node name="rocks_04" parent="Nature" unique_id=1627500098 instance=ExtResource("46")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.2, 14.869266, 34)
+
+[node name="small_rocks_04" parent="Nature" unique_id=664886827 instance=ExtResource("47")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.61, 14.654759, 28.34)
+
+[node name="small_rocks_00" parent="Nature" unique_id=1879595972 instance=ExtResource("48")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.2, 14.664148, 32.16)
+
+[node name="small_rocks_01" parent="Nature" unique_id=1003343260 instance=ExtResource("49")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.13, 14.736002, 35.06)
+
+[node name="rocks_03" parent="Nature" unique_id=689811371 instance=ExtResource("50")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.9, 14.716222, 34)
+
+[node name="Trunk_02" parent="Nature" unique_id=2131098473 instance=ExtResource("51")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.99, 14.735362, 17.39)
+
+[node name="rocks_big" parent="Nature" unique_id=66152310 instance=ExtResource("52")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.25, 21.896687, 33.63)
+
+[node name="rocks_02" parent="Nature" unique_id=1793856731 instance=ExtResource("53")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.4, 17.1692, 32.63)
+
+[node name="small_rocks_03" parent="Nature" unique_id=1607338171 instance=ExtResource("54")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.03, 14.755259, 35.05)
+
+[node name="LowWalsTop" type="Node3D" parent="." unique_id=154121175]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -93.91855, 8.949969, 140.53235)
+
+[node name="lowWallToplowWallTop_03_seamless" parent="LowWalsTop" unique_id=700328601 instance=ExtResource("55")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -44.5, -8.949974, -7.09)
+
+[node name="lowWallToplowWallTop_03_corner_01" parent="LowWalsTop" unique_id=2144088191 instance=ExtResource("56")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -51.6, -8.94997, -7.09)
+
+[node name="lowWallToplowWallTop_03_corner_02" parent="LowWalsTop" unique_id=66017189 instance=ExtResource("57")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 46.4, -8.949966, -7.09)
+
+[node name="lowWallToplowWallTop_03_long" parent="LowWalsTop" unique_id=1660351349 instance=ExtResource("58")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -24, -8.934986, -7.09)
+
+[node name="Road_01" type="Node3D" parent="." unique_id=652465247]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -132.02702, -33.47377, 51.746178)
+
+[node name="3_road_01_seamles" parent="Road_01" unique_id=984750348 instance=ExtResource("59")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.757027, 34.4, 7.053822)
+
+[node name="3_road_01_seamles_2" parent="Road_01" unique_id=307838567 instance=ExtResource("59")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.757027, 34.4, 15.053825)
+
+[node name="2_road_01_start_downhill" parent="Road_01" unique_id=34732586 instance=ExtResource("60")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.757027, 34.4, 23.053825)
+
+[node name="4_road_01_end_downhill" parent="Road_01" unique_id=1840435547 instance=ExtResource("61")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.75383, 34.4, -8.946178)
+
+[node name="5_road_01_bend" parent="Road_01" unique_id=2040738309 instance=ExtResource("62")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.72702, 34.4, -8.946178)
+
+[node name="3_road_01_seamles_3" parent="Road_01" unique_id=160107878 instance=ExtResource("59")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.757027, 34.4, -0.946178)
+
+[node name="1_road_01_start_uphill" parent="Road_01" unique_id=397013349 instance=ExtResource("63")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 49.757027, 34.4, 31.053825)
+
+[node name="Wals_top" type="Node3D" parent="." unique_id=1464910944]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -93.91855, -10.3, 140.53235)
+
+[node name="wallTop_02_seamless" parent="Wals_top" unique_id=1227555585 instance=ExtResource("64")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 25.5, 10.300001, -6.7)
+
+[node name="wallTop_02_end" parent="Wals_top" unique_id=182651396 instance=ExtResource("65")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -47.7, 28.250364, -6.7)
+
+[node name="wallTop_02_long" parent="Wals_top" unique_id=1216447304 instance=ExtResource("66")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -43.5, 10.300001, -6.7)
+
+[node name="wallTop_02_corner_01" parent="Wals_top" unique_id=554226695 instance=ExtResource("67")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -68.1, 10.306158, -6.7)
+
+[node name="wallTop_02_corner_02" parent="Wals_top" unique_id=1644871245 instance=ExtResource("68")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 67.4, 10.306185, -6.7)
+
+[node name="wallTop_02_start" parent="Wals_top" unique_id=1753253225 instance=ExtResource("69")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 46.9, 10.299999, -6.7)
+
+[node name="TouristPlaces" type="Node3D" parent="." unique_id=96229738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.01, -0.17, 60.34)
+
+[node name="massive_bench_02" parent="TouristPlaces" unique_id=1480750050 instance=ExtResource("70")]
+transform = Transform3D(1, 0, 0, 0, 0.993416, -0.114564, 0, 0.114564, 0.993416, 9.58, 0.9150753, -0.14)
+
+[node name="block" parent="TouristPlaces" unique_id=597598033 instance=ExtResource("71")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.13, 0.16, 1.41)
+
+[node name="Tourist_trash" parent="TouristPlaces" unique_id=1101169586 instance=ExtResource("72")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.46, 0.17605467, -2.75)
+
+[node name="massive_tabble_01" parent="TouristPlaces" unique_id=846116704 instance=ExtResource("73")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14, 0.18419491, 0)
+
+[node name="massive_bench_01" parent="TouristPlaces" unique_id=1714051995 instance=ExtResource("74")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.65, 0.17016481, 0)
+
+[node name="Covered_bridge_02" parent="." unique_id=17826286 instance=ExtResource("75")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -188, 0, 38.5)
+
+[node name="Covered_bridge_01" parent="." unique_id=7100002 instance=ExtResource("78")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -187.94586, 0.068190575, -13.002703)
+
+[node name="Covered_bridge_03" parent="." unique_id=7100003 instance=ExtResource("79")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -188, 0, 76.6)
+
+[node name="Covered_bridge_04" parent="." unique_id=7100004 instance=ExtResource("80")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -188, 0, 108.5)
+
+[node name="Covered_bridge_03_modular" type="Node3D" parent="." unique_id=7100005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -188, 0, 133)
+
+[node name="1_b3_first_left" parent="Covered_bridge_03_modular" unique_id=7100006 instance=ExtResource("81")]
+
+[node name="2_b3_first_left_02" parent="Covered_bridge_03_modular" unique_id=7100007 instance=ExtResource("82")]
+
+[node name="3_b3_seamless" parent="Covered_bridge_03_modular" unique_id=7100008 instance=ExtResource("83")]
+
+[node name="4_b3_end_right_01" parent="Covered_bridge_03_modular" unique_id=7100009 instance=ExtResource("84")]
+
+[node name="5_b3_end_right_02" parent="Covered_bridge_03_modular" unique_id=7100010 instance=ExtResource("85")]
+
+[node name="Covered_bridge_04_modular" type="Node3D" parent="." unique_id=7100011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -188, 0, 150)
+
+[node name="0_b4_footbridge" parent="Covered_bridge_04_modular" unique_id=7100012 instance=ExtResource("86")]
+
+[node name="1_b4_first_left" parent="Covered_bridge_04_modular" unique_id=7100013 instance=ExtResource("87")]
+
+[node name="2_b4_left_seamless" parent="Covered_bridge_04_modular" unique_id=7100014 instance=ExtResource("88")]
+
+[node name="3_b4_middle" parent="Covered_bridge_04_modular" unique_id=7100015 instance=ExtResource("89")]
+
+[node name="4_b4_right_seamless" parent="Covered_bridge_04_modular" unique_id=7100016 instance=ExtResource("90")]
+
+[node name="5_b4_right_right" parent="Covered_bridge_04_modular" unique_id=7100017 instance=ExtResource("91")]
+
+[node name="Column_bridge_04_01" parent="Covered_bridge_04_modular" unique_id=7100018 instance=ExtResource("92")]
+
+[node name="Column_bridge_04_02" parent="Covered_bridge_04_modular" unique_id=7100019 instance=ExtResource("93")]
+
+[node name="Column_bridge_04_03" parent="Covered_bridge_04_modular" unique_id=7100020 instance=ExtResource("94")]
+
+[node name="__EA_ENVIRONMENT__" type="Node3D" parent="." unique_id=1181587]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="__EA_ENVIRONMENT__" unique_id=201617032]
+environment = SubResource("Env")
+
+[node name="Sun" type="DirectionalLight3D" parent="__EA_ENVIRONMENT__" unique_id=1872963126]
+transform = Transform3D(-0.469472, 0, -0.882948, -0.153322, 0.984808, 0.081523, 0.869534, 0.173648, -0.462339, 0, 60, 0)
+light_color = Color(0.42, 0.52, 0.78, 1)
+light_energy = 0.28
+light_angular_distance = 1.2
+light_specular = 0.0
+shadow_enabled = true
+shadow_bias = 0.04
+shadow_normal_bias = 1.4
+directional_shadow_split_1 = 0.06
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 220.0
+
+[node name="Fill_Sky" type="DirectionalLight3D" parent="__EA_ENVIRONMENT__" unique_id=256246057]
+transform = Transform3D(0.5, 0, 0.866025, 0.764655, 0.469472, -0.441474, -0.406574, 0.882948, 0.234736, 0, 60, 0)
+light_color = Color(0.46, 0.56, 0.78, 1)
+light_energy = 0.9
+light_specular = 0.0
+
+[node name="Fill_Back" type="DirectionalLight3D" parent="__EA_ENVIRONMENT__" unique_id=225974094]
+transform = Transform3D(0.469472, 0, 0.882948, 0.213604, 0.970296, -0.113575, -0.85672, 0.241922, 0.455526, 0, 60, 0)
+light_color = Color(0.4, 0.42, 0.55, 1)
+light_energy = 0.5
+light_specular = 0.0
+
+[node name="ShowroomGround" type="StaticBody3D" parent="." unique_id=1614791659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65.0906, -1, 65.143906)
+
+[node name="GroundMesh" type="MeshInstance3D" parent="ShowroomGround" unique_id=837966538]
+material_override = ExtResource("77_x6hap")
+mesh = SubResource("BoxMesh_6rmrv")
+
+[node name="GroundShape" type="CollisionShape3D" parent="ShowroomGround" unique_id=614478900]
+shape = SubResource("BoxShape3D_rgygn")
+
+[node name="PSXScreenPass" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="PSXScreenRect" type="ColorRect" parent="PSXScreenPass"]
+material = ExtResource("psx_screen_mat")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
