@@ -198,6 +198,7 @@ func _setup_ui_options() -> void:
 func _connect_matrix_signals() -> void:
 	MatrixClient.logged_in.connect(_on_logged_in)
 	MatrixClient.login_failed.connect(_on_login_failed)
+	MatrixClient.session_expired.connect(_on_session_expired)
 	MatrixClient.matrix_auth_completed.connect(_on_matrix_auth_completed)
 	MatrixClient.friends_updated.connect(_refresh_friends_ui)
 	MatrixClient.friend_request_received.connect(_on_friend_request_received)
@@ -270,6 +271,12 @@ func _on_return_to_game_btn_pressed() -> void:
 
 func _on_login_failed(reason: String) -> void:
 	auth_status_label.text = "Login Error: " + reason
+
+
+func _on_session_expired() -> void:
+	auth_panel.visible = true
+	main_panel.visible = false
+	auth_status_label.text = "Your session could not be verified. Please log in again."
 
 
 func _on_matrix_auth_completed(success: bool, message: String) -> void:

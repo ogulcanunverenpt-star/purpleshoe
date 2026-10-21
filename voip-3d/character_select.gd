@@ -11,6 +11,7 @@ var avatar_buttons: Dictionary = {}
 
 
 func _ready() -> void:
+	MatrixClient.session_expired.connect(_on_session_expired)
 	avatar_buttons = {
 		AvatarCatalog.MAN: $Panel/Margin/VBox/AvatarChoices/Man,
 		AvatarCatalog.JOURNALIST: $Panel/Margin/VBox/AvatarChoices/Journalist,
@@ -24,6 +25,10 @@ func _ready() -> void:
 	continue_button.pressed.connect(_on_continue_pressed)
 	selected_avatar = MatrixClient.selected_avatar_id()
 	_select_avatar(selected_avatar)
+
+
+func _on_session_expired() -> void:
+	get_tree().change_scene_to_file.call_deferred("res://lobby.tscn")
 
 
 func _process(delta: float) -> void:

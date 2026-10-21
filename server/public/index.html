@@ -153,10 +153,12 @@
     <script>
         let isRegisterMode = false;
         let token = localStorage.getItem('voip_token') || '';
+        let refreshToken = localStorage.getItem('voip_refresh_token') || '';
         let currentUser = localStorage.getItem('voip_user') || '';
         let ws = null;
         let activeChatFriend = '';
         let currentInvite = null;
+        let authRefreshAttempted = false;
         const chats = {}; // friend -> array of messages
 
         window.onload = () => {
@@ -192,11 +194,14 @@
                     body: JSON.stringify({ username, password })
                 });
                 const data = await res.json();
-                if (data.success || data.token) {
+                if ((data.success || data.token) && data.token && data.refreshToken) {
                     token = data.token;
+                    refreshToken = data.refreshToken;
                     currentUser = data.username || username;
                     localStorage.setItem('voip_token', token);
+                    localStorage.setItem('voip_refresh_token', refreshToken);
                     localStorage.setItem('voip_user', currentUser);
+                    authRefreshAttempted = false;
                     document.getElementById('auth-screen').style.display = 'none';
                     document.getElementById('user-info').innerHTML = `Giriş Yapıldı: <b>${currentUser}</b> | <a href="#" onclick="logout()" style="color: #ef4444; text-decoration: none;">Çıkış</a>`;
                     connectWebSocket();
@@ -208,11 +213,50 @@
             }
         }
 
-        function logout() {
+        async function logout() {
+            try {
+                if (refreshToken) {
+                    await fetch('/api/token/revoke', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ refreshToken })
+                    });
+                }
+            } catch (error) {
+                console.error('Could not revoke refresh token:', error);
+            }
             localStorage.removeItem('voip_token');
+            localStorage.removeItem('voip_refresh_token');
             localStorage.removeItem('voip_user');
+            token = '';
+            refreshToken = '';
             if (ws) ws.close();
             location.reload();
+        }
+
+        async function refreshSession() {
+            if (!refreshToken) return false;
+            try {
+                const res = await fetch('/api/token/refresh', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refreshToken })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success || !data.token || !data.refreshToken) return false;
+                token = data.token;
+                refreshToken = data.refreshToken;
+                currentUser = data.username || currentUser;
+                localStorage.setItem('voip_token', token);
+                localStorage.setItem('voip_refresh_token', refreshToken);
+                localStorage.setItem('voip_user', currentUser);
+                if (ws) ws.close();
+                connectWebSocket();
+                return true;
+            } catch (error) {
+                console.error('Could not refresh session:', error);
+                return false;
+            }
         }
 
         function connectWebSocket() {
@@ -223,9 +267,27 @@
                 ws.send(JSON.stringify({ type: 'auth', token }));
             };
 
-            ws.onmessage = (event) => {
+            ws.onmessage = async (event) => {
                 const data = JSON.parse(event.data);
-                if (data.type === 'sync_state') {
+                if (data.type === 'auth_error') {
+                    if (!authRefreshAttempted) {
+                        authRefreshAttempted = true;
+                        if (await refreshSession()) return;
+                    }
+                    localStorage.removeItem('voip_token');
+                    localStorage.removeItem('voip_refresh_token');
+                    localStorage.removeItem('voip_user');
+                    token = '';
+                    refreshToken = '';
+                    currentUser = '';
+                    document.getElementById('auth-screen').style.display = 'flex';
+                    document.getElementById('auth-error').innerText = 'Oturum süresi dolmuş veya geçersiz. Lütfen yeniden giriş yapın.';
+                    document.getElementById('user-info').innerText = 'Giriş Yapılmadı';
+                    ws.close();
+                    ws = null;
+                } else if (data.type === 'auth_ok') {
+                    authRefreshAttempted = false;
+                } else if (data.type === 'sync_state') {
                     renderFriends(data.friends || []);
                     renderPending(data.pending_requests || []);
                 } else if (data.type === 'friend_request' || data.type === 'friend_accepted') {

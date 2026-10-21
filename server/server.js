@@ -141,6 +141,29 @@ function verifyJWT(token) {
   }
 }
 
+function hashRefreshToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+async function createTokenPair(user) {
+  const token = generateJWT({
+    username: user.username,
+    id: user.id,
+    role: user.role || 'default'
+  });
+  const refreshToken = crypto.randomBytes(48).toString('base64url');
+  const now = Math.floor(Date.now() / 1000);
+  const expiresAt = now + 30 * 24 * 60 * 60;
+  await dbRun('DELETE FROM refresh_tokens WHERE expires_at <= ?', now);
+  await dbRun(
+    'INSERT INTO refresh_tokens (token_hash, username, expires_at) VALUES (?, ?, ?)',
+    hashRefreshToken(refreshToken),
+    user.username,
+    expiresAt
+  );
+  return { token, refreshToken };
+}
+
 if (typeof process.send === 'function') {
   process.on('message', (message) => {
     if (!message || message.type !== 'matrix-handoff-response') return;
@@ -498,6 +521,11 @@ async function dbRun(sql, ...params) {
           avatar_url TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+        CREATE TABLE IF NOT EXISTS refresh_tokens (
+          token_hash TEXT PRIMARY KEY,
+          username TEXT NOT NULL,
+          expires_at BIGINT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS user_scores (
           id SERIAL PRIMARY KEY,
           username TEXT NOT NULL UNIQUE,
@@ -580,6 +608,11 @@ async function dbRun(sql, ...params) {
           role TEXT DEFAULT 'default',
           avatar_url TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS refresh_tokens (
+          token_hash TEXT PRIMARY KEY,
+          username TEXT NOT NULL,
+          expires_at INTEGER NOT NULL
         );
         CREATE TABLE IF NOT EXISTS user_scores (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1925,13 +1958,17 @@ app.post('/api/register', async (req, res) => {
       cleanUsername, hashedPassword, totpSecret, userRole
     );
 
-    const token = generateJWT({ username: cleanUsername, role: userRole });
+    const { token, refreshToken } = await createTokenPair({
+      username: cleanUsername,
+      role: userRole
+    });
     pushEvent(`New user registered via API: ${cleanUsername} [Role: ${userRole}]`, 'info');
 
     return res.json({
       success: true,
       message: 'Kayıt başarılı!',
       token,
+      refreshToken,
       username: cleanUsername,
       role: userRole,
       totpEnabled: !!enable2FA,
@@ -1987,12 +2024,17 @@ app.post('/api/login', async (req, res) => {
       }
     }
 
-    const token = generateJWT({ username: user.username, id: user.id, role: userRole });
+    const { token, refreshToken } = await createTokenPair({
+      username: user.username,
+      id: user.id,
+      role: userRole
+    });
     pushEvent(`User logged in via API: ${user.username} [Role: ${userRole}]`, 'info');
 
     return res.json({
       success: true,
       token,
+      refreshToken,
       username: user.username,
       role: userRole,
       totpEnabled: !!user.totp_secret,
@@ -2001,6 +2043,75 @@ app.post('/api/login', async (req, res) => {
   } catch (e) {
     console.error('API Login error:', e);
     return res.status(500).json({ error: 'Giriş esnasında sunucu hatası oluştu.' });
+  }
+});
+
+app.post('/api/token/refresh', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const refreshToken = req.body && req.body.refreshToken;
+    if (typeof refreshToken !== 'string' || refreshToken.length < 32 || refreshToken.length > 256) {
+      return res.status(401).json({ success: false, error: 'Refresh session is invalid or expired.' });
+    }
+
+    const tokenHash = hashRefreshToken(refreshToken);
+    const now = Math.floor(Date.now() / 1000);
+    const storedToken = await dbGet(
+      'SELECT username FROM refresh_tokens WHERE token_hash = ? AND expires_at > ?',
+      tokenHash,
+      now
+    );
+    if (!storedToken) {
+      return res.status(401).json({ success: false, error: 'Refresh session is invalid or expired.' });
+    }
+
+    const deletion = await dbRun('DELETE FROM refresh_tokens WHERE token_hash = ?', tokenHash);
+    const deletedCount = isPg ? deletion.rowCount : deletion.changes;
+    if (deletedCount !== 1) {
+      return res.status(401).json({ success: false, error: 'Refresh session has already been used.' });
+    }
+
+    const user = await dbGet(
+      'SELECT id, username, role, avatar_url, (CASE WHEN totp_secret IS NOT NULL AND totp_secret != "" THEN 1 ELSE 0 END) as totp_enabled FROM users WHERE username = ?',
+      storedToken.username
+    );
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'User account was not found.' });
+    }
+
+    const userRole = user.role || 'default';
+    const { token, refreshToken: nextRefreshToken } = await createTokenPair({
+      id: user.id,
+      username: user.username,
+      role: userRole
+    });
+    return res.json({
+      success: true,
+      token,
+      refreshToken: nextRefreshToken,
+      username: user.username,
+      role: userRole,
+      totpEnabled: !!user.totp_enabled,
+      avatarUrl: user.avatar_url || null
+    });
+  } catch (e) {
+    console.error('Token refresh error:', e);
+    return res.status(500).json({ success: false, error: 'A server error occurred while refreshing the session.' });
+  }
+});
+
+app.post('/api/token/revoke', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const refreshToken = req.body && req.body.refreshToken;
+    if (typeof refreshToken !== 'string' || refreshToken.length < 32 || refreshToken.length > 256) {
+      return res.status(400).json({ success: false, error: 'Refresh session is required.' });
+    }
+    await dbRun('DELETE FROM refresh_tokens WHERE token_hash = ?', hashRefreshToken(refreshToken));
+    return res.json({ success: true });
+  } catch (e) {
+    console.error('Token revoke error:', e);
+    return res.status(500).json({ success: false, error: 'A server error occurred while ending the session.' });
   }
 });
 

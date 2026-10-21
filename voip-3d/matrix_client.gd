@@ -4,6 +4,8 @@ extends Node
 
 signal logged_in(user_id: String)
 signal login_failed(reason: String)
+signal session_expired
+signal token_refresh_completed(success: bool)
 signal matrix_auth_completed(success: bool, message: String)
 signal friend_request_received(from_user_id: String, display_name: String)
 signal friend_accepted(from_user_id: String)
@@ -23,6 +25,7 @@ const CHAT_HISTORY_PATH := "user://chat_history.json"
 const AVATAR_CONFIG_PATH := "user://avatar_preferences.cfg"
 
 var access_token := ""
+var refresh_token := ""
 var user_id := ""
 var matrix_access_token := ""
 var matrix_user_id := ""
@@ -37,6 +40,8 @@ var _chat_history: Dictionary = {}
 var _last_sync_ts: int = 0
 var _syncing := false
 var _auth_generation := 0
+var _refresh_in_progress := false
+var _last_refresh_succeeded := false
 var _avatar_preferences := ConfigFile.new()
 
 
@@ -120,6 +125,7 @@ func _finish_auth(res: Dictionary, username: String, password: String, is_regist
 		matrix_user_id = ""
 		matrix_device_id = ""
 	access_token = String(body.get("token", ""))
+	refresh_token = String(body.get("refreshToken", ""))
 	user_id = authenticated_user
 	matrix_auth_warning = ""
 	_auth_generation += 1
@@ -247,10 +253,22 @@ func _logout_matrix(token: String) -> void:
 
 func logout() -> void:
 	_auth_generation += 1
+	if not refresh_token.is_empty():
+		var revoke_result: Dictionary = await _raw_request_once(
+			"POST",
+			"/api/token/revoke",
+			{"refreshToken": refresh_token},
+			false,
+			8.0
+		)
+		if int(revoke_result.get("code", 0)) < 200 or int(revoke_result.get("code", 0)) >= 300:
+			var revoke_body: Dictionary = revoke_result.get("body", {})
+			push_warning("Could not revoke refresh token: %s" % String(revoke_body.get("error", "server unavailable")))
 	if not matrix_access_token.is_empty():
 		_logout_matrix(matrix_access_token)
 	_syncing = false
 	access_token = ""
+	refresh_token = ""
 	user_id = ""
 	matrix_access_token = ""
 	matrix_user_id = ""
@@ -273,6 +291,7 @@ func _load_config() -> void:
 	if cfg.load(CONFIG_PATH) != OK:
 		return
 	access_token = str(cfg.get_value("account", "access_token", ""))
+	refresh_token = str(cfg.get_value("account", "refresh_token", ""))
 	user_id = str(cfg.get_value("account", "user_id", ""))
 	SERVER_URL = str(cfg.get_value("account", "server_url", default_server_url))
 	if not OS.is_debug_build() and SERVER_URL.begins_with("http://"):
@@ -293,6 +312,7 @@ func _load_avatar_preferences() -> void:
 func _save_config() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("account", "access_token", access_token)
+	cfg.set_value("account", "refresh_token", refresh_token)
 	cfg.set_value("account", "user_id", user_id)
 	cfg.set_value("account", "server_url", SERVER_URL)
 	cfg.set_value("account", "matrix_access_token", matrix_access_token)
@@ -304,6 +324,46 @@ func _save_config() -> void:
 # ---------------- Low-level HTTP ----------------
 
 func _raw_request(method: String, path: String, body = null, authed: bool = true, timeout := 20.0) -> Dictionary:
+	var result: Dictionary = await _raw_request_once(method, path, body, authed, timeout)
+	if authed and int(result.get("code", 0)) == 401:
+		if await _refresh_access_token():
+			result = await _raw_request_once(method, path, body, true, timeout)
+	return result
+
+
+func _refresh_access_token() -> bool:
+	if _refresh_in_progress:
+		await token_refresh_completed
+		return _last_refresh_succeeded
+	if refresh_token.is_empty():
+		return false
+	_refresh_in_progress = true
+	var result: Dictionary = await _raw_request_once(
+		"POST",
+		"/api/token/refresh",
+		{"refreshToken": refresh_token},
+		false,
+		12.0
+	)
+	var body: Dictionary = result.get("body", {})
+	var refreshed := false
+	if int(result.get("code", 0)) == 200 and body.get("success", false):
+		var new_access_token := String(body.get("token", ""))
+		var new_refresh_token := String(body.get("refreshToken", ""))
+		if new_access_token.is_empty() or new_refresh_token.is_empty():
+			push_error("The server returned an incomplete refreshed session.")
+		else:
+			access_token = new_access_token
+			refresh_token = new_refresh_token
+			_save_config()
+			refreshed = true
+	_refresh_in_progress = false
+	_last_refresh_succeeded = refreshed
+	token_refresh_completed.emit(refreshed)
+	return refreshed
+
+
+func _raw_request_once(method: String, path: String, body = null, authed: bool = true, timeout := 20.0) -> Dictionary:
 	var req := HTTPRequest.new()
 	req.timeout = timeout
 	add_child(req)
@@ -349,6 +409,14 @@ func _sync_loop() -> void:
 		if res.get("code", 0) == 200 and body.get("success", false):
 			_last_sync_ts = int(body.get("timestamp", _last_sync_ts))
 			_handle_sync_payload(body)
+		elif int(res.get("code", 0)) == 401:
+			access_token = ""
+			refresh_token = ""
+			user_id = ""
+			_syncing = false
+			_save_config()
+			session_expired.emit()
+			return
 		await get_tree().create_timer(2.0).timeout
 
 
