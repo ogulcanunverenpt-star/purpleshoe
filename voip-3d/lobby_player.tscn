@@ -27,6 +27,7 @@ outline_size = 8
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=323644774]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 stream = SubResource("AudioStreamGenerator_1")
+playback_type = 1
 autoplay = true
 
 [node name="audioManager" parent="." unique_id=912448435 instance=ExtResource("2_am")]

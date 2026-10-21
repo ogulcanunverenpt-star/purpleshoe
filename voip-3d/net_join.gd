@@ -9,6 +9,8 @@ const TRANSPORT_UDP := 0
 const TRANSPORT_WEBSOCKET := 1
 const GAME_SCENE := "res://world.tscn"
 const OVERLAND_SCENE := "res://openworld/main.tscn"
+const CONFERENCE_SCENE := "res://AloneInTheDusk/Scenes/Conference.tscn"
+const SHOWROOM_SCENE := "res://AloneInTheDusk/Scenes/ShowroomAssets.tscn"
 
 static var peer: MultiplayerPeer
 
@@ -20,7 +22,7 @@ var webview_return_scene := ""
 
 func game_scene_for(mode: int) -> String:
 	if mode == MatchManager.MODE_CONFERENCE:
-		return "res://Scenes/Demo.tscn"
+		return SHOWROOM_SCENE
 	if mode == MatchManager.MODE_MATCH:
 		return "res://match.tscn"
 	return OVERLAND_SCENE if mode == MatchManager.MODE_OVERLAND else GAME_SCENE
@@ -167,7 +169,7 @@ func return_to_game() -> Dictionary:
 func return_from_webview() -> int:
 	var target_scene := webview_return_scene
 	if target_scene.is_empty():
-		target_scene = "res://Scenes/Demo.tscn"
+		target_scene = SHOWROOM_SCENE
 	var result := get_tree().change_scene_to_file(target_scene)
 	if result == OK:
 		webview_return_scene = ""

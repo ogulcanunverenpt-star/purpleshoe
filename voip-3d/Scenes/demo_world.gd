@@ -29,7 +29,9 @@ func _ready() -> void:
 
 	await get_tree().physics_frame
 	_build_game_huts()
-	_build_farm_portal()
+	var current_scene := get_tree().current_scene
+	if not current_scene or current_scene.scene_file_path != NetJoin.SHOWROOM_SCENE:
+		_build_farm_portal()
 	_build_lobby_portals()
 	_spawn_existing_players()
 	_setup_rain()
@@ -155,10 +157,16 @@ func _on_ptt_button_up() -> void:
 
 
 func _connect_to_plaza() -> void:
-	status_label.text = "Connecting to the shared farm square..."
+	var scene_path := get_tree().current_scene.scene_file_path
+	var location_name := "shared farm square"
+	if scene_path == NetJoin.CONFERENCE_SCENE:
+		location_name = "conference"
+	elif scene_path == NetJoin.SHOWROOM_SCENE:
+		location_name = "voice chat room"
+	status_label.text = "Connecting to the %s..." % location_name
 	var room: Dictionary = await MatrixClient.join_shared_room("plaza")
 	if not room.get("success", false):
-		status_label.text = "Could not connect to the square: %s" % room.get("error", "The server did not respond.")
+		status_label.text = "Could not connect to the %s: %s" % [location_name, room.get("error", "The server did not respond.")]
 		return
 
 	await get_tree().create_timer(1.0).timeout
@@ -226,7 +234,13 @@ func _update_online_players() -> void:
 	var names: Array[String] = []
 	for peer_id in MatchManager.roster:
 		names.append(MatchManager.username_for_peer(int(peer_id)))
-	online_players_label.text = "FARM SQUARE · %d PLAYERS" % names.size()
+	var scene_path := get_tree().current_scene.scene_file_path
+	var location_name := "FARM SQUARE"
+	if scene_path == NetJoin.CONFERENCE_SCENE:
+		location_name = "CONFERENCE"
+	elif scene_path == NetJoin.SHOWROOM_SCENE:
+		location_name = "VOICE CHAT ROOM"
+	online_players_label.text = "%s · %d PLAYERS" % [location_name, names.size()]
 	if not names.is_empty():
 		online_players_label.text += "\n" + " · ".join(names)
 	if nearby_portal.is_empty():
@@ -303,11 +317,13 @@ func _build_lobby_portals() -> void:
 	_add_portal_label(messages_frame, "MESSAGES")
 
 	var bridge := get_node_or_null("prefab (#3)/Bridge_prefab (#1)/Bridge_prefab") as Node3D
+	if bridge == null:
+		bridge = get_node_or_null("Covered_bridge_01") as Node3D
 	if bridge:
 		var bridge_frame := _create_portal("lobby_bridge", Vector3(0.0, -0.12, 12.0), Color(0.53, 0.82, 1.0), bridge)
 		_add_portal_label(bridge_frame, "GAME LOBBY")
 	else:
-		push_warning("Bridge prefab lobby portal target is missing")
+		push_warning("Bridge lobby portal target is missing")
 
 
 func _add_portal_label(portal: Node3D, text: String) -> void:
@@ -385,7 +401,9 @@ func _enter_portal(portal_id: String) -> void:
 			status_label.text = "Could not open messages: %s" % error_string(result)
 		return
 	if portal_id == "farm":
-		get_tree().change_scene_to_file("res://building_lobby.tscn")
+		var result := get_tree().change_scene_to_file(NetJoin.SHOWROOM_SCENE)
+		if result != OK:
+			status_label.text = "Could not open the farm scene: %s" % error_string(result)
 		return
 	if portal_id.begins_with("lobby_"):
 		MatrixClient.open_lobby_from_game = true

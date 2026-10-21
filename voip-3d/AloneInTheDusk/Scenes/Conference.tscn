@@ -1,0 +1,232 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://Scenes/demo_world.gd" id="1_world"]
+[ext_resource type="Script" path="res://virtual_joystick.gd" id="2_joystick"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Prefabs/Bridge_prefab.tscn" id="3_bridge"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Prefabs/Road_01.tscn" id="4_road"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Prefabs/Wall_01_prefab.tscn" id="5_wall"]
+[ext_resource type="PackedScene" path="res://AloneInTheDusk/Prefabs/BigFence_prefab.tscn" id="6_fence"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMaterial"]
+sky_top_color = Color(0.035, 0.045, 0.105, 1)
+sky_horizon_color = Color(0.42, 0.27, 0.26, 1)
+sky_curve = 0.2
+sky_energy_multiplier = 0.85
+ground_bottom_color = Color(0.07, 0.065, 0.1, 1)
+ground_horizon_color = Color(0.38, 0.24, 0.24, 1)
+ground_curve = 0.08
+sun_angle_max = 24.0
+sun_curve = 0.08
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("SkyMaterial")
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.18, 0.2, 0.38, 1)
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 1.8
+tonemap_mode = 3
+tonemap_exposure = 1.5
+tonemap_white = 2.4
+glow_enabled = true
+glow_intensity = 0.38
+glow_strength = 0.85
+glow_bloom = 0.1
+glow_hdr_threshold = 0.95
+fog_enabled = true
+fog_light_color = Color(0.13, 0.14, 0.23, 1)
+fog_sun_scatter = 0.18
+fog_density = 0.005
+fog_aerial_perspective = 0.35
+fog_sky_affect = 0.85
+adjustment_enabled = true
+adjustment_contrast = 1.08
+adjustment_saturation = 0.84
+
+[sub_resource type="StandardMaterial3D" id="GroundMaterial"]
+albedo_color = Color(0.12, 0.13, 0.2, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="GroundMesh"]
+material = SubResource("GroundMaterial")
+size = Vector3(280, 2, 220)
+
+[sub_resource type="BoxShape3D" id="GroundShape"]
+size = Vector3(280, 2, 220)
+
+[node name="Conference" type="Node3D"]
+script = ExtResource("1_world")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.82, -0.45, 0)
+light_color = Color(0.72, 0.72, 1, 1)
+light_energy = 0.72
+shadow_enabled = true
+
+[node name="ConferenceGround" type="StaticBody3D" parent="."]
+position = Vector3(0, -1, 0)
+
+[node name="GroundMesh" type="MeshInstance3D" parent="ConferenceGround"]
+mesh = SubResource("GroundMesh")
+
+[node name="GroundShape" type="CollisionShape3D" parent="ConferenceGround"]
+shape = SubResource("GroundShape")
+
+[node name="Covered_bridge_01" parent="." instance=ExtResource("3_bridge")]
+position = Vector3(-40, 0, 55)
+
+[node name="Road_01" parent="." instance=ExtResource("4_road")]
+position = Vector3(-40, 0, 100)
+
+[node name="Wall_01_prefab" parent="." instance=ExtResource("5_wall")]
+position = Vector3(75, 0, -15)
+
+[node name="BigFence_prefab" parent="." instance=ExtResource("6_fence")]
+position = Vector3(-110, 0, 35)
+
+[node name="Players" type="Node3D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="HUD" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/HUD"]
+layout_mode = 1
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 100.0
+mouse_filter = 2
+
+[node name="OnlinePlayersLabel" type="Label" parent="CanvasLayer/HUD/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "CONFERENCE · ONLINE PLAYERS"
+
+[node name="ButtonsHBox" type="HBoxContainer" parent="CanvasLayer/HUD"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 24.0
+offset_right = -20.0
+offset_bottom = 84.0
+grow_horizontal = 0
+
+[node name="PTTButton" type="Button" parent="CanvasLayer/HUD/ButtonsHBox"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Push to Talk (V)"
+
+[node name="MobilePortalButton" type="Button" parent="CanvasLayer/HUD"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 96.0
+offset_right = -20.0
+offset_bottom = 156.0
+grow_horizontal = 0
+custom_minimum_size = Vector2(200, 60)
+theme_override_font_sizes/font_size = 20
+text = "ENTER PORTAL"
+
+[node name="MobileJumpButton" type="Button" parent="CanvasLayer/HUD"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -184.0
+offset_top = -120.0
+offset_right = -24.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+custom_minimum_size = Vector2(160, 100)
+theme_override_font_sizes/font_size = 24
+text = "JUMP"
+
+[node name="MobileAimJoystick" type="Control" parent="CanvasLayer/HUD"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -184.0
+offset_top = 180.0
+offset_right = -24.0
+offset_bottom = 340.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("2_joystick")
+
+[node name="MobileAimLabel" type="Label" parent="CanvasLayer/HUD"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -184.0
+offset_top = 158.0
+offset_right = -24.0
+offset_bottom = 180.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+text = "AIM / CAMERA"
+
+[node name="MobileJoystick" type="Control" parent="CanvasLayer/HUD"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -220.0
+offset_right = 220.0
+offset_bottom = -40.0
+grow_vertical = 0
+script = ExtResource("2_joystick")
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer/HUD"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -240.0
+offset_top = -60.0
+offset_right = 240.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[connection signal="button_down" from="CanvasLayer/HUD/ButtonsHBox/PTTButton" to="." method="_on_ptt_button_down"]
+[connection signal="button_up" from="CanvasLayer/HUD/ButtonsHBox/PTTButton" to="." method="_on_ptt_button_up"]
+[connection signal="pressed" from="CanvasLayer/HUD/MobilePortalButton" to="." method="_on_mobile_portal_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/HUD/MobileJumpButton" to="." method="_on_mobile_jump_button_pressed"]

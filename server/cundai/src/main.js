@@ -78,6 +78,12 @@ function bindReturnGameButton() {
   });
 }
 
+window.addEventListener("keydown", (event) => {
+  if (!IS_GAME_PORTAL || event.key !== "Escape" || event.repeat) return;
+  event.preventDefault();
+  document.querySelector(".return-game-button")?.click();
+});
+
 async function redeemMatrixHandoff(ticket) {
   if (import.meta.env.PROD && new URL(API_BASE_URL).protocol !== "https:") {
     throw new Error("Matrix session tickets require HTTPS in production.");

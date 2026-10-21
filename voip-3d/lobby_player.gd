@@ -11,7 +11,7 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9
 @onready var audio_manager: Node = $audioManager
 @onready var audio_player_3d: AudioStreamPlayer3D = $AudioStreamPlayer3D
 @onready var spring_arm: SpringArm3D = $SpringArm3D
-@onready var aim_joystick: MobileVirtualJoystick = get_tree().current_scene.get_node("CanvasLayer/HUD/MobileAimJoystick")
+@onready var aim_joystick: MobileVirtualJoystick = get_tree().current_scene.get_node_or_null("CanvasLayer/HUD/MobileAimJoystick") as MobileVirtualJoystick
 
 var avatar_model: Node3D
 var current_avatar_id := ""

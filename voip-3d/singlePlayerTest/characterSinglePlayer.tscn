@@ -19,6 +19,7 @@ outputPath = NodePath("../AudioStreamPlayer3D")
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.7)
 stream = SubResource("AudioStreamGenerator_jg0he")
+playback_type = 1
 autoplay = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]

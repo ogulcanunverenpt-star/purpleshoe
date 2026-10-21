@@ -231,7 +231,7 @@ func _on_logged_in(user_id: String) -> void:
 	auth_panel.visible = false
 	auth_status_label.text = "Opening the 3D building lobby..."
 	print("[Lobby] Auth successful for ", user_id, ". Loading 3D Building Lobby...")
-	get_tree().change_scene_to_file.call_deferred("res://Scenes/Demo.tscn")
+	get_tree().change_scene_to_file.call_deferred(NetJoin.SHOWROOM_SCENE)
 
 
 func _on_login_failed(reason: String) -> void:

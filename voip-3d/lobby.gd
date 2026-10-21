@@ -266,7 +266,7 @@ func _on_return_to_game_btn_pressed() -> void:
 		MatrixClient.open_lobby_from_game = true
 		room_status_label.text = "Could not return to the game: " + String(result.get("message", "Could not connect to the server."))
 		return
-	get_tree().change_scene_to_file("res://Scenes/Demo.tscn")
+	get_tree().change_scene_to_file(NetJoin.SHOWROOM_SCENE)
 
 
 func _on_login_failed(reason: String) -> void:

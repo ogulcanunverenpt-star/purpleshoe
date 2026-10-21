@@ -76,7 +76,7 @@ func _on_ptt_button_up() -> void:
 
 
 func _on_exit_btn_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/Demo.tscn")
+	get_tree().change_scene_to_file(NetJoin.SHOWROOM_SCENE)
 
 
 func _build_farm() -> void:

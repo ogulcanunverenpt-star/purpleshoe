@@ -51,16 +51,38 @@ func _open_web_portal(url: String) -> void:
 				position: "fixed", inset: "0", width: "100vw", height: "100vh",
 				border: "0", zIndex: "2147483000", background: "#111018"
 			});
+			const returnButton = document.createElement("button");
+			returnButton.type = "button";
+			returnButton.textContent = "Return to Game (Esc)";
+			Object.assign(returnButton.style, {
+				position: "fixed", top: "14px", right: "14px", zIndex: "2147483647",
+				padding: "10px 14px", border: "1px solid #a78bfa", borderRadius: "8px",
+				background: "#6d28d9", color: "#fff", font: "600 14px sans-serif",
+				cursor: "pointer", boxShadow: "0 4px 16px #0008"
+			});
 			const onMessage = (event) => {
 				if (event.origin !== %s || !event.data || event.data.type !== "purpleshoe:return-to-game") return;
-				window.removeEventListener("message", onMessage);
-				frame.remove();
-				const returnToGame = window.psGodotReturnCallback;
-				delete window.psGodotReturnCallback;
-				if (returnToGame) returnToGame();
+				returnToGame();
 			};
+			const returnToGame = () => {
+				window.removeEventListener("message", onMessage);
+				window.removeEventListener("keydown", onKeyDown);
+				frame.remove();
+				returnButton.remove();
+				const gameCallback = window.psGodotReturnCallback;
+				delete window.psGodotReturnCallback;
+				if (gameCallback) gameCallback();
+			};
+			const onKeyDown = (event) => {
+				if (event.key !== "Escape") return;
+				event.preventDefault();
+				returnToGame();
+			};
+			returnButton.addEventListener("click", returnToGame);
 			window.addEventListener("message", onMessage);
+			window.addEventListener("keydown", onKeyDown);
 			document.body.appendChild(frame);
+			document.body.appendChild(returnButton);
 		})()
 	""" % [frame_id_json, frame_id_json, url_json, expected_origin_json]
 	JavaScriptBridge.eval(script)
