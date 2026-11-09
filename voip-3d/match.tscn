@@ -574,25 +574,25 @@ transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0,
 [node name="PlayerSpawns" type="Node3D" parent="MatchEnvironment" unique_id=210260146]
 
 [node name="BlueFieldPlayer0" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1687152793]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 40)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer0" unique_id=468334866 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
 
 [node name="BlueFieldPlayer1" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=96617572]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 43)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer1" unique_id=1763508290 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 6.240715, 0, 0)
 
 [node name="BlueFieldPlayer2" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1487840513]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 43)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer2" unique_id=1573569443 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 13.002687, 0, 0)
 
 [node name="BlueFieldPlayer3" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1920975567]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 40)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer3" unique_id=3615732 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 11.187767, 0, 27.946182)
@@ -616,43 +616,43 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 23)
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
 
 [node name="BlueFieldPlayer7" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=436560459]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 36)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 10)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer7" unique_id=1009917148 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
 
 [node name="BlueFieldPlayer8" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=450732457]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 43)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer8" unique_id=991594935 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0.037052155, 0, -10.86541)
 
 [node name="BlueFieldPlayer9" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=823749292]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 36)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 10)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/BlueFieldPlayer9" unique_id=571390679 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, -4.0875397)
 
 [node name="RedFieldPlayer0" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=53991549]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -16, 0, -10)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -16, 0, -40)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer0" unique_id=1251828864 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
 
 [node name="RedFieldPlayer1" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=258202172]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -5, 0, -8)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -5, 0, -43)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer1" unique_id=508937402 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
 
 [node name="RedFieldPlayer2" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1709476664]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 5, 0, -8)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 5, 0, -43)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer2" unique_id=2072749901 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -1.0967255e-05, 0, 33.034737)
 
 [node name="RedFieldPlayer3" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1789542604]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 16, 0, -10)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 16, 0, -40)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer3" unique_id=1898881786 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
@@ -676,19 +676,19 @@ transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 12
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
 
 [node name="RedFieldPlayer7" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1720926288]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -14, 0, -36)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -14, 0, -10)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer7" unique_id=298619698 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
 
 [node name="RedFieldPlayer8" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=1791146551]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, -43)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, -8)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer8" unique_id=1441885000 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
 
 [node name="RedFieldPlayer9" type="Marker3D" parent="MatchEnvironment/PlayerSpawns" unique_id=523837006]
-transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 14, 0, -36)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 14, 0, -10)
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer9" unique_id=2041204228 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)

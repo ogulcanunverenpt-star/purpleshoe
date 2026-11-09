@@ -40,10 +40,10 @@ account and lobby flow in `lobby.tscn`.
 | World and asset utilities | Python |
 
 The game project and bundled services have separate responsibilities and setup requirements. The
-`server/` directory also contains a legacy firewall-agent and log-management service; it is
-optional for running the Godot client, and the install script does not start it. Server credentials
-and local environment settings are intentionally not included; configure services from their
-supplied example files before deploying them.
+`server/` directory runs the account API and manages game rooms as well as a legacy firewall-agent
+and log-management service. The install script prepares the game and server dependencies but does
+not start the Node service. Server credentials and local environment settings are intentionally not
+included; configure services from their supplied example files before deploying them.
 
 ## Requirements
 
@@ -57,12 +57,42 @@ supplied example files before deploying them.
 ## Run the game on Windows
 
 Clone this repository, then run the install script from the repository root. It imports project
-resources, performs headless startup checks for the main and open-world scenes, and launches the
-game:
+resources, installs missing server dependencies, performs headless startup checks, records the Godot
+path for the server, and launches the game:
 
 ```powershell
 .\install.ps1
 ```
+
+In a second terminal, start the service before logging in to the game:
+
+```powershell
+Set-Location .\server
+npm start
+```
+
+The service starts the shared game rooms and all portal rooms before accepting API requests. This
+starts 19 headless Godot processes and can take time and substantial memory. Leave the terminal
+open while playing; stop the service with Ctrl+C. If startup reports an occupied port, stop the
+other service using that port and retry. The local API uses TCP 3000, the legacy listener uses
+TCP 8000, and the game rooms use WebSocket TCP ports 12882–12900. Private rooms use TCP
+12810–12849. Port 12806 is for manually hosted games, not the shared open world.
+
+The defaults are for a game client on the same machine. For LAN access set `SERVER_HOST` in
+`server/.env` to the server's reachable LAN address, configure the client API URL accordingly, and
+allow the required TCP ports through the firewall. `GODOT_PATH` or `VOIP_3D_EXE` can override the
+Godot path saved by the installer. Restart the service after changing configuration.
+
+Windows release exports use the production API by default. To test an export against the local
+service, start it from PowerShell with:
+
+```powershell
+$env:PURPLESHOE_SERVER_URL = 'http://127.0.0.1:3000'
+.\voip-3d.exe
+```
+
+Release builds accept HTTPS URLs or HTTP loopback URLs for this override. Rebuild the export after
+updating the project; previously exported executables do not include these fixes.
 
 If Godot is not on `PATH`, pass its executable explicitly:
 
@@ -85,7 +115,8 @@ The game can use WebSocket or UDP/ENet transport. Browser clients require WebSoc
 deployments served over HTTPS must connect through `wss://`. UDP/ENet is available to desktop and
 Android clients. A server listens on one transport at a time.
 
-The open-world multiplayer server can be started from the game project directory:
+For manual testing, an open-world multiplayer server can be started from the game project directory
+instead of the Node-managed server (do not run both on the same port):
 
 ```powershell
 godot --headless --path . -- --server --mode overland --transport ws --port 12897
@@ -123,6 +154,10 @@ commit credentials, database files, uploads, or generated dependencies.
 | C | Mark |
 | Q | Switch player |
 | G | Goalkeeper control |
+
+For a pass or shot, use the arrows to choose the direction and hold the action key to adjust its
+power; release it to kick. Short passes and through balls are assisted toward a teammate in that
+direction. `Q` switches to the nearest teammate.
 
 ### Open world
 

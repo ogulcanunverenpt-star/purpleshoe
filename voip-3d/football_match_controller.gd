@@ -21,6 +21,7 @@ const RED_GOAL_LINE_Z := -FIELD_HALF_LENGTH
 const BLUE_GOAL_LINE_Z := FIELD_HALF_LENGTH
 const BALL_LAYER := 4
 const TACKLE_SPEED := 9.0
+const PLAYER_SEPARATION := 0.9
 const TEAM_BLUE_COLOR := Color(0.08, 0.34, 0.95)
 const TEAM_RED_COLOR := Color(0.9, 0.08, 0.12)
 
@@ -63,6 +64,7 @@ var ai_action_cooldowns: Dictionary = {}
 var ai_tackle_cooldowns: Dictionary = {}
 var ai_keeper_dive_cooldowns: Dictionary = {}
 var ai_ball_action_cooldown_until := 0
+var last_kick_control_until := 0
 var local_q_held := false
 var local_g_held := false
 var waiting_label: Label
@@ -553,16 +555,7 @@ func can_local_shoot() -> bool:
 	var player := get_local_selected_player()
 	if player == null or player.role != MatchManager.ROLE_PLAYER or player.global_position.distance_to(ball.global_position) > 2.7:
 		return false
-	if not _team_has_ball_control(player.team):
-		return false
-	var camera := player.get_node_or_null("Camera3D") as Camera3D
-	if camera == null or camera.is_position_behind(ball.global_position):
-		return false
-	var viewport_size := camera.get_viewport().get_visible_rect().size
-	if viewport_size.x <= 0.0:
-		return false
-	var ball_screen_position := camera.unproject_position(ball.global_position)
-	return absf(ball_screen_position.x - viewport_size.x * 0.5) <= viewport_size.x / 6.0
+	return _team_has_ball_control(player.team)
 
 func get_local_selected_player() -> CharacterBody3D:
 	if is_instance_valid(local_selected_entity):
@@ -654,12 +647,9 @@ func server_input_for(player: CharacterBody3D) -> Dictionary:
 	var peer_id: int = player.controller_peer_id
 	if set_piece_active and player.name == set_piece_taker_name:
 		return {"world_move": Vector3.ZERO, "yaw": player.rotation.y}
-	var cross_target: Dictionary = cross_run_assignments.get(player.name, {})
-	if not cross_target.is_empty() and int(cross_target.get("expires", 0)) > Time.get_ticks_msec():
-		return {}
 	if selected_entity_by_peer.get(peer_id, "") != player.name:
 		return {}
-	return controller_input_by_peer.get(peer_id, {})
+	return controller_input_by_peer.get(peer_id, {"move": Vector2.ZERO, "yaw": player.rotation.y})
 
 func can_local_clear(player: CharacterBody3D) -> bool:
 	return is_instance_valid(player) and player.global_position.distance_to(ball.global_position) <= 2.7 and can_player_clear(player)
@@ -681,6 +671,10 @@ func update_player_dribble(player: CharacterBody3D, movement: Vector3, delta: fl
 	if not multiplayer.is_server() or ball == null or ball.freeze or set_piece_active:
 		return
 	if player.role != MatchManager.ROLE_PLAYER or (not _is_player_selected(player) and not player.is_ai):
+		return
+	if player.name == last_ball_actor_name and Time.get_ticks_msec() < last_kick_control_until:
+		return
+	if ball.global_position.y > player.global_position.y + 1.0 or ball.linear_velocity.length() > 14.0:
 		return
 	movement.y = 0.0
 	if movement.length_squared() < 0.01 or player.global_position.distance_to(ball.global_position) > 2.0:
@@ -722,6 +716,8 @@ func _is_player_selected(player: CharacterBody3D) -> bool:
 func ai_input_for(player: CharacterBody3D, _delta: float) -> Dictionary:
 	if ball == null:
 		return {}
+	if kickoff_team >= 0 and ball.freeze and player.team == kickoff_team and player.field_slot == 8:
+		return {"world_move": Vector3.ZERO, "yaw": player.rotation.y, "sprint": false}
 	var target := player.global_position
 	var attack_sign := _attack_sign(player.team)
 	if player.role == MatchManager.ROLE_GOALKEEPER:
@@ -775,11 +771,33 @@ func ai_input_for(player: CharacterBody3D, _delta: float) -> Dictionary:
 	target.y = 0.0
 	var direction := target - player.global_position
 	direction.y = 0.0
-	if direction.length_squared() < 0.01:
+	var target_distance := direction.length()
+	var movement := direction.normalized() * minf(target_distance / 2.0, 1.0) if target_distance > 0.1 else Vector3.ZERO
+	if player.role == MatchManager.ROLE_PLAYER:
+		movement += _teammate_avoidance(player)
+		movement = movement.limit_length(1.0)
+	if movement.length_squared() < 0.01:
 		return {"world_move": Vector3.ZERO, "yaw": player.rotation.y, "sprint": false}
-	direction = direction.normalized()
-	var yaw := atan2(-direction.x, -direction.z)
-	return {"world_move": direction, "yaw": yaw, "sprint": true}
+	var yaw := atan2(-movement.x, -movement.z)
+	return {"world_move": movement, "yaw": yaw, "sprint": target_distance > 6.0}
+
+func _teammate_avoidance(player: CharacterBody3D) -> Vector3:
+	var avoidance := Vector3.ZERO
+	for child in players.get_children():
+		var teammate := child as CharacterBody3D
+		if teammate == null or teammate == player or teammate.team != player.team:
+			continue
+		var offset := player.global_position - teammate.global_position
+		offset.y = 0.0
+		var distance := offset.length()
+		if distance >= 2.5:
+			continue
+		if distance < 0.01:
+			offset = Vector3.RIGHT if String(player.name) < String(teammate.name) else Vector3.LEFT
+		else:
+			offset /= distance
+		avoidance += offset * (1.0 - distance / 2.5)
+	return avoidance.limit_length(1.0)
 
 func _ai_dribble_target(player: CharacterBody3D, attack_sign: float) -> Vector3:
 	var forward := Vector3(0.0, 0.0, attack_sign)
@@ -842,6 +860,8 @@ func _try_ai_keeper_dive(player: CharacterBody3D, attack_sign: float) -> void:
 func try_ai_ball_action(player: CharacterBody3D) -> void:
 	if not multiplayer.is_server() or not game_started or ball == null:
 		return
+	if kickoff_team >= 0 and ball.freeze:
+		return
 	var other_team := MatchManager.TEAM_RED if player.team == MatchManager.TEAM_BLUE else MatchManager.TEAM_BLUE
 	if _is_player_selected(player):
 		var selected_input := server_input_for(player)
@@ -852,6 +872,8 @@ func try_ai_ball_action(player: CharacterBody3D) -> void:
 		_try_ai_tackle(player, other_team)
 		return
 	if player.global_position.distance_to(ball.global_position) > 2.25 or not _team_has_ball_control(player.team):
+		return
+	if _nearest_player_to_ball(player.team) != player:
 		return
 	if ai_ball_action_cooldown_until > Time.get_ticks_msec():
 		return
@@ -954,6 +976,29 @@ func _best_forward_teammate(player: CharacterBody3D) -> CharacterBody3D:
 			continue
 		var score := player.global_position.distance_to(teammate.global_position) - progress * 0.15
 		if score < best_score:
+			best = teammate
+			best_score = score
+	return best
+
+func _pass_receiver(player: CharacterBody3D, direction: Vector3, max_distance: float) -> CharacterBody3D:
+	var best: CharacterBody3D
+	var best_score := -INF
+	for child in players.get_children():
+		var teammate := child as CharacterBody3D
+		if teammate == null or teammate == player or teammate.team != player.team or teammate.role != MatchManager.ROLE_PLAYER:
+			continue
+		if not set_piece_active and _is_offside_position(teammate, player.team, ball.global_position):
+			continue
+		var offset := teammate.global_position - ball.global_position
+		offset.y = 0.0
+		var distance := offset.length()
+		if distance < 1.0 or distance > max_distance:
+			continue
+		var alignment := direction.dot(offset / distance)
+		if alignment < 0.35:
+			continue
+		var score := alignment * 2.0 - distance / max_distance
+		if score > best_score:
 			best = teammate
 			best_score = score
 	return best
@@ -1081,6 +1126,16 @@ func _handle_ball_action(peer_id: int, actor_name: String, direction: Vector3, p
 	elif direction.length_squared() < 0.01:
 		direction = -player.global_transform.basis.z
 	direction = direction.normalized()
+	if not ai_action and not is_taker and action in ["pass", "through", "lofted_through"]:
+		var horizontal_direction := Vector3(direction.x, 0.0, direction.z).normalized()
+		var receiver := _pass_receiver(player, horizontal_direction, 45.0 if action != "pass" else 30.0)
+		if receiver != null:
+			var target := receiver.global_position
+			if action != "pass":
+				target += Vector3(receiver.velocity.x, 0.0, receiver.velocity.z) * 0.35
+			direction = target - ball.global_position
+			direction.y = 0.0
+			direction = direction.normalized()
 	var safe_power = clampf(power, 0.15, 1.0)
 	var forward_speed := 18.0
 	var lift := 0.15
@@ -1126,6 +1181,8 @@ func start_ball_action(kick_velocity: Vector3, curve: float, action: String, act
 		ball.sleeping = false
 		ball.linear_velocity = kick_velocity
 		ball.angular_velocity = Vector3(curve * 10.0, 0.0, -kick_velocity.x * 2.2)
+		last_kick_control_until = Time.get_ticks_msec() + 350
+		ai_ball_action_cooldown_until = Time.get_ticks_msec() + 600
 	else:
 		ball.freeze = true
 	ball.sleeping = false
@@ -1147,11 +1204,6 @@ func _on_ball_body_entered(body: Node):
 		if int(diving_peers.get(player.name, 0)) > Time.get_ticks_msec():
 			_stop_ball("SAVE")
 		return
-	var away = (player.global_position - ball.global_position).normalized()
-	_apply_player_impulse(player.name, away * 2.2 + Vector3.UP * 0.35)
-	ball.apply_central_impulse(-away * 0.35)
-	if away.length_squared() > 0.0:
-		broadcast_player_action.rpc(player.name, "fall")
 
 func request_tackle(_position: Vector3, _forward: Vector3):
 	if not game_started:
@@ -1474,6 +1526,8 @@ func _physics_process(delta: float):
 	_update_scoreboard()
 
 func _process(delta: float):
+	if game_started and not is_instance_valid(local_selected_entity):
+		_ensure_initial_local_selection()
 	_process_selection_keys()
 	_update_aim_indicator()
 	if multiplayer.is_server() or ball == null or ball.freeze:
@@ -1517,14 +1571,14 @@ func _update_aim_indicator() -> void:
 		return
 	var player := get_local_selected_player()
 	var aiming_set_piece: bool = set_piece_active and player != null and player.name == set_piece_taker_name and player.set_piece_aiming
-	if not aiming_set_piece and (ball.freeze or player == null or player.role != MatchManager.ROLE_PLAYER or not can_local_shoot()):
+	if not aiming_set_piece and (player == null or player.role != MatchManager.ROLE_PLAYER or not can_local_shoot()):
 		aim_indicator.visible = false
 		return
 	var camera := player.get_node_or_null("Camera3D") as Camera3D
 	if camera == null:
 		aim_indicator.visible = false
 		return
-	var direction := -camera.global_transform.basis.z.normalized()
+	var direction: Vector3 = -camera.global_transform.basis.z.normalized() if aiming_set_piece else player.match_action_direction()
 	var start := ball.global_position + Vector3.UP * 0.2
 	var length: float = 2.0 + player.shot_charge / 1.5 * 8.0
 	var tip: Vector3 = start + direction * length
@@ -1689,9 +1743,21 @@ func _resolve_player_contacts():
 			var second = field_players[second_index]
 			var separation = second.global_position - first.global_position
 			separation.y = 0.0
-			var distance = separation.length()
-			if distance < 0.001 or distance >= 0.68:
+			var distance: float = separation.length()
+			if distance >= PLAYER_SEPARATION:
 				continue
+			var normal: Vector3
+			if distance < 0.001:
+				normal = Vector3.RIGHT if String(first.name) < String(second.name) else Vector3.LEFT
+			else:
+				normal = separation / distance
+			var correction := normal * (PLAYER_SEPARATION - distance) * 0.5
+			first.global_position -= correction
+			second.global_position += correction
+			first.global_position.x = clampf(first.global_position.x, -FIELD_HALF_WIDTH + 0.5, FIELD_HALF_WIDTH - 0.5)
+			first.global_position.z = clampf(first.global_position.z, -FIELD_HALF_LENGTH + 0.5, FIELD_HALF_LENGTH - 0.5)
+			second.global_position.x = clampf(second.global_position.x, -FIELD_HALF_WIDTH + 0.5, FIELD_HALF_WIDTH - 0.5)
+			second.global_position.z = clampf(second.global_position.z, -FIELD_HALF_LENGTH + 0.5, FIELD_HALF_LENGTH - 0.5)
 			if first.team == second.team:
 				continue
 			var first_id: String = first.name
@@ -1701,8 +1767,7 @@ func _resolve_player_contacts():
 			if contact_cooldowns.get(pair_key, 0) > now:
 				continue
 			contact_cooldowns[pair_key] = now + 180
-			var normal = separation.normalized()
-			var shove = normal * (1.6 + (0.68 - distance) * 6.0)
+			var shove = normal * (1.0 + (PLAYER_SEPARATION - distance) * 2.0)
 			_apply_player_impulse(first_id, -shove)
 			_apply_player_impulse(second_id, shove)
 
@@ -1879,9 +1944,7 @@ func _on_match_state_changed(ready: bool):
 		sync_match_clock.rpc(match_clock)
 		if kickoff_team < 0 and blue_score + red_score == 0 and ball != null and ball.global_position.distance_to(BALL_START) < 0.5:
 			kickoff_team = MatchManager.TEAM_RED
-	if ready:
-		call_deferred("_select_initial_local_player")
-	else:
+	if not ready:
 		selected_entity_by_peer.clear()
 		controller_input_by_peer.clear()
 		if is_instance_valid(local_selected_entity):
@@ -1903,15 +1966,24 @@ func _on_match_state_changed(ready: bool):
 		ball.angular_velocity = Vector3.ZERO
 	_update_scoreboard()
 
-func _select_initial_local_player() -> void:
-	for _attempt in range(20):
-		await get_tree().process_frame
-		if not game_started:
-			return
-		if MatchManager.local_team() < 0:
-			return
-		if is_instance_valid(local_selected_entity):
-			return
+func prepare_initial_kickoff() -> void:
+	if not multiplayer.is_server() or not game_started or blue_score + red_score != 0:
+		return
+	if kickoff_team < 0 or ball == null or ball.global_position.distance_to(BALL_START) >= 0.5:
+		return
+	restart_position = BALL_START
+	kickoff_wait = 0.0
+	reset_players_for_kickoff.rpc(kickoff_team)
+
+func _ensure_initial_local_selection() -> void:
+	var team := MatchManager.local_team()
+	if team < 0:
+		return
+	var available := 0
+	for child in players.get_children():
+		if child is CharacterBody3D and child.team == team and child.role == MatchManager.ROLE_PLAYER:
+			available += 1
+	if available >= MatchManager.MAX_FIELD_PLAYERS_PER_TEAM:
 		select_nearest_local_player()
 
 func _on_role_selection_rejected(message: String):

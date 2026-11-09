@@ -3,45 +3,19 @@
 const cluster = require('node:cluster');
 const os = require('node:os');
 const process = require('node:process');
-const path = require('node:path');
-const net = require('node:net');
+const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { issueMatrixHandoffTicket, redeemMatrixHandoffTicket } = require('./matrix_handoff_store');
+const { gameServerLaunch, ensurePortAvailable, waitForGameServer } = require('./game_server_launch');
 require('dotenv').config();
-
-function waitForRoomPort(port, timeoutMs = 10000) {
-  return new Promise((resolve, reject) => {
-    const startedAt = Date.now();
-
-    function attempt() {
-      if (Date.now() - startedAt >= timeoutMs) {
-        return reject(new Error(`Game server did not open port ${port} in time.`));
-      }
-      const socket = net.createConnection({ host: '127.0.0.1', port });
-      let attemptFinished = false;
-      const retry = () => {
-        if (attemptFinished) return;
-        attemptFinished = true;
-        socket.destroy();
-        setTimeout(attempt, 250);
-      };
-      socket.setTimeout(1000, retry);
-      socket.once('connect', () => {
-        if (attemptFinished) return;
-        attemptFinished = true;
-        socket.destroy();
-        resolve();
-      });
-      socket.once('error', retry);
-    }
-
-    attempt();
-  });
-}
 
 if (cluster.isPrimary) {
   let shuttingDown = false;
+  process.env.SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+  process.env.JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
   const sharedRooms = new Map();
+  const startingRooms = new Map();
+  const reservedPorts = new Map();
   const sharedRoomModes = {
     plaza: { mode: 'conference', minutes: 60, port: 12900 },
     match: { mode: 'match', minutes: 10, port: 12899 },
@@ -64,7 +38,7 @@ if (cluster.isPrimary) {
       };
     }
   }
-  const serverHost = process.env.SERVER_HOST || '192.168.1.9';
+  const serverHost = process.env.SERVER_HOST || '127.0.0.1';
 
   function sendSharedRoomResponse(worker, requestId, room, error = '') {
     if (worker.isConnected()) {
@@ -72,26 +46,25 @@ if (cluster.isPrimary) {
     }
   }
 
-  async function getSharedRoom(worker, request) {
-    const portalId = String(request.portal_id || '');
-    const settings = portalId
-      ? portalRoomModes[portalId]
-      : (Object.hasOwn(sharedRoomModes, request.mode) ? sharedRoomModes[request.mode] : null);
-    if (settings && portalId && settings.mode !== request.mode) {
-      sendSharedRoomResponse(worker, request.requestId, null, 'Portal türüyle oda türü eşleşmiyor.');
-      return;
+  async function startSharedRoom(roomKey, settings) {
+    if (startingRooms.has(roomKey)) return startingRooms.get(roomKey);
+    const starting = doStartSharedRoom(roomKey, settings);
+    startingRooms.set(roomKey, starting);
+    try {
+      return await starting;
+    } finally {
+      if (startingRooms.get(roomKey) === starting) startingRooms.delete(roomKey);
     }
-    if (!settings) {
-      sendSharedRoomResponse(worker, request.requestId, null, 'Geçersiz ortak oda türü.');
-      return;
-    }
+  }
 
-    const roomKey = portalId ? `portal_${portalId}` : request.mode;
+  async function doStartSharedRoom(roomKey, settings) {
     let room = sharedRooms.get(roomKey);
     if (!room || room.process.exitCode !== null || room.process.signalCode !== null) {
-      const exePath = process.env.VOIP_3D_EXE || path.resolve(__dirname, '..', 'voip-3d', 'voip-3d.exe');
+      await ensurePortAvailable(settings.port);
+      if (shuttingDown) throw new Error('Server is shutting down.');
+      const launch = gameServerLaunch();
       const args = [
-        '--headless',
+        ...launch.prefixArgs,
         '--server',
         '--host', serverHost,
         '--port', settings.port.toString(),
@@ -99,7 +72,7 @@ if (cluster.isPrimary) {
         '--minutes', settings.minutes.toString(),
         '--transport', 'ws'
       ];
-      const child = spawn(exePath, args, { cwd: path.dirname(exePath) });
+      const child = spawn(launch.command, args, { cwd: launch.cwd });
       room = {
         id: `shared_${roomKey}_${settings.port}`,
         mode: settings.mode,
@@ -107,10 +80,7 @@ if (cluster.isPrimary) {
         host: serverHost,
         token: '',
         process: child,
-        ready: new Promise((resolve, reject) => {
-          child.once('spawn', resolve);
-          child.once('error', reject);
-        })
+        ready: waitForGameServer(child, settings.port)
       };
       sharedRooms.set(roomKey, room);
 
@@ -129,14 +99,40 @@ if (cluster.isPrimary) {
 
     try {
       await room.ready;
-      await waitForRoomPort(room.port);
+      if (room.process.exitCode !== null || room.process.signalCode !== null) {
+        throw new Error(`Game server on port ${room.port} exited.`);
+      }
+      return room;
     } catch (error) {
       if (room.process.exitCode === null) room.process.kill();
       if (sharedRooms.get(roomKey) === room) sharedRooms.delete(roomKey);
-      sendSharedRoomResponse(worker, request.requestId, null, 'Ortak oda sunucusu zamanında hazır olmadı.');
+      throw error;
+    }
+  }
+
+  async function getSharedRoom(worker, request) {
+    const portalId = String(request.portal_id || '');
+    const settings = portalId
+      ? (Object.hasOwn(portalRoomModes, portalId) ? portalRoomModes[portalId] : null)
+      : (Object.hasOwn(sharedRoomModes, request.mode) ? sharedRoomModes[request.mode] : null);
+    if (settings && portalId && settings.mode !== request.mode) {
+      sendSharedRoomResponse(worker, request.requestId, null, 'Portal türüyle oda türü eşleşmiyor.');
+      return;
+    }
+    if (!settings) {
+      sendSharedRoomResponse(worker, request.requestId, null, 'Geçersiz ortak oda türü.');
       return;
     }
 
+    const roomKey = portalId ? `portal_${portalId}` : request.mode;
+    let room;
+    try {
+      room = await startSharedRoom(roomKey, settings);
+    } catch (error) {
+      console.error(`[Cluster Primary] Could not start ${roomKey}:`, error);
+      sendSharedRoomResponse(worker, request.requestId, null, 'Ortak oda sunucusu başlatılamadı.');
+      return;
+    }
     sendSharedRoomResponse(worker, request.requestId, {
       success: true,
       message: 'Ortak oda hazır.',
@@ -152,6 +148,18 @@ if (cluster.isPrimary) {
     worker.on('message', (message) => {
       if (message && message.type === 'shared-room-request') {
         getSharedRoom(worker, message);
+      } else if (message && message.type === 'room-port-request') {
+        let port = null;
+        for (let candidate = 12810; candidate <= 12849; candidate++) {
+          if (!reservedPorts.has(candidate)) {
+            port = candidate;
+            reservedPorts.set(port, worker.id);
+            break;
+          }
+        }
+        worker.send({ type: 'room-port-response', requestId: message.requestId, port });
+      } else if (message && message.type === 'room-port-release') {
+        if (reservedPorts.get(message.port) === worker.id) reservedPorts.delete(message.port);
       } else if (message && message.type === 'matrix-handoff-issue-request') {
         try {
           const handoff = issueMatrixHandoffTicket(message.session);
@@ -188,19 +196,42 @@ if (cluster.isPrimary) {
     });
   });
 
-  const numCPUs = os.availableParallelism ? os.availableParallelism() : os.cpus().length;
-  console.log(`[Cluster Primary] Master PID ${process.pid} is running. Forking ${numCPUs} CPU workers for Railway...`);
-
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork({ SERVER_SHARED_ROOM_IPC: '1' });
+  async function start() {
+    const httpPort = Number(process.env.PORT || process.env.HTTP_PORT || 3000);
+    const tcpPort = Number(process.env.TCP_PORT || 8000);
+    if (!Number.isInteger(httpPort) || httpPort < 1 || httpPort > 65535 ||
+        !Number.isInteger(tcpPort) || tcpPort < 1 || tcpPort > 65535 || httpPort === tcpPort) {
+      throw new Error('HTTP and TCP ports must be different valid port numbers.');
+    }
+    if ([httpPort, tcpPort].some(port => port >= 12810 && port <= 12900)) {
+      throw new Error('HTTP and TCP ports must not overlap the game-room range 12810-12900.');
+    }
+    await ensurePortAvailable(httpPort);
+    await ensurePortAvailable(tcpPort);
+    for (const [key, settings] of Object.entries(sharedRoomModes)) {
+      await startSharedRoom(key, settings);
+      console.log(`[Cluster Primary] ${key} ready on ${settings.port}`);
+    }
+    for (const [key, settings] of Object.entries(portalRoomModes)) {
+      await startSharedRoom(`portal_${key}`, settings);
+      console.log(`[Cluster Primary] portal ${key} ready on ${settings.port}`);
+    }
+    const numCPUs = os.availableParallelism ? os.availableParallelism() : os.cpus().length;
+    console.log(`[Cluster Primary] Rooms ready. Forking ${numCPUs} workers.`);
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork({ SERVER_SHARED_ROOM_IPC: '1' });
+    }
   }
 
   cluster.on('exit', (worker, code, signal) => {
+    for (const [port, owner] of reservedPorts) {
+      if (owner === worker.id) reservedPorts.delete(port);
+    }
     console.log(`[Cluster Primary] Worker ${worker.process.pid} died (${code || signal}). Restarting replacement worker...`);
     if (!shuttingDown) cluster.fork({ SERVER_SHARED_ROOM_IPC: '1' });
   });
 
-  function shutdown() {
+  function shutdown(exitCode = 0) {
     if (shuttingDown) return;
     shuttingDown = true;
     for (const room of sharedRooms.values()) {
@@ -209,11 +240,16 @@ if (cluster.isPrimary) {
     for (const worker of Object.values(cluster.workers)) {
       if (worker && worker.isConnected()) worker.kill('SIGINT');
     }
-    setTimeout(() => process.exit(0), 5000).unref();
+    setTimeout(() => process.exit(exitCode), 5000).unref();
   }
 
-  process.on('SIGINT', shutdown);
-  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', () => shutdown());
+  process.on('SIGTERM', () => shutdown());
+  start().catch((error) => {
+    console.error('[Cluster Primary] Failed to start game rooms:', error);
+    process.exitCode = 1;
+    shutdown(1);
+  });
 } else {
   // Worker process loads server.js logic
   require('./server.js');

@@ -27,6 +27,9 @@ Portal rooms use ports `12882-12896`, the shared open world uses `12897`, and ex
 use `12898-12900`. The Node room manager uses dynamic ports `12810-12849`; the Python room manager
 uses `12850-12881`. These ranges avoid collisions between the managers and the fixed portal/shared
 room servers.
+`npm start` in `server/` starts all fixed shared and portal rooms before the API accepts requests;
+this requires 19 headless Godot processes. The installer records the Godot executable path for
+this purpose. Port `12806` is a manual hosting default and is not the shared open-world port.
 
 ## Offline world data
 
@@ -56,7 +59,7 @@ room servers.
   godot --headless --path . -- --server --mode overland --transport ws --port 12897
   ```
 
-  If `--transport` is omitted, the server uses UDP for backward compatibility.
+  The lobby's dedicated-server mode uses WebSocket by default.
 - Web clients served over HTTPS must use `wss://`. Put the server behind a TLS-terminating reverse
   proxy such as nginx or Caddy, then enter the `wss://` domain and proxy port in the game menu.
 

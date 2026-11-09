@@ -64,7 +64,7 @@ func _select_avatar(avatar_id: String) -> void:
 	preview_model = new_preview
 	selected_avatar = avatar_id
 	selected_label.text = "Selected character: %s" % AvatarCatalog.display_name(avatar_id)
-	status_label.text = "The model preview is rotating. Your selection is saved to your account."
+	status_label.text = "The model preview is rotating. Your selection is saved when you continue."
 	_update_avatar_buttons()
 
 
@@ -84,7 +84,7 @@ func _update_avatar_buttons() -> void:
 
 func _on_continue_pressed() -> void:
 	if not MatrixClient.save_selected_avatar_id(selected_avatar):
-		status_label.text = "Could not save character selection. Check your device storage."
+		status_label.text = MatrixClient.avatar_save_error
 		return
 	continue_button.disabled = true
 	status_label.text = "Connecting to the open world..."

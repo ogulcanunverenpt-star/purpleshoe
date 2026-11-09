@@ -18,6 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const { spawn } = require('child_process');
+const { gameServerLaunch, ensurePortAvailable, waitForGameServer } = require('./game_server_launch');
 
 const net = require('net');
 const http = require('http');
@@ -45,6 +46,7 @@ const QRCode = require('qrcode');
 const activeRooms = {}; // roomId -> roomInfo
 const sharedRooms = {}; // shared room key -> roomInfo
 const userEvents = {};  // username -> [ events ]
+const localReservedPorts = new Set();
 
 function queueUserEvent(username, event) {
   if (!username) return;
@@ -53,48 +55,64 @@ function queueUserEvent(username, event) {
   userEvents[key].push({ ...event, timestamp: Date.now() });
 }
 
-function getNextAvailablePort() {
+async function reserveRoomPort() {
+  if (process.env.SERVER_SHARED_ROOM_IPC === '1' && typeof process.send === 'function') {
+    const requestId = crypto.randomUUID();
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        process.off('message', handleResponse);
+        reject(new Error('Oda portu yöneticisinden yanıt alınamadı.'));
+      }, 10000);
+      const handleResponse = (message) => {
+        if (!message || message.type !== 'room-port-response' || message.requestId !== requestId) return;
+        clearTimeout(timeout);
+        process.off('message', handleResponse);
+        if (message.port === null) reject(new Error('Boş oda portu kalmadı.'));
+        else resolve(message.port);
+      };
+      process.on('message', handleResponse);
+      process.send({ type: 'room-port-request', requestId }, (error) => {
+        if (error) {
+          clearTimeout(timeout);
+          process.off('message', handleResponse);
+          reject(error);
+        }
+      });
+    });
+  }
   const minPort = 12810;
   const maxPort = 12849;
   const usedPorts = new Set(Object.values(activeRooms).map(r => r.port));
   for (let p = minPort; p <= maxPort; p++) {
-    if (!usedPorts.has(p)) return p;
-  }
-  return Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort;
-}
-
-function waitForRoomPort(port, timeoutMs = 10000) {
-  return new Promise((resolve, reject) => {
-    const startedAt = Date.now();
-
-    function attempt() {
-      if (Date.now() - startedAt >= timeoutMs) {
-        return reject(new Error(`Game server did not open port ${port} in time.`));
-      }
-      const socket = net.createConnection({ host: '127.0.0.1', port });
-      let attemptFinished = false;
-      const retry = () => {
-        if (attemptFinished) return;
-        attemptFinished = true;
-        socket.destroy();
-        setTimeout(attempt, 250);
-      };
-      socket.setTimeout(1000, retry);
-      socket.once('connect', () => {
-        if (attemptFinished) return;
-        attemptFinished = true;
-        socket.destroy();
-        resolve();
-      });
-      socket.once('error', retry);
+    if (!usedPorts.has(p) && !localReservedPorts.has(p)) {
+      localReservedPorts.add(p);
+      return p;
     }
-
-    attempt();
-  });
+  }
+  throw new Error('Boş oda portu kalmadı.');
 }
+
+function releaseRoomPort(port) {
+  localReservedPorts.delete(port);
+  if (process.env.SERVER_SHARED_ROOM_IPC === '1' && typeof process.send === 'function' && process.connected) {
+    process.send({ type: 'room-port-release', port });
+  }
+}
+
+async function reserveAvailableRoomPort() {
+  const port = await reserveRoomPort();
+  try {
+    await ensurePortAvailable(port);
+    return port;
+  } catch (error) {
+    releaseRoomPort(port);
+    throw error;
+  }
+}
+
 const TCP_PORT = Number(process.env.TCP_PORT || 8000);
 const HTTP_PORT = Number(process.env.PORT || process.env.HTTP_PORT || 3000);
-const SERVER_HOST = process.env.SERVER_HOST || '192.168.1.9';
+const SERVER_HOST = process.env.SERVER_HOST || '127.0.0.1';
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 const AES_KEY_RAW = process.env.AES_KEY;
@@ -2618,25 +2636,28 @@ app.post('/api/rooms/create', async (req, res) => {
     const { mode, match_minutes, invitees } = req.body;
     const modeStr = mode || 'free_kick';
 
-    const port = getNextAvailablePort();
+    const launch = gameServerLaunch();
+    const port = await reserveAvailableRoomPort();
     const minutesVal = match_minutes || 10;
-    const exePath = process.env.VOIP_3D_EXE || path.resolve(__dirname, '..', 'voip-3d', 'voip-3d.exe');
     const args = [
-      '--headless',
+      ...launch.prefixArgs,
       '--server',
-      '--host', '192.168.1.9',
+      '--host', SERVER_HOST,
       '--port', port.toString(),
       '--mode', modeStr,
       '--minutes', minutesVal.toString(),
       '--transport', 'ws'
     ];
 
-    console.log(`[RoomManager] Spawning game server binary: ${exePath} ${args.join(' ')}`);
+    console.log(`[RoomManager] Spawning game server: ${launch.command} ${args.join(' ')}`);
 
     let proc = null;
     let procError = null;
+    let ready;
     try {
-      proc = spawn(exePath, args, { cwd: path.dirname(exePath) });
+      proc = spawn(launch.command, args, { cwd: launch.cwd });
+      ready = waitForGameServer(proc, port);
+      proc.once('close', () => releaseRoomPort(port));
       proc.on('error', (error) => {
         procError = error;
         console.error(`[RoomManager] Game server on port ${port} failed to spawn:`, error);
@@ -2644,6 +2665,7 @@ app.post('/api/rooms/create', async (req, res) => {
       proc.stdout.on('data', (data) => console.log(`[GodotServer:${port}] ${data}`));
       proc.stderr.on('data', (data) => console.error(`[GodotServer:${port}] ${data}`));
     } catch (err) {
+      releaseRoomPort(port);
       console.error('[RoomManager] Failed to spawn binary:', err);
       return res.status(500).json({ success: false, error: 'Oda sunucu binarysi çalıştırılamadı.' });
     }
@@ -2672,7 +2694,7 @@ app.post('/api/rooms/create', async (req, res) => {
     }
 
     try {
-      await waitForRoomPort(port);
+      await ready;
     } catch (error) {
       delete activeRooms[roomId];
       if (proc && proc.exitCode === null && proc.signalCode === null) proc.kill();
@@ -2832,10 +2854,11 @@ app.post('/api/rooms/shared', async (req, res) => {
 
     let roomInfo = sharedRooms[roomKey];
     if (!roomInfo || !roomInfo.process || roomInfo.process.exitCode !== null || roomInfo.process.signalCode !== null) {
-      const port = roomSettings.port || getNextAvailablePort();
-      const exePath = process.env.VOIP_3D_EXE || path.resolve(__dirname, '..', 'voip-3d', 'voip-3d.exe');
+      const launch = gameServerLaunch();
+      const port = roomSettings.port || await reserveAvailableRoomPort();
+      if (roomSettings.port) await ensurePortAvailable(port);
       const args = [
-        '--headless',
+        ...launch.prefixArgs,
         '--server',
         '--host', SERVER_HOST,
         '--port', port.toString(),
@@ -2843,7 +2866,9 @@ app.post('/api/rooms/shared', async (req, res) => {
         '--minutes', roomSettings.minutes.toString(),
         '--transport', 'ws'
       ];
-      const proc = spawn(exePath, args, { cwd: path.dirname(exePath) });
+      const proc = spawn(launch.command, args, { cwd: launch.cwd });
+      const ready = waitForGameServer(proc, port);
+      if (!roomSettings.port) proc.once('close', () => releaseRoomPort(port));
       const roomId = `shared_${roomKey}_${port}`;
       roomInfo = {
         id: roomId,
@@ -2871,19 +2896,11 @@ app.post('/api/rooms/shared', async (req, res) => {
         delete activeRooms[roomId];
       });
 
-      try {
-        await new Promise((resolve, reject) => {
-          proc.once('spawn', resolve);
-          proc.once('error', reject);
-        });
-      } catch (error) {
-        console.error(`[RoomManager] Could not spawn shared server (${sharedMode}):`, error);
-        return res.status(500).json({ success: false, error: 'Ortak oda sunucusu başlatılamadı.' });
-      }
+      roomInfo.ready = ready;
     }
 
     try {
-      await waitForRoomPort(roomInfo.port);
+      await roomInfo.ready;
     } catch (error) {
       if (roomInfo.process && roomInfo.process.exitCode === null) roomInfo.process.kill();
       if (sharedRooms[roomKey] === roomInfo) delete sharedRooms[roomKey];
@@ -3120,13 +3137,13 @@ wss.on('connection', (ws) => {
         const { mode, match_minutes, invitees } = data;
         const modeStr = mode || 'free_kick';
 
-        const port = getNextAvailablePort();
+        const launch = gameServerLaunch();
+        const port = await reserveAvailableRoomPort();
         const minutesVal = match_minutes || 10;
-        const exePath = process.env.VOIP_3D_EXE || path.resolve(__dirname, '..', 'voip-3d', 'voip-3d.exe');
         const args = [
-          '--headless',
+          ...launch.prefixArgs,
           '--server',
-          '--host', '192.168.1.9',
+          '--host', SERVER_HOST,
           '--port', port.toString(),
           '--mode', modeStr,
           '--minutes', minutesVal.toString(),
@@ -3134,8 +3151,11 @@ wss.on('connection', (ws) => {
         ];
 
         let proc = null;
+        let ready;
         try {
-          proc = spawn(exePath, args, { cwd: path.dirname(exePath) });
+          proc = spawn(launch.command, args, { cwd: launch.cwd });
+          ready = waitForGameServer(proc, port);
+          proc.once('close', () => releaseRoomPort(port));
           proc.stdout.on('data', (d) => {
             d.toString().split('\n').forEach(line => {
               if (line.trim()) console.log(`[GodotServer:${port}] ${line.trim()}`);
@@ -3147,22 +3167,36 @@ wss.on('connection', (ws) => {
             });
           });
         } catch (e) {
+          releaseRoomPort(port);
           console.error('[RoomManager] Failed to spawn binary:', e);
           return ws.send(JSON.stringify({ type: 'error', message: 'Oda başlatılamadı' }));
         }
 
         const roomId = `room_${Date.now()}_${port}`;
         const token = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
-        activeRooms[roomId] = { id: roomId, creator: currentUser, mode: modeStr, minutes: minutesVal, port, host: '192.168.1.9', token, process: proc };
+        activeRooms[roomId] = { id: roomId, creator: currentUser, mode: modeStr, minutes: minutesVal, port, host: SERVER_HOST, token, process: proc };
 
         if (proc) {
+          proc.on('error', (error) => {
+            console.error(`[RoomManager] Game server on port ${port} failed:`, error);
+          });
           proc.on('exit', (code) => {
             console.log(`[RoomManager] Game server on port ${port} exited code ${code}`);
             delete activeRooms[roomId];
           });
         }
 
-        ws.send(JSON.stringify({ type: 'room_created', roomId, host: '192.168.1.9', port, token, mode: modeStr }));
+        try {
+          await ready;
+          if (proc.exitCode !== null || proc.signalCode !== null) throw new Error('Game server exited.');
+        } catch (error) {
+          console.error(`[RoomManager] Game server on port ${port} failed:`, error);
+          delete activeRooms[roomId];
+          if (proc.exitCode === null && proc.signalCode === null) proc.kill();
+          return ws.send(JSON.stringify({ type: 'error', message: 'Oda başlatılamadı' }));
+        }
+
+        ws.send(JSON.stringify({ type: 'room_created', roomId, host: SERVER_HOST, port, token, mode: modeStr }));
 
         if (Array.isArray(invitees)) {
           invitees.forEach(friendName => {
@@ -3172,7 +3206,7 @@ wss.on('connection', (ws) => {
               from: currentUser,
               mode: modeStr,
               match_minutes: minutesVal,
-              host: '192.168.1.9',
+              host: SERVER_HOST,
               port,
               token
             };

@@ -17,7 +17,7 @@ signal talk_request_received(from_user_id: String)
 signal talk_response_received(from_user_id: String, accepted: bool)
 signal chat_message_received(other_user_id: String, body: String, local_echo: bool)
 
-var SERVER_URL := "http://192.168.1.9:3000"
+var SERVER_URL := "http://127.0.0.1:3000"
 const PRODUCTION_SERVER_URL := "https://gamebler.xyz"
 const MATRIX_SERVER_URL := "https://matrix.gamebler.xyz"
 const CONFIG_PATH := "user://account.cfg"
@@ -43,9 +43,12 @@ var _auth_generation := 0
 var _refresh_in_progress := false
 var _last_refresh_succeeded := false
 var _avatar_preferences := ConfigFile.new()
+var avatar_save_error := ""
 
 
 func _ready() -> void:
+	if "--server" in OS.get_cmdline_user_args() or "--server" in OS.get_cmdline_args():
+		return
 	_load_config()
 	_load_chat_history()
 	_load_avatar_preferences()
@@ -54,7 +57,7 @@ func _ready() -> void:
 
 
 func is_logged_in() -> bool:
-	return access_token != ""
+	return access_token != "" and not user_id.strip_edges().is_empty()
 
 
 func local_username() -> String:
@@ -62,7 +65,8 @@ func local_username() -> String:
 
 
 func selected_avatar_id() -> String:
-	var avatar_id := String(_avatar_preferences.get_value("avatars", user_id, AvatarCatalog.MAN))
+	var key := user_id.sha256_text()
+	var avatar_id := String(_avatar_preferences.get_value("avatars", key, _avatar_preferences.get_value("avatars", user_id, AvatarCatalog.MAN)))
 	if not AvatarCatalog.is_valid_avatar(avatar_id):
 		push_warning("Ignoring invalid saved avatar selection for %s: %s" % [user_id, avatar_id])
 		return AvatarCatalog.MAN
@@ -70,16 +74,27 @@ func selected_avatar_id() -> String:
 
 
 func save_selected_avatar_id(avatar_id: String) -> bool:
+	avatar_save_error = ""
 	if not AvatarCatalog.is_valid_avatar(avatar_id):
-		push_error("Refusing to save unknown avatar selection: %s" % avatar_id)
+		avatar_save_error = "Unknown character selection: %s" % avatar_id
+		push_error(avatar_save_error)
 		return false
-	if user_id.strip_edges().is_empty():
-		push_error("Cannot save an avatar selection without an authenticated account.")
+	if not is_logged_in():
+		avatar_save_error = "Your session is missing or expired. Please log in again."
+		push_error(avatar_save_error)
 		return false
-	_avatar_preferences.set_value("avatars", user_id, AvatarCatalog.canonical_avatar_id(avatar_id))
+	var key := user_id.sha256_text()
+	var had_previous := _avatar_preferences.has_section_key("avatars", key)
+	var previous = _avatar_preferences.get_value("avatars", key, "")
+	_avatar_preferences.set_value("avatars", key, AvatarCatalog.canonical_avatar_id(avatar_id))
 	var save_result := _avatar_preferences.save(AVATAR_CONFIG_PATH)
 	if save_result != OK:
-		push_error("Could not save avatar selection: %s" % error_string(save_result))
+		if had_previous:
+			_avatar_preferences.set_value("avatars", key, previous)
+		else:
+			_avatar_preferences.erase_section_key("avatars", key)
+		avatar_save_error = "Could not save character selection: %s" % error_string(save_result)
+		push_error(avatar_save_error)
 		return false
 	return true
 
@@ -120,6 +135,9 @@ func _finish_auth(res: Dictionary, username: String, password: String, is_regist
 		login_failed.emit(String(body.get("error", "Could not connect to the server, or the username or password is incorrect.")))
 		return
 	var authenticated_user := String(body.get("username", ""))
+	if authenticated_user.strip_edges().is_empty() or String(body.get("token", "")).is_empty():
+		login_failed.emit("The server returned an incomplete login session.")
+		return
 	if not user_id.is_empty() and user_id != authenticated_user:
 		matrix_access_token = ""
 		matrix_user_id = ""
@@ -285,20 +303,44 @@ func logout() -> void:
 
 
 func _load_config() -> void:
-	var default_server_url := "http://192.168.1.9:3000" if OS.is_debug_build() else PRODUCTION_SERVER_URL
+	var default_server_url := "http://127.0.0.1:3000" if OS.is_debug_build() else PRODUCTION_SERVER_URL
 	SERVER_URL = default_server_url
 	var cfg := ConfigFile.new()
-	if cfg.load(CONFIG_PATH) != OK:
-		return
-	access_token = str(cfg.get_value("account", "access_token", ""))
-	refresh_token = str(cfg.get_value("account", "refresh_token", ""))
-	user_id = str(cfg.get_value("account", "user_id", ""))
-	SERVER_URL = str(cfg.get_value("account", "server_url", default_server_url))
-	if not OS.is_debug_build() and SERVER_URL.begins_with("http://"):
+	if cfg.load(CONFIG_PATH) == OK:
+		access_token = str(cfg.get_value("account", "access_token", ""))
+		refresh_token = str(cfg.get_value("account", "refresh_token", ""))
+		user_id = str(cfg.get_value("account", "user_id", ""))
+		SERVER_URL = str(cfg.get_value("account", "server_url", default_server_url))
+		matrix_access_token = str(cfg.get_value("account", "matrix_access_token", ""))
+		matrix_user_id = str(cfg.get_value("account", "matrix_user_id", ""))
+		matrix_device_id = str(cfg.get_value("account", "matrix_device_id", ""))
+	var stored_server_url := SERVER_URL
+	if OS.is_debug_build() and SERVER_URL == "http://192.168.1.9:3000":
+		SERVER_URL = default_server_url
+	var requested_url := OS.get_environment("PURPLESHOE_SERVER_URL").strip_edges().trim_suffix("/")
+	if not requested_url.is_empty():
+		if not OS.is_debug_build() and not _is_secure_or_local_api_url(requested_url):
+			push_error("PURPLESHOE_SERVER_URL must use HTTPS or a local loopback address.")
+		else:
+			SERVER_URL = requested_url
+	if not OS.is_debug_build() and not _is_secure_or_local_api_url(SERVER_URL):
+		push_warning("Ignoring insecure non-local API URL in saved configuration.")
 		SERVER_URL = PRODUCTION_SERVER_URL
-	matrix_access_token = str(cfg.get_value("account", "matrix_access_token", ""))
-	matrix_user_id = str(cfg.get_value("account", "matrix_user_id", ""))
-	matrix_device_id = str(cfg.get_value("account", "matrix_device_id", ""))
+	if SERVER_URL != stored_server_url:
+		access_token = ""
+		refresh_token = ""
+		user_id = ""
+		matrix_access_token = ""
+		matrix_user_id = ""
+		matrix_device_id = ""
+
+
+func _is_secure_or_local_api_url(url: String) -> bool:
+	if url.begins_with("https://"):
+		return true
+	var local_url := RegEx.new()
+	local_url.compile("^http://(127\\.0\\.0\\.1|localhost)(:[0-9]+)?/?$")
+	return local_url.search(url) != null
 
 
 func _load_avatar_preferences() -> void:
@@ -402,9 +444,12 @@ func _start_sync() -> void:
 func _sync_loop() -> void:
 	while _syncing and access_token != "":
 		var url := "/api/sync?since=%d" % _last_sync_ts
+		var auth_generation := _auth_generation
 		var res = await _raw_request("GET", url, null, true, 10.0)
 		if not _syncing:
 			return
+		if auth_generation != _auth_generation:
+			continue
 		var body: Dictionary = res.get("body", {})
 		if res.get("code", 0) == 200 and body.get("success", false):
 			_last_sync_ts = int(body.get("timestamp", _last_sync_ts))

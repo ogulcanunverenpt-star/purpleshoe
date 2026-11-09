@@ -16,4 +16,5 @@ voip-3d/exported/
 **/*.db
 **/uploads/
 **/logs/
+server/godot-path.local.json
 *.log

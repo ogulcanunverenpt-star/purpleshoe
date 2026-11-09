@@ -154,10 +154,13 @@ func _check_cmdline_args() -> bool:
 		print("[CLI] Headless/Server mode starting on port %d, mode %d..." % [port, mode_id])
 		var res := NetJoin.create_server(port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, "DedicatedServer", minutes, mode_id, transport_id, room_tokens, "", "", false)
 		if res.get("ok", false):
+			print("ROOM_SERVER_READY %d" % port)
 			get_tree().change_scene_to_file.call_deferred(NetJoin.game_scene_for(mode_id))
 			return true
 		else:
 			push_error("Failed to start headless server: %s" % res.get("message", ""))
+			get_tree().quit(1)
+			return true
 	return false
 
 
@@ -467,15 +470,19 @@ func _on_request_room_btn_pressed() -> void:
 # ---------------- Overland Direct Entry ----------------
 
 func _on_enter_overland_btn_pressed() -> void:
-	room_status_label.text = "Starting the open-world server..."
-	var res := await MatrixClient.create_server_room("overland", [], 60)
+	room_status_label.text = "Connecting to the shared open world..."
+	var res := await MatrixClient.join_shared_room("overland")
+	if not is_inside_tree():
+		return
 	if res.get("success", false):
-		var host: String = String(res.get("host", "192.168.1.9"))
-		var port: int = int(res.get("port", 12810))
+		var host: String = String(res.get("host", ""))
+		var port: int = int(res.get("port", 0))
 		var token: String = String(res.get("token", ""))
-		NetJoin.create_client(host, port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, MatrixClient.local_username(), MatchManager.MODE_OVERLAND, NetJoin.TRANSPORT_WEBSOCKET, token)
+		var join_result := NetJoin.create_client(host, port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, MatrixClient.local_username(), MatchManager.MODE_OVERLAND, NetJoin.TRANSPORT_WEBSOCKET, token)
+		if not join_result.get("ok", false):
+			room_status_label.text = "Could not connect to the open-world server: %s" % String(join_result.get("message", ""))
 	else:
-		NetJoin.create_client("192.168.1.9", NetJoin.DEFAULT_PORT, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, MatrixClient.local_username(), MatchManager.MODE_OVERLAND, NetJoin.TRANSPORT_WEBSOCKET)
+		room_status_label.text = "Could not connect to the open world: %s" % String(res.get("error", "The server did not respond."))
 
 
 # ---------------- Room Invites & One-Click Join ----------------

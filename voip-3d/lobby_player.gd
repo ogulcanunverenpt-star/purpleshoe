@@ -5,6 +5,7 @@ const RUN_SPEED = 8.5
 const JUMP_VELOCITY = 5.0
 const FALL_RESPAWN_DISTANCE := 40.0
 const FOOTBALL_MODEL_UTILS = preload("res://football_model_utils.gd")
+enum Locomotion { IDLE, WALK, RUN, JUMP }
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
 @onready var label_3d: Label3D = $Label3D
@@ -21,6 +22,7 @@ var anim_player: AnimationPlayer = null
 var ptt_pressed := false
 var ptt_touch_active := false
 var spawn_position := Vector3.ZERO
+var locomotion := Locomotion.IDLE
 
 func _enter_tree():
 	set_multiplayer_authority(name.to_int())
@@ -94,13 +96,25 @@ func _apply_avatar_selection(avatar_id: String) -> void:
 func _setup_animations():
 	if avatar_model == null:
 		return
+	anim_player = null
 	var players = avatar_model.find_children("*", "AnimationPlayer", true, false)
 	if players.size() > 0:
 		anim_player = players[0] as AnimationPlayer
 		if AvatarCatalog.supports_shared_human_animations(current_avatar_id):
 			FOOTBALL_MODEL_UTILS.install_human_animations(anim_player, avatar_model)
 		FOOTBALL_MODEL_UTILS.configure_locomotion_loops(anim_player)
-		_play_anim("Idle")
+		_play_locomotion(locomotion)
+
+func _play_locomotion(state: int) -> void:
+	match state:
+		Locomotion.WALK:
+			_play_anim("walk")
+		Locomotion.RUN:
+			_play_anim("run")
+		Locomotion.JUMP:
+			_play_anim("jump")
+		Locomotion.IDLE:
+			_play_anim("Idle")
 
 func _play_anim(anim_name: String):
 	if anim_player == null:
@@ -186,19 +200,18 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	# Animations
-	var jumping := not is_on_floor()
-	if jumping:
-		_play_anim("jump")
+	if not is_on_floor():
+		locomotion = Locomotion.JUMP
 	elif direction != Vector3.ZERO:
 		if is_sprinting:
-			_play_anim("run")
+			locomotion = Locomotion.RUN
 		else:
-			_play_anim("walk")
+			locomotion = Locomotion.WALK
 	else:
-		_play_anim("Idle")
+		locomotion = Locomotion.IDLE
+	_play_locomotion(locomotion)
 
-	sync_position.rpc(global_position, avatar_model.rotation.y, ptt_pressed)
+	sync_position.rpc(global_position, avatar_model.rotation.y, ptt_pressed, locomotion)
 
 func jump() -> void:
 	if not is_multiplayer_authority() or not is_on_floor():
@@ -210,16 +223,21 @@ func _update_label_text():
 		var status_str := "🔊 [SPEAKING]" if ptt_pressed else "🔇 [V: PUSH TO TALK]"
 		label_3d.text = "%s\n%s" % [username, status_str]
 
-@rpc("any_peer", "call_remote", "unreliable")
-func sync_position(pos: Vector3, rot_y: float, ptt: bool):
+@rpc("authority", "call_remote", "unreliable_ordered")
+func sync_position(pos: Vector3, rot_y: float, ptt: bool, state: int):
 	if not is_multiplayer_authority():
+		if state < Locomotion.IDLE or state > Locomotion.JUMP:
+			push_warning("Ignored invalid locomotion state for player %s." % name)
+			return
 		global_position = pos
 		if avatar_model:
 			avatar_model.rotation.y = rot_y
+		locomotion = state
+		_play_locomotion(locomotion)
 		ptt_pressed = ptt
 		_update_label_text()
 
-@rpc("any_peer", "call_remote", "unreliable")
+@rpc("authority", "call_remote", "unreliable_ordered")
 func sync_ptt(ptt: bool):
 	ptt_pressed = ptt
 	_update_label_text()

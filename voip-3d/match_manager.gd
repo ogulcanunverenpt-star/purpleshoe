@@ -26,16 +26,16 @@ const MIN_MATCH_PLAYERS := 1
 const MAX_FIELD_PLAYERS_PER_TEAM := 10
 const MAX_PLAYERS_PER_TEAM := MAX_FIELD_PLAYERS_PER_TEAM + 1
 const MATCH_FORMATION_433 := [
-	Vector2(-16.0, 10.0),
-	Vector2(-5.0, 8.0),
-	Vector2(5.0, 8.0),
-	Vector2(16.0, 10.0),
+	Vector2(-16.0, 40.0),
+	Vector2(-5.0, 43.0),
+	Vector2(5.0, 43.0),
+	Vector2(16.0, 40.0),
 	Vector2(-12.0, 23.0),
 	Vector2(0.0, 26.0),
 	Vector2(12.0, 23.0),
-	Vector2(-14.0, 36.0),
-	Vector2(0.0, 43.0),
-	Vector2(14.0, 36.0)
+	Vector2(-14.0, 10.0),
+	Vector2(0.0, 8.0),
+	Vector2(14.0, 10.0)
 ]
 
 var requested_role := ROLE_PLAYER

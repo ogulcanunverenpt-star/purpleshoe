@@ -153,10 +153,13 @@ func _check_cmdline_args() -> bool:
 		print("[CLI] Headless/Server mode starting on port %d, mode %d..." % [port, mode_id])
 		var res := NetJoin.create_server(port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, "DedicatedServer", minutes, mode_id, transport_id, room_tokens, "", "", false)
 		if res.get("ok", false):
+			print("ROOM_SERVER_READY %d" % port)
 			get_tree().change_scene_to_file.call_deferred(NetJoin.game_scene_for(mode_id))
 			return true
 		else:
 			push_error("Failed to start headless server: %s" % res.get("message", ""))
+			get_tree().quit(1)
+			return true
 	return false
 
 

@@ -273,6 +273,16 @@ func _get_field_arrow_input() -> Vector2:
 		float(Input.is_key_pressed(KEY_LEFT)) - float(Input.is_key_pressed(KEY_RIGHT))
 	)
 
+func match_action_direction() -> Vector3:
+	var move_input := _get_field_arrow_input()
+	if mobile_ui.visible and joystick.value.length() > 0.1:
+		move_input = joystick.value
+	var direction := Vector3(move_input.x, 0.0, move_input.y)
+	if direction.length_squared() < 0.01:
+		direction = -global_transform.basis.z
+	direction.y = 0.0
+	return direction.normalized()
+
 
 func _submit_match_input(delta: float) -> void:
 	match_input_sync_timer -= delta
@@ -439,8 +449,6 @@ func _physics_process(delta):
 			_submit_match_input(delta)
 		if multiplayer.is_server():
 			_match_server_physics(delta)
-		elif is_local_selected:
-			_submit_match_input(delta)
 		return
 	if !is_multiplayer_authority():
 		return
@@ -704,7 +712,7 @@ func _update_match_action_charge(delta: float):
 		if human_model_active:
 			_play_animation("shot" if charging_action == "shot" else "pass")
 		game.request_ball_action(
-			-$Camera3D.global_transform.basis.z,
+			match_action_direction(),
 			shot_charge / MAX_ACTION_CHARGE_SECONDS,
 			0.0,
 			charging_action,
@@ -725,7 +733,8 @@ func _request_action(action: String, power: float):
 				_play_animation("keeper_kick")
 			elif action == "pass" or action == "through" or action == "cross":
 				_play_animation("pass")
-		game.request_ball_action(-$Camera3D.global_transform.basis.z, power, 0.0, action, name if MatchManager.game_mode == MatchManager.MODE_MATCH else "")
+		var direction: Vector3 = match_action_direction() if MatchManager.game_mode == MatchManager.MODE_MATCH else -$Camera3D.global_transform.basis.z
+		game.request_ball_action(direction, power, 0.0, action, name if MatchManager.game_mode == MatchManager.MODE_MATCH else "")
 
 func _get_game_controller() -> Node:
 	var controller_name := "FootballMatchController" if MatchManager.game_mode == MatchManager.MODE_MATCH else "FreeKickController"

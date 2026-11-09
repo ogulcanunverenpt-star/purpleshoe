@@ -214,11 +214,11 @@ func _sync_match_lineup() -> void:
 			else:
 				player_spawn_position = MatchManager.match_formation_position(team, field_slot)
 				player_spawn_yaw = 0.0 if team == MatchManager.TEAM_BLUE else PI
-			playersNode.add_child(player, true)
-			player.global_position = player_spawn_position
-			player.global_rotation.y = player_spawn_yaw
+			player.position = playersNode.to_local(player_spawn_position)
+			player.rotation.y = player_spawn_yaw - playersNode.global_rotation.y
 			player.velocity = Vector3.ZERO
-			player.spawn_position = player.global_position
+			player.spawn_position = player_spawn_position
+			playersNode.add_child(player, true)
 		var keeper = playerScene.instantiate()
 		keeper.name = str(10000 + team * 100 + MatchManager.MAX_FIELD_PLAYERS_PER_TEAM)
 		keeper.team = team
@@ -229,6 +229,9 @@ func _sync_match_lineup() -> void:
 		keeper.is_ai = true
 		playersNode.add_child(keeper, true)
 	match_lineup_spawned = true
+	var controller := get_node_or_null("FootballMatchController")
+	if controller:
+		controller.prepare_initial_kickoff()
 
 func _clear_match_lineup() -> void:
 	for child in playersNode.get_children():
