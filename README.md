@@ -56,15 +56,33 @@ included; configure services from their supplied example files before deploying 
 
 ## Run the game on Windows
 
-Clone this repository, then run the install script from the repository root. It imports project
-resources, installs missing server dependencies, performs headless startup checks, records the Godot
-path for the server, and launches the game:
+### 1. Install and launch the game
+
+Clone the repository and run the installer from its root:
 
 ```powershell
+git clone https://github.com/ogulcanunverenpt-star/purpleshoe.git
+Set-Location .\purpleshoe
 .\install.ps1
 ```
 
-In a second terminal, start the service before logging in to the game:
+The installer installs missing server dependencies, imports Godot resources, checks the game and
+open-world scenes, saves the Godot executable path for the server, and launches the game. It does
+not start the Node service.
+
+If Godot is not on `PATH` or in the installer's default Downloads location, pass its executable
+explicitly:
+
+```powershell
+.\install.ps1 -GodotPath 'C:\Tools\Godot_v4.7.2-stable_win64.exe'
+```
+
+Use `.\install.ps1 -Editor` instead to open the project in the Godot editor after the checks.
+
+### 2. Start the server
+
+In a second PowerShell terminal, go to the repository's `server` directory and start the service
+before logging in to the game:
 
 ```powershell
 Set-Location .\server
@@ -72,16 +90,18 @@ npm start
 ```
 
 The service starts the shared game rooms and all portal rooms before accepting API requests. This
-starts 19 headless Godot processes and can take time and substantial memory. Leave the terminal
-open while playing; stop the service with Ctrl+C. If startup reports an occupied port, stop the
-other service using that port and retry. The local API uses TCP 3000, the legacy listener uses
-TCP 8000, and the game rooms use WebSocket TCP ports 12882–12900. Private rooms use TCP
+starts 19 headless Godot processes and can take time and substantial memory. Wait for the
+`Rooms ready` message and for the API to start before logging in. Leave the terminal open while
+playing; stop the service with Ctrl+C. If startup reports an occupied port, stop the other service
+using that port and retry. The local API uses TCP 3000, the legacy listener uses TCP 8000, and the
+game rooms use WebSocket TCP ports 12882–12900. Private rooms use TCP
 12810–12849. Port 12806 is for manually hosted games, not the shared open world.
 
 The defaults are for a game client on the same machine. For LAN access set `SERVER_HOST` in
 `server/.env` to the server's reachable LAN address, configure the client API URL accordingly, and
 allow the required TCP ports through the firewall. `GODOT_PATH` or `VOIP_3D_EXE` can override the
-Godot path saved by the installer. Restart the service after changing configuration.
+Godot path saved by the installer. If using an export, rebuild it after updating the project so it
+includes the room-readiness protocol. Restart the service after changing configuration.
 
 Windows release exports use the production API by default. To test an export against the local
 service, start it from PowerShell with:
@@ -93,18 +113,6 @@ $env:PURPLESHOE_SERVER_URL = 'http://127.0.0.1:3000'
 
 Release builds accept HTTPS URLs or HTTP loopback URLs for this override. Rebuild the export after
 updating the project; previously exported executables do not include these fixes.
-
-If Godot is not on `PATH`, pass its executable explicitly:
-
-```powershell
-.\install.ps1 -GodotPath 'C:\Tools\Godot_v4.7.2-stable_win64.exe'
-```
-
-To open the project in the editor after the checks:
-
-```powershell
-.\install.ps1 -Editor
-```
 
 You can also open `voip-3d/project.godot` directly in Godot. To run the open-world scene on its own,
 select `voip-3d/openworld/main.tscn`.
@@ -170,6 +178,11 @@ direction. `Q` switches to the nearest teammate.
 
 Touch controls are available on supported mobile screens. Portal and vehicle interactions are
 prompted in the world.
+
+## To do
+
+- Improve football match gameplay with FIFA-style pacing and mechanics.
+- Improve the free-kick mode's stadium atmosphere and gameplay.
 
 ## Project layout
 
