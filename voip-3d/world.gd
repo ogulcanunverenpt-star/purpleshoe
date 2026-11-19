@@ -15,6 +15,8 @@ var game_notification_timer: Timer
 var stadium_camera: Camera3D
 var match_camera_focus := Vector3.ZERO
 var goal_camera_target: Node3D
+var camera_shake_remaining := 0.0
+var goal_camera_hold := 0.0
 var match_lineup_spawned := false
 
 func _enter_tree():
@@ -93,19 +95,36 @@ func _process(delta: float) -> void:
 		target_fov = 36.0
 	else:
 		goal_camera_target = null
+		var ball_speed: float = tracked_ball.linear_velocity.length() if multiplayer.is_server() else match_controller.remote_ball_speed
+		var pitch_factor := absf(target.z) / 52.5
+		target_fov += clampf(ball_speed / 30.0, 0.0, 1.0) * 4.0 + pitch_factor * 2.0
+		camera_offset *= 1.0 + pitch_factor * 0.08
+	if goal_camera_hold > 0.0:
+		goal_camera_hold = maxf(0.0, goal_camera_hold - delta)
+		return
 	var weight := 1.0 - exp(-MATCH_CAMERA_FOLLOW_SPEED * delta)
 	match_camera_focus = match_camera_focus.lerp(target, weight)
-	stadium_camera.global_position = stadium_camera.global_position.lerp(match_camera_focus + camera_offset, weight)
+	var camera_position := stadium_camera.global_position.lerp(match_camera_focus + camera_offset, weight)
+	if camera_shake_remaining > 0.0:
+		camera_shake_remaining = maxf(0.0, camera_shake_remaining - delta)
+		var shake := camera_shake_remaining / 0.25
+		camera_position += Vector3(0.0, sin(camera_shake_remaining * 80.0), cos(camera_shake_remaining * 65.0)) * shake * 0.12
+	stadium_camera.global_position = camera_position
 	stadium_camera.fov = lerpf(stadium_camera.fov, target_fov, weight)
 	stadium_camera.look_at(match_camera_focus, Vector3.UP)
 
 func focus_goal_scorer(player_name: String) -> void:
 	goal_camera_target = playersNode.get_node_or_null(player_name) as Node3D
+	goal_camera_hold = 0.12
 	if goal_camera_target == null:
 		push_error("Could not find goal scorer %s for the celebration camera." % player_name)
 
 func restore_stadium_camera() -> void:
 	goal_camera_target = null
+	goal_camera_hold = 0.0
+
+func _on_power_shot_triggered() -> void:
+	camera_shake_remaining = 0.25
 
 func _build_game_notifications() -> void:
 	if DisplayServer.get_name() == "headless":

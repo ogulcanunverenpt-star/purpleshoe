@@ -150,6 +150,34 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "SHOOT"
 
+[node name="PowerShotBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -166.0
+offset_right = -190.0
+offset_bottom = -120.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "POWER SHOT"
+
+[node name="ControlBtn" type="Button" parent="MobileUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -378.0
+offset_top = -220.0
+offset_right = -288.0
+offset_bottom = -174.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "CONTROL"
+
 [node name="CurveLeftBtn" type="Button" parent="MobileUI"]
 anchors_preset = 3
 anchor_left = 0.5

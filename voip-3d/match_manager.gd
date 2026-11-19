@@ -93,7 +93,10 @@ func _on_connected_to_server():
 		announce_matrix_id.rpc_id(1, MatrixClient.user_id)
 
 func _on_connection_failed():
-	push_error("Could not connect to free-kick server")
+	push_error("Could not connect to the game server.")
+	last_rejection = "Could not connect to the game server."
+	disconnect_client()
+	get_tree().change_scene_to_file.call_deferred("res://lobby.tscn")
 
 @rpc("any_peer", "call_remote", "reliable")
 func request_join(team: int, role: int, username: String, selected_mode: int, room_token: String = ""):

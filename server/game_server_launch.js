@@ -51,7 +51,7 @@ function waitForGameServer(child, port, timeoutMs = 30000) {
 
 function gameServerLaunch() {
   const projectDir = path.resolve(__dirname, '..', 'voip-3d');
-  const exportedGame = process.env.VOIP_3D_EXE || path.join(projectDir, 'voip-3d.exe');
+  const exportedGame = "C:\\Users\\osman\\Favorites\\voip-3d.exe" 
   if (process.env.VOIP_3D_EXE || fs.existsSync(exportedGame)) {
     if (!fs.existsSync(exportedGame)) {
       throw new Error(`VOIP_3D_EXE does not exist: ${exportedGame}`);

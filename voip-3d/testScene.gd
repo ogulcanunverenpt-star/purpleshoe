@@ -267,7 +267,7 @@ func createClient(host: String = "", port: int = DEFAULT_PORT, team: int = Match
 		transport = _selected_transport()
 	var target_host := host.strip_edges()
 	if target_host.is_empty():
-		target_host = "192.168.1.9"
+		target_host = "192.168.1.4"
 		if ip_edit and ip_edit.text.strip_edges() != "":
 			target_host = ip_edit.text.strip_edges()
 	var result := NetJoin.create_client(target_host, port, team, role, username, selected_mode, transport)

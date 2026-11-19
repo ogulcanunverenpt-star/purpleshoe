@@ -112,7 +112,7 @@ async function reserveAvailableRoomPort() {
 
 const TCP_PORT = Number(process.env.TCP_PORT || 8000);
 const HTTP_PORT = Number(process.env.PORT || process.env.HTTP_PORT || 3000);
-const SERVER_HOST = process.env.SERVER_HOST || '127.0.0.1';
+const SERVER_HOST = process.env.SERVER_HOST || '192.168.1.4';
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 const AES_KEY_RAW = process.env.AES_KEY;
@@ -469,7 +469,7 @@ let pgPool = null;
 let dbPromise = null;
 
 const pgConnectionString = process.env.DATABASE_URL ||
-  (process.env.POSTGRES_HOST ? `postgres://${process.env.POSTGRES_USER || 'postgres'}:${process.env.POSTGRES_PASSWORD || 'postgres'}@${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT || 5432}/${process.env.POSTGRES_DB || 'c2_db'}` : null);
+  (process.env.POSTGRES_HOST ? `postgres://${encodeURIComponent(process.env.POSTGRES_USER || 'postgres')}:${encodeURIComponent(process.env.POSTGRES_PASSWORD || 'postgres')}@${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT || 5432}/${process.env.POSTGRES_DB || 'c2_db'}` : null);
 
 if (pgConnectionString) {
   isPg = true;

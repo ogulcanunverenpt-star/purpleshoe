@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: c2_db
       POSTGRES_USER: c2_user
-      POSTGRES_PASSWORD: c2_password_secret_123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in server/.env}
     ports:
       - "5432:5432"
     volumes:
@@ -43,15 +43,14 @@ services:
     environment:
       - PORT=3000
       - TCP_PORT=8000
-      - AES_KEY=2f8d4c5a7e8b1f23d9a1c0b8d67f3f4c6a2b4d1e9c8f7a5d1c2b3e4f8a7d6c5b
+      - AES_KEY=${AES_KEY:?Set AES_KEY in server/.env}
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DB=c2_db
       - POSTGRES_USER=c2_user
-      - POSTGRES_PASSWORD=c2_password_secret_123
-      - DATABASE_URL=postgres://c2_user:c2_password_secret_123@postgres:5432/c2_db
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in server/.env}
       - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in .env}
-      - SESSION_SECRET=cundai-session-secret-key-32bytes
+      - SESSION_SECRET=${SESSION_SECRET:?Set SESSION_SECRET in server/.env}
     depends_on:
       postgres:
         condition: service_healthy

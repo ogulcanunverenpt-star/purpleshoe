@@ -17,7 +17,7 @@ signal talk_request_received(from_user_id: String)
 signal talk_response_received(from_user_id: String, accepted: bool)
 signal chat_message_received(other_user_id: String, body: String, local_echo: bool)
 
-var SERVER_URL := "http://127.0.0.1:3000"
+var SERVER_URL := "http://192.168.1.4:3000"
 const PRODUCTION_SERVER_URL := "https://gamebler.xyz"
 const MATRIX_SERVER_URL := "https://matrix.gamebler.xyz"
 const CONFIG_PATH := "user://account.cfg"
@@ -50,6 +50,8 @@ func _ready() -> void:
 	if "--server" in OS.get_cmdline_user_args() or "--server" in OS.get_cmdline_args():
 		return
 	_load_config()
+	if OS.has_feature("web"):
+		print("Game API origin: ", SERVER_URL)
 	_load_chat_history()
 	_load_avatar_preferences()
 	if access_token != "":
@@ -131,8 +133,11 @@ func login(username: String, password: String) -> void:
 
 func _finish_auth(res: Dictionary, username: String, password: String, is_register: bool) -> void:
 	var body: Dictionary = res.get("body", {})
+	if body.get("requires2FA", false):
+		login_failed.emit("This account requires a 2FA code, which the game login does not currently support.")
+		return
 	if not body.get("success", false) and not body.has("token"):
-		login_failed.emit(String(body.get("error", "Could not connect to the server, or the username or password is incorrect.")))
+		login_failed.emit(String(body.get("error", "The server returned an unexpected login response.")))
 		return
 	var authenticated_user := String(body.get("username", ""))
 	if authenticated_user.strip_edges().is_empty() or String(body.get("token", "")).is_empty():
@@ -303,7 +308,7 @@ func logout() -> void:
 
 
 func _load_config() -> void:
-	var default_server_url := "http://127.0.0.1:3000" if OS.is_debug_build() else PRODUCTION_SERVER_URL
+	var default_server_url := "http://192.168.1.4:3000" if OS.is_debug_build() else PRODUCTION_SERVER_URL
 	SERVER_URL = default_server_url
 	var cfg := ConfigFile.new()
 	if cfg.load(CONFIG_PATH) == OK:
@@ -315,7 +320,7 @@ func _load_config() -> void:
 		matrix_user_id = str(cfg.get_value("account", "matrix_user_id", ""))
 		matrix_device_id = str(cfg.get_value("account", "matrix_device_id", ""))
 	var stored_server_url := SERVER_URL
-	if OS.is_debug_build() and SERVER_URL == "http://192.168.1.9:3000":
+	if OS.is_debug_build() and SERVER_URL == "http://192.168.1.4:3000":
 		SERVER_URL = default_server_url
 	var requested_url := OS.get_environment("PURPLESHOE_SERVER_URL").strip_edges().trim_suffix("/")
 	if not requested_url.is_empty():
@@ -323,6 +328,9 @@ func _load_config() -> void:
 			push_error("PURPLESHOE_SERVER_URL must use HTTPS or a local loopback address.")
 		else:
 			SERVER_URL = requested_url
+	if OS.has_feature("web"):
+		if bool(JavaScriptBridge.eval("window.PURPLESHOE_WEB_PROXY === true", true)):
+			SERVER_URL = str(JavaScriptBridge.eval("window.location.origin", true))
 	if not OS.is_debug_build() and not _is_secure_or_local_api_url(SERVER_URL):
 		push_warning("Ignoring insecure non-local API URL in saved configuration.")
 		SERVER_URL = PRODUCTION_SERVER_URL
@@ -424,11 +432,18 @@ func _raw_request_once(method: String, path: String, body = null, authed: bool =
 		return {"code": 0, "body": {"error": error_string(err)}}
 	var result = await req.request_completed
 	req.queue_free()
+	var request_result: int = result[0]
 	var code: int = result[1]
+	if request_result != HTTPRequest.RESULT_SUCCESS:
+		push_error("Game API request failed: %s %s (result %d)." % [method, path, request_result])
+		return {"code": code, "body": {"error": "Could not reach the game API (connection error %d). Check that both servers are running and the HTTPS certificate is trusted." % request_result}}
 	var raw := (result[3] as PackedByteArray).get_string_from_utf8()
 	var parsed = null
 	if raw != "" and (raw.begins_with("{") or raw.begins_with("[")):
 		parsed = JSON.parse_string(raw)
+	if not parsed is Dictionary and (code < 200 or code >= 300):
+		push_error("Game API returned HTTP %d for %s %s." % [code, method, path])
+		return {"code": code, "body": {"error": "Game API returned HTTP %d." % code}}
 	return {"code": code, "body": parsed if parsed is Dictionary else {}}
 
 
@@ -705,7 +720,7 @@ func join_shared_room(mode_str: String, portal_id: String = "") -> Dictionary:
 	return resp_body
 
 
-func send_direct_room_invites(invitees: Array, mode_str: String, port: int, match_minutes: int = 5, address: String = "192.168.1.9", transport_str: String = "ws") -> Array:
+func send_direct_room_invites(invitees: Array, mode_str: String, port: int, match_minutes: int = 5, address: String = "192.168.1.4", transport_str: String = "ws") -> Array:
 	var tokens: Array = []
 	for target_user_id in invitees:
 		var tok := _generate_random_token()

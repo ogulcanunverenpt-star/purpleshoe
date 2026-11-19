@@ -1,0 +1,7 @@
+BEER-WARE LICENSE
+
+Copyright (c) 2026 Vlad
+
+As long as you retain this notice, you may do whatever you want with this software.
+
+If we meet someday and you think this software was useful, you can buy me a beer in return.

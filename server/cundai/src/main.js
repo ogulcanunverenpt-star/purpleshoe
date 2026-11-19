@@ -8,7 +8,7 @@ const SESSION_KEY = "purpleshoe.session";
 const LEGACY_SESSION_KEY = "redshoe.session";
 const NOTIFICATIONS_KEY = "purpleshoe.notifications";
 const LEGACY_NOTIFICATIONS_KEY = "redshoe.notifications";
-const API_BASE_URL = (import.meta.env.VITE_PURPLESHOE_API_BASE_URL || (import.meta.env.DEV ? "http://192.168.1.9:3000" : window.location.origin)).replace(/\/$/, "");
+const API_BASE_URL = (import.meta.env.VITE_PURPLESHOE_API_BASE_URL || (import.meta.env.DEV ? "http://192.168.1.4:3000" : window.location.origin)).replace(/\/$/, "");
 const IS_GAME_PORTAL = new URLSearchParams(window.location.search).get("source") === "godot";
 const MATRIX_HANDOFF_TICKET = new URLSearchParams(window.location.hash.slice(1)).get("ps_handoff");
 if (MATRIX_HANDOFF_TICKET) history.replaceState(null, "", `${location.pathname}${location.search}`);

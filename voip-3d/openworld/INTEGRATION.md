@@ -45,11 +45,18 @@ this purpose. Port `12806` is a manual hosting default and is not the shared ope
 - `overland_net.gd` broadcasts each player's position, movement state, and selected avatar at
   approximately 20 updates per second. Other players appear with their selected character model.
   Usernames come from `MatchManager.roster`.
-- Spatial push-to-talk captures microphone audio through `AudioEffectCapture`, relays it through
-  the server to players in the same open-world room, and plays it back with `AudioStreamPlayer3D`
-  using distance-based audio. Hold `V` on keyboard or the on-screen **PUSH TO TALK** button on
-  mobile. Android requests microphone permission on first use; press the button again after
-  granting permission.
+- Spatial push-to-talk uses WebRTC media between web players. For communication with native
+  players, the browser also sends PCM through the existing game-server relay; native audio is
+  played with `AudioStreamPlayer3D`. Hold `V` or the on-screen **PUSH TO TALK** button. Web
+  microphone access requires HTTPS (or localhost) and permission. Android requests microphone
+  permission on first use; press the button again after granting permission.
+- Web voice defaults to Cloudflare STUN. Some networks require a TURN relay; configure
+  `window.PURPLESHOE_ICE_SERVERS` before launching Godot with an `RTCIceServer` array containing
+  a STUN server and short-lived TURN credentials issued by your backend. Do not embed long-lived
+  TURN secrets in the web export. P2P connections can expose player IP addresses to other players.
+  Include `*.js` in the Web export preset's non-resource export filter so
+  `res://openworld/web_voice.js` is packaged. Re-export both the web client and the Godot room
+  server after updating their scripts.
 - Choose the transport in the menu: **WebSocket** (web, Android, and PC) or **UDP/ENet** (Android
   and PC). A server listens on one transport at a time; web clients can only connect to WebSocket
   servers.
@@ -62,6 +69,11 @@ this purpose. Port `12806` is a manual hosting default and is not the shared ope
   The lobby's dedicated-server mode uses WebSocket by default.
 - Web clients served over HTTPS must use `wss://`. Put the server behind a TLS-terminating reverse
   proxy such as nginx or Caddy, then enter the `wss://` domain and proxy port in the game menu.
+- The standalone `purpleshoeweb/client` HTTPS server can proxy the game API on loopback port 3000
+  and room WebSockets through the same HTTPS origin. Its injected opt-in marker makes the web
+  export use that origin; other web deployments and native clients retain their existing settings.
+  Re-export the Web preset after changing game scripts, and follow the HTTPS server's README for
+  certificates and network exposure.
 
 ## Restoring world assets
 

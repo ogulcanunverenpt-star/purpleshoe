@@ -1,6 +1,10 @@
 class_name OverlandVoice extends Node
 
 signal voice_packet_ready(data: PackedByteArray)
+signal web_voice_ready
+signal web_voice_signal(target: int, message: String)
+signal web_voice_error(message: String)
+signal web_voice_warning(message: String)
 
 const VOICE_PCM := preload("res://voice_pcm.gd")
 const INPUT_THRESHOLD := 0.005
@@ -17,10 +21,14 @@ var _outgoing_data := PackedByteArray()
 var _remote_outputs: Dictionary = {}
 var _pending_packets: Dictionary = {}
 var _input_warning_sent := false
+var _web_voice = null
+var _web_signal_callback = null
+var _web_pcm_callback = null
+var _web_error_callback = null
 
 
 func _ready() -> void:
-	if DisplayServer.get_name() == "headless":
+	if DisplayServer.get_name() == "headless" or OS.has_feature("web"):
 		return
 	var record_bus := AudioServer.get_bus_index("Record")
 	if record_bus < 0:
@@ -43,6 +51,15 @@ func _ready() -> void:
 
 
 func set_ptt_active(active: bool) -> void:
+	if OS.has_feature("web"):
+		if _web_voice != null:
+			if active:
+				ptt_active = true
+			_web_voice.setTalking(active)
+			ptt_active = active
+		elif active:
+			web_voice_error.emit("Voice chat is not ready.")
+		return
 	if ptt_active == active:
 		return
 	if not active:
@@ -99,6 +116,8 @@ func queue_voice_packet(peer_id: int, data: PackedByteArray) -> void:
 
 
 func _process(_delta: float) -> void:
+	if OS.has_feature("web"):
+		return
 	if not ptt_active:
 		_discard_capture_buffer()
 		return
@@ -113,6 +132,74 @@ func _process(_delta: float) -> void:
 	if not _start_microphone():
 		return
 	_capture_audio()
+
+
+func initialize_web(peer_id: int) -> void:
+	if not OS.has_feature("web") or _web_voice != null:
+		return
+	var script := FileAccess.get_file_as_string("res://openworld/web_voice.js")
+	if script.is_empty():
+		web_voice_error.emit("Web voice client is missing from the export.")
+		return
+	JavaScriptBridge.eval(script, true)
+	var window := JavaScriptBridge.get_interface("window")
+	var ice_json := str(JavaScriptBridge.eval("JSON.stringify(window.PURPLESHOE_ICE_SERVERS || [{urls:'stun:stun.cloudflare.com:3478'}])", true))
+	_web_signal_callback = JavaScriptBridge.create_callback(_on_web_signal)
+	_web_pcm_callback = JavaScriptBridge.create_callback(_on_web_pcm)
+	_web_error_callback = JavaScriptBridge.create_callback(_on_web_error)
+	_web_voice = window.createOverlandVoice(peer_id, ice_json, _web_signal_callback, _web_pcm_callback, _web_error_callback)
+	if _web_voice == null:
+		web_voice_error.emit("Could not initialize web voice.")
+		return
+	web_voice_ready.emit()
+	if not bool(JavaScriptBridge.eval("Array.isArray(window.PURPLESHOE_ICE_SERVERS) && window.PURPLESHOE_ICE_SERVERS.some(s => (Array.isArray(s.urls) ? s.urls : [s.urls]).some(u => typeof u === 'string' && /^turns?:/.test(u)))", true)):
+		web_voice_warning.emit("TURN is not configured; voice may fail on some networks.")
+
+
+func _on_web_signal(args: Array) -> void:
+	if args.is_empty():
+		return
+	var data = JSON.parse_string(str(args[0]))
+	if data is Dictionary and data.has("target") and data.has("message"):
+		web_voice_signal.emit(int(data.target), JSON.stringify(data.message))
+
+
+func _on_web_pcm(args: Array) -> void:
+	if ptt_active and _is_online() and not args.is_empty():
+		var data := Marshalls.base64_to_raw(str(args[0]))
+		if not data.is_empty():
+			voice_packet_ready.emit(data)
+
+
+func _on_web_error(args: Array) -> void:
+	if not args.is_empty():
+		web_voice_error.emit(str(args[0]))
+
+
+func add_web_peer(peer_id: int) -> void:
+	if _web_voice != null:
+		_web_voice.addPeer(peer_id)
+
+
+func remove_web_peer(peer_id: int) -> void:
+	if _web_voice != null:
+		_web_voice.removePeer(peer_id)
+
+
+func receive_web_signal(peer_id: int, message: String) -> void:
+	if _web_voice != null:
+		_web_voice.receive(peer_id, message)
+
+
+func set_web_position(peer_id: int, position: Vector3) -> void:
+	if _web_voice != null:
+		_web_voice.setPosition(peer_id, position.x, position.y, position.z)
+
+
+func _exit_tree() -> void:
+	if _web_voice != null:
+		_web_voice.close()
+		_web_voice = null
 
 
 func _start_microphone() -> bool:

@@ -1,7 +1,11 @@
 extends CharacterBody3D
 
+signal power_shot_triggered
+
 const SPEED = 5.0
 const SPRINT_SPEED = 8.0
+const MATCH_ACCELERATION := 12.0
+const MATCH_DECELERATION := 16.0
 const JUMP_SPEED = 5.0
 const TACKLE_SPEED = 9.0
 const FIELD_HALF_WIDTH := 34.0
@@ -59,9 +63,11 @@ var clearance_key_held := false
 var set_piece_aiming := false
 var player_push_cooldown := 0.0
 var charging_action := ""
+var charging_direction := Vector3.ZERO
 var dive_timer := 0.0
 var sprint_active := false
 var contact_impulse := Vector3.ZERO
+var match_movement_velocity := Vector3.ZERO
 var current_animation := ""
 var match_animation_sync_ready := true
 var animation_player: AnimationPlayer
@@ -90,6 +96,7 @@ var match_keeper_movement_axis := 0.0
 var match_keeper_forward_axis := 0.0
 var match_input_sync_timer := 0.0
 var match_jump_held := false
+var match_keeper_dive_held := false
 var match_tackle_held := false
 var match_clear_held := false
 var selection_ring: MeshInstance3D
@@ -101,6 +108,8 @@ var selection_ring: MeshInstance3D
 @onready var aim_joystick: MobileVirtualJoystick = $MobileUI/AimJoystick
 @onready var aim_label: Label = $MobileUI/AimLabel
 @onready var shot_button: Button = $MobileUI/ShotBtn
+@onready var power_shot_button: Button = $MobileUI/PowerShotBtn
+@onready var control_button: Button = $MobileUI/ControlBtn
 @onready var curve_left_button: Button = $MobileUI/CurveLeftBtn
 @onready var curve_right_button: Button = $MobileUI/CurveRightBtn
 @onready var pass_button: Button = $MobileUI/PassBtn
@@ -203,6 +212,11 @@ func _input(event):
 			$Camera3D.rotation.x = clampf($Camera3D.rotation.x, -deg_to_rad(70), deg_to_rad(70))
 		if event is InputEventMouseButton and event.pressed and not mobile_ui.visible:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		if (event is InputEventKey and not event.echo and event.keycode in [KEY_D, KEY_S, KEY_W, KEY_A, KEY_F, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_SHIFT, KEY_R, KEY_T]) \
+				or (set_piece_aiming and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT):
+			var game := _get_game_controller()
+			if game != null and game.game_started and (role == MatchManager.ROLE_PLAYER or set_piece_aiming):
+				_update_match_action_charge(0.0)
 		return
 	if !is_multiplayer_authority():
 		return
@@ -233,10 +247,15 @@ func _apply_match_camera():
 func _set_local_selected(selected: bool) -> void:
 	if not selected and set_piece_aiming:
 		end_set_piece_aim()
+	if not selected:
+		charging_action = ""
+		shot_charge = 0.0
+		shot_charging = false
+		selected_curve = 0.0
 	is_local_selected = selected
 	var camera := $Camera3D as Camera3D
 	camera.current = false
-	mobile_ui.visible = selected and (OS.has_feature("mobile") or OS.get_name() == "Android")
+	mobile_ui.visible = selected and (OS.has_feature("mobile") or OS.get_name() == "Android" or DisplayServer.is_touchscreen_available())
 	if active_model:
 		active_model.visible = role != MatchManager.ROLE_GOALKEEPER
 	if role == MatchManager.ROLE_GOALKEEPER:
@@ -309,7 +328,7 @@ func _submit_match_input(delta: float) -> void:
 		$Camera3D.global_rotation.y,
 		Input.is_key_pressed(KEY_E) or (mobile_ui.visible and sprint_button.is_pressed()),
 		jump_pressed and not match_jump_held,
-		Input.is_key_pressed(KEY_C)
+		Input.is_key_pressed(KEY_C) or (mobile_ui.visible and control_button.is_pressed())
 	)
 	match_jump_held = jump_pressed
 
@@ -322,7 +341,7 @@ func _update_match_local_process(delta: float) -> void:
 		$Camera3D.rotate_x(-aim_joystick.value.y * 2.0 * delta)
 		$Camera3D.rotation.x = clampf($Camera3D.rotation.x, -deg_to_rad(70), deg_to_rad(70))
 	if set_piece_aiming:
-		_update_set_piece_aim(delta, game)
+		_update_match_action_charge(delta)
 		return
 	if role == MatchManager.ROLE_GOALKEEPER:
 		var clear_pressed := Input.is_key_pressed(KEY_D)
@@ -330,11 +349,11 @@ func _update_match_local_process(delta: float) -> void:
 			_request_action("clearance", 0.8)
 		match_clear_held = clear_pressed
 		var dive_pressed := Input.is_key_pressed(KEY_SPACE) or (mobile_ui.visible and jump_button.is_pressed())
-		if dive_pressed and not match_jump_held:
+		if dive_pressed and not match_keeper_dive_held:
 			var keeper_axis := float(Input.is_key_pressed(KEY_RIGHT)) - float(Input.is_key_pressed(KEY_LEFT))
 			var side := signi(keeper_axis) if absf(keeper_axis) > 0.05 else 1
 			game.request_keeper_dive(side)
-		match_jump_held = dive_pressed
+		match_keeper_dive_held = dive_pressed
 		return
 
 	var can_act_on_ball: bool = game.can_local_shoot()
@@ -350,19 +369,23 @@ func _match_server_physics(delta: float) -> void:
 	var game := _get_game_controller()
 	if game == null or not game.game_started:
 		velocity = Vector3.ZERO
+		match_movement_velocity = Vector3.ZERO
 		return
 	if goal_celebration_active:
 		velocity = Vector3.ZERO
+		match_movement_velocity = Vector3.ZERO
 		return
 	tackle_timer = maxf(0.0, tackle_timer - delta)
 	if role == MatchManager.ROLE_PLAYER and global_position.y < -3.0:
 		global_position = spawn_position
 		velocity = Vector3.ZERO
 		contact_impulse = Vector3.ZERO
+		match_movement_velocity = Vector3.ZERO
 		is_diving = false
 		rotation.z = 0.0
 		return
 	if role == MatchManager.ROLE_PLAYER and tackle_stun_timer > 0.0:
+		match_movement_velocity = Vector3.ZERO
 		tackle_stun_timer = maxf(0.0, tackle_stun_timer - delta)
 		velocity.x = move_toward(velocity.x, 0.0, delta * 12.0)
 		velocity.z = move_toward(velocity.z, 0.0, delta * 12.0)
@@ -371,6 +394,7 @@ func _match_server_physics(delta: float) -> void:
 		move_and_slide()
 		global_position.x = clampf(global_position.x, -FIELD_HALF_WIDTH + 0.5, FIELD_HALF_WIDTH - 0.5)
 		global_position.z = clampf(global_position.z, -FIELD_HALF_LENGTH + 0.5, FIELD_HALF_LENGTH - 0.5)
+		game.enforce_kickoff_position(self)
 		return
 	var input_state: Dictionary = game.server_input_for(self)
 	if input_state.is_empty():
@@ -403,6 +427,8 @@ func _match_server_physics(delta: float) -> void:
 			game.start_ai_keeper_dive(self)
 		_update_match_keeper_footwork(delta)
 		velocity = Vector3.ZERO
+		match_movement_velocity = Vector3.ZERO
+		game.enforce_kickoff_position(self)
 		game.try_ai_ball_action(self)
 		return
 	if input_state.get("jump", false) and is_on_floor():
@@ -416,11 +442,11 @@ func _match_server_physics(delta: float) -> void:
 	var movement_strength := minf(movement.length(), 1.0)
 	if movement_strength > 0.0:
 		movement = movement.normalized()
-		velocity.x = movement.x * speed * movement_strength
-		velocity.z = movement.z * speed * movement_strength
-	else:
-		velocity.x = move_toward(velocity.x, 0.0, SPEED)
-		velocity.z = move_toward(velocity.z, 0.0, SPEED)
+	var target_velocity := movement * speed * movement_strength
+	var acceleration := MATCH_ACCELERATION if movement_strength > 0.0 else MATCH_DECELERATION
+	match_movement_velocity = match_movement_velocity.move_toward(target_velocity, acceleration * delta)
+	velocity.x = match_movement_velocity.x
+	velocity.z = match_movement_velocity.z
 	velocity.x += contact_impulse.x
 	velocity.z += contact_impulse.z
 	contact_impulse = contact_impulse.move_toward(Vector3.ZERO, delta * 7.0)
@@ -428,6 +454,7 @@ func _match_server_physics(delta: float) -> void:
 	move_and_slide()
 	global_position.x = clampf(global_position.x, -FIELD_HALF_WIDTH + 0.5, FIELD_HALF_WIDTH - 0.5)
 	global_position.z = clampf(global_position.z, -FIELD_HALF_LENGTH + 0.5, FIELD_HALF_LENGTH - 0.5)
+	game.enforce_kickoff_position(self)
 	_push_colliding_players(movement_velocity)
 	_update_movement_animation()
 	game.update_player_dribble(self, movement, delta)
@@ -440,7 +467,11 @@ func _apply_match_keeper_spawn():
 		push_error("Missing match goalkeeper spawn marker: %s" % marker_name)
 		return
 	global_transform = marker.global_transform
-	spawn_position = marker.global_position
+	var game := _get_game_controller()
+	if game != null and game.second_half:
+		global_position.z = -global_position.z
+		rotation.y += PI
+	spawn_position = global_position
 	velocity = Vector3.ZERO
 
 func _physics_process(delta):
@@ -646,6 +677,7 @@ func begin_set_piece_aim() -> void:
 	charging_action = ""
 	shot_charge = 0.0
 	shot_charging = false
+	selected_curve = 0.0
 	var camera := $Camera3D as Camera3D
 	camera.position = Vector3(0.0, 3.0, 5.5)
 	camera.rotation = Vector3(deg_to_rad(-12.0), 0.0, 0.0)
@@ -660,6 +692,7 @@ func end_set_piece_aim() -> void:
 	charging_action = ""
 	shot_charge = 0.0
 	shot_charging = false
+	selected_curve = 0.0
 	var camera := $Camera3D as Camera3D
 	camera.rotation.y = 0.0
 	_apply_match_camera()
@@ -667,39 +700,38 @@ func end_set_piece_aim() -> void:
 	if is_instance_valid(stadium_camera):
 		stadium_camera.make_current()
 
-func _update_set_piece_aim(delta: float, game: Node) -> void:
-	var firing := (Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED) \
-		or Input.is_key_pressed(KEY_D) or (mobile_ui.visible and shot_button.is_pressed())
-	var curve := _get_curve_axis()
-	if firing:
-		shot_charging = true
-		shot_charge = minf(shot_charge + delta, MAX_ACTION_CHARGE_SECONDS)
-	elif shot_charging:
-		var action := "clearance" if role == MatchManager.ROLE_GOALKEEPER else "shot"
-		if human_model_active:
-			_play_animation("keeper_kick" if action == "clearance" else "shot")
-		game.request_ball_action(
-			-$Camera3D.global_transform.basis.z,
-			maxf(shot_charge / MAX_ACTION_CHARGE_SECONDS, 0.15),
-			curve,
-			action,
-			name
-		)
-		shot_charging = false
-		shot_charge = 0.0
-	game.update_charge(shot_charge, shot_charging, curve if shot_charging else 0.0, "shot")
+func _match_action_held(action: String) -> bool:
+	match action:
+		"shot", "power_shot", "clearance":
+			return Input.is_key_pressed(KEY_D) or (set_piece_aiming and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED) \
+				or (mobile_ui.visible and (shot_button.is_pressed() if action != "power_shot" else power_shot_button.is_pressed()))
+		"pass":
+			return Input.is_key_pressed(KEY_S) or (mobile_ui.visible and pass_button.is_pressed())
+		"through", "lofted_through":
+			return Input.is_key_pressed(KEY_W) or (mobile_ui.visible and through_button.is_pressed())
+		"cross":
+			return Input.is_key_pressed(KEY_A) or (mobile_ui.visible and cross_button.is_pressed())
+	return false
 
 func _update_match_action_charge(delta: float):
 	var game := _get_game_controller()
 	var next_action := ""
-	if role == MatchManager.ROLE_PLAYER and game != null and game.can_local_shoot():
-		if Input.is_key_pressed(KEY_D) or (mobile_ui.visible and shot_button.is_pressed()):
+	if game == null:
+		return
+	if not charging_action.is_empty() and _match_action_held(charging_action):
+		next_action = charging_action
+	elif charging_action.is_empty() and (set_piece_aiming or (role == MatchManager.ROLE_PLAYER and game.can_local_shoot())):
+		if role == MatchManager.ROLE_GOALKEEPER and _match_action_held("clearance"):
+			next_action = "clearance"
+		elif not set_piece_aiming and (Input.is_key_pressed(KEY_D) and Input.is_key_pressed(KEY_SHIFT) or (mobile_ui.visible and power_shot_button.is_pressed())):
+			next_action = "power_shot"
+		elif _match_action_held("shot"):
 			next_action = "shot"
-		elif Input.is_key_pressed(KEY_S) or (mobile_ui.visible and pass_button.is_pressed()):
+		elif _match_action_held("pass"):
 			next_action = "pass"
-		elif Input.is_key_pressed(KEY_W) or (mobile_ui.visible and through_button.is_pressed()):
+		elif _match_action_held("through"):
 			next_action = "lofted_through" if Input.is_key_pressed(KEY_Q) else "through"
-		elif Input.is_key_pressed(KEY_A) or (mobile_ui.visible and cross_button.is_pressed()):
+		elif _match_action_held("cross"):
 			next_action = "cross"
 
 	if not next_action.is_empty():
@@ -707,23 +739,35 @@ func _update_match_action_charge(delta: float):
 			charging_action = next_action
 			shot_charge = 0.0
 			shot_charging = true
+			selected_curve = 0.0
+			charging_direction = match_action_direction()
 		shot_charge = minf(shot_charge + delta, MAX_ACTION_CHARGE_SECONDS)
+		if _get_field_arrow_input().length_squared() > 0.0 or (mobile_ui.visible and joystick.value.length() > 0.1):
+			charging_direction = match_action_direction()
+		if Input.is_key_pressed(KEY_F):
+			var arrows := _get_field_arrow_input()
+			if arrows.length_squared() > 0.0:
+				selected_curve = -arrows.y / arrows.length()
+		elif charging_action == "shot" and absf(_get_curve_axis()) > 0.05:
+			selected_curve = _get_curve_axis()
 	elif not charging_action.is_empty():
-		if human_model_active:
-			_play_animation("shot" if charging_action == "shot" else "pass")
-		game.request_ball_action(
-			match_action_direction(),
-			shot_charge / MAX_ACTION_CHARGE_SECONDS,
-			0.0,
-			charging_action,
-			name
-		)
+		var direction: Vector3 = -$Camera3D.global_transform.basis.z if set_piece_aiming else charging_direction
+		var action := charging_action
+		var power := shot_charge / MAX_ACTION_CHARGE_SECONDS
+		var curve := selected_curve
 		charging_action = ""
 		shot_charge = 0.0
 		shot_charging = false
+		selected_curve = 0.0
+		game.request_ball_action(
+			direction,
+			power,
+			curve,
+			action,
+			name
+		)
 
-	if game:
-		game.update_charge(shot_charge, shot_charging, 0.0, charging_action)
+	game.update_charge(shot_charge, shot_charging, 0.0, charging_action)
 
 func _request_action(action: String, power: float):
 	var game = _get_game_controller()
@@ -746,7 +790,7 @@ func _get_curve_axis() -> float:
 	return float(Input.is_key_pressed(KEY_T)) - float(Input.is_key_pressed(KEY_R))
 
 func _on_shot_button_down():
-	if role != MatchManager.ROLE_GOALKEEPER:
+	if role != MatchManager.ROLE_GOALKEEPER or set_piece_aiming:
 		return
 	_request_action("clearance", 0.0)
 
@@ -1094,6 +1138,8 @@ func _update_role_controls():
 		var is_mobile := mobile_ui.visible
 		var is_keeper := role == MatchManager.ROLE_GOALKEEPER
 		shot_button.visible = not is_keeper and is_mobile
+		power_shot_button.visible = false
+		control_button.visible = false
 		pass_button.visible = false
 		through_button.visible = false
 		cross_button.visible = false
@@ -1108,6 +1154,8 @@ func _update_role_controls():
 		return
 	if role == MatchManager.ROLE_GOALKEEPER:
 		shot_button.text = "CLEAR"
+		power_shot_button.visible = false
+		control_button.visible = false
 		pass_button.visible = false
 		through_button.visible = false
 		cross_button.visible = false
@@ -1121,6 +1169,8 @@ func _update_role_controls():
 		aim_label.visible = false
 	else:
 		shot_button.text = "SHOOT"
+		power_shot_button.visible = mobile_ui.visible
+		control_button.visible = mobile_ui.visible
 		pass_button.visible = mobile_ui.visible
 		through_button.visible = mobile_ui.visible
 		cross_button.visible = mobile_ui.visible
@@ -1134,6 +1184,9 @@ func _update_role_controls():
 		aim_label.visible = aim_joystick.visible
 
 func play_action_local(animation_name: String):
+	if animation_name == "power_shot":
+		power_shot_triggered.emit()
+		animation_name = "shot"
 	if animation_name == "keeper_save" and match_keeper_model != null:
 		_set_match_keeper_catch_pose()
 		return

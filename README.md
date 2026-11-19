@@ -18,6 +18,8 @@ account and lobby flow in `lobby.tscn`.
 - **Social play:** Meet other players, use spatial voice chat, send messages, and join football
   matches or voice-chat rooms through portals and invitations.
 
+The game does not play background music; sound effects and ambient sounds remain enabled.
+
 ## Highlights
 
 - Football movement, dribbling, passing, shooting, tackling, formations, restart situations, and
@@ -146,6 +148,13 @@ Production deployments must use HTTPS. The Node service source is in `server/`; 
 `.env.example` as a starting point and supply your own secrets and service configuration. Do not
 commit credentials, database files, uploads, or generated dependencies.
 
+For Docker Compose, set `POSTGRES_PASSWORD`, `AES_KEY`, `JWT_SECRET`, and `SESSION_SECRET` in
+`server/.env`. Use separate cryptographically random values; `AES_KEY` must be 32 bytes encoded as
+64 hexadecimal characters. The environment file is excluded from Git and Docker build contexts.
+Keep the existing AES key when existing encrypted data must remain readable. Changing the password
+in `.env` does not change it in an existing PostgreSQL volume: update the database user's password
+to match before restarting the application. Previously committed credentials should be rotated.
+
 ## Controls
 
 ### Football match
@@ -155,17 +164,31 @@ commit credentials, database files, uploads, or generated dependencies.
 | Arrow keys | Move |
 | E | Sprint |
 | D | Shoot / tackle |
+| Shift + D | Power shot (hold, then release) |
 | S | Short pass |
 | A | Long pass / sliding tackle |
 | W | Through ball |
 | Q + W | Lofted through ball |
-| C | Mark |
+| C | Mark / control an incoming ball |
+| R / T | Curve a shot left / right |
+| F + D/S/W/A + arrows | Curve a shot, pass, through ball or cross using the arrow direction |
 | Q | Switch player |
 | G | Goalkeeper control |
 
 For a pass or shot, use the arrows to choose the direction and hold the action key to adjust its
 power; release it to kick. Short passes and through balls are assisted toward a teammate in that
-direction. `Q` switches to the nearest teammate.
+direction. Running with `E` does not interrupt a charged action. On a human-controlled set piece,
+aim with the mouse and use the same pass, through-ball, cross or shot keys (or left click to shoot);
+release the action key to kick. `Q` switches to the nearest teammate.
+With `F`, left/right selects the curve direction and diagonal input produces less curve than a
+sideways direction. Free kicks in the attacking half use one defender, or four within 10 metres of
+the opposing penalty area; free kicks in the taker's own half have no wall. Goalkeepers can dive
+only while the ball is in their own six-yard box.
+At corners, eight attacking field players line up in and just outside the penalty area. Attacking-half
+free kicks also place players around the penalty area, while all players stay in their own half
+until kickoff.
+Power shots have a short wind-up and can be interrupted if possession is lost. Mobile players
+have separate power-shot and control buttons. The goal camera effect does not slow the match.
 
 ### Open world
 

@@ -150,6 +150,8 @@ func play_sfx(sname: String, vol_db := 0.0, pitch := 1.0) -> void:
 func _loopify(s: AudioStream) -> void:
 	if s is AudioStreamOggVorbis:
 		(s as AudioStreamOggVorbis).loop = true
+	elif s is AudioStreamMP3:
+		(s as AudioStreamMP3).loop = true
 	elif s is AudioStreamWAV:
 		(s as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
 

@@ -1,7 +1,7 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene format=3 uid="uid://bxr3o0rm5dau4"]
 
-[ext_resource type="Script" path="res://Scenes/demo_world.gd" id="1_world"]
-[ext_resource type="Script" path="res://virtual_joystick.gd" id="2_joystick"]
+[ext_resource type="Script" uid="uid://b2ooe2grg0vxx" path="res://Scenes/demo_world.gd" id="1_world"]
+[ext_resource type="Script" uid="uid://cdtyne0nwc0js" path="res://virtual_joystick.gd" id="2_joystick"]
 [ext_resource type="PackedScene" path="res://AloneInTheDusk/Prefabs/Bridge_prefab.tscn" id="3_bridge"]
 [ext_resource type="PackedScene" path="res://AloneInTheDusk/Prefabs/Road_01.tscn" id="4_road"]
 [ext_resource type="PackedScene" path="res://AloneInTheDusk/Prefabs/Wall_01_prefab.tscn" id="5_wall"]
@@ -48,7 +48,6 @@ adjustment_saturation = 0.84
 
 [sub_resource type="StandardMaterial3D" id="GroundMaterial"]
 albedo_color = Color(0.12, 0.13, 0.2, 1)
-roughness = 1.0
 
 [sub_resource type="BoxMesh" id="GroundMesh"]
 material = SubResource("GroundMaterial")
@@ -57,45 +56,45 @@ size = Vector3(280, 2, 220)
 [sub_resource type="BoxShape3D" id="GroundShape"]
 size = Vector3(280, 2, 220)
 
-[node name="Conference" type="Node3D"]
+[node name="Conference" type="Node3D" unique_id=1432854381]
 script = ExtResource("1_world")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=631748462]
 environment = SubResource("Environment")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-rotation = Vector3(-0.82, -0.45, 0)
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1452199661]
+transform = Transform3D(0.90044713, 0.3180232, -0.2967427, 0, 0.68222123, 0.7311458, 0.43496552, -0.65835816, 0.6143041, 0, 0, 0)
 light_color = Color(0.72, 0.72, 1, 1)
 light_energy = 0.72
 shadow_enabled = true
 
-[node name="ConferenceGround" type="StaticBody3D" parent="."]
-position = Vector3(0, -1, 0)
+[node name="ConferenceGround" type="StaticBody3D" parent="." unique_id=1680853570]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 
-[node name="GroundMesh" type="MeshInstance3D" parent="ConferenceGround"]
+[node name="GroundMesh" type="MeshInstance3D" parent="ConferenceGround" unique_id=1634148479]
 mesh = SubResource("GroundMesh")
 
-[node name="GroundShape" type="CollisionShape3D" parent="ConferenceGround"]
+[node name="GroundShape" type="CollisionShape3D" parent="ConferenceGround" unique_id=871159552]
 shape = SubResource("GroundShape")
 
-[node name="Covered_bridge_01" parent="." instance=ExtResource("3_bridge")]
-position = Vector3(-40, 0, 55)
+[node name="Covered_bridge_01" parent="." unique_id=1154228967 instance=ExtResource("3_bridge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0, 55)
 
-[node name="Road_01" parent="." instance=ExtResource("4_road")]
-position = Vector3(-40, 0, 100)
+[node name="Road_01" parent="." unique_id=746907677 instance=ExtResource("4_road")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0, 100)
 
-[node name="Wall_01_prefab" parent="." instance=ExtResource("5_wall")]
-position = Vector3(75, 0, -15)
+[node name="Wall_01_prefab" parent="." unique_id=1966577976 instance=ExtResource("5_wall")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 75, 0, -15)
 
-[node name="BigFence_prefab" parent="." instance=ExtResource("6_fence")]
-position = Vector3(-110, 0, 35)
+[node name="BigFence_prefab" parent="." unique_id=408175566 instance=ExtResource("6_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -110, 0, 35)
 
-[node name="Players" type="Node3D" parent="."]
+[node name="Players" type="Node3D" parent="." unique_id=1411522334]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1982188084]
 layer = 2
 
-[node name="HUD" type="Control" parent="CanvasLayer"]
+[node name="HUD" type="Control" parent="CanvasLayer" unique_id=1602770499]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -104,7 +103,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="VBox" type="VBoxContainer" parent="CanvasLayer/HUD"]
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/HUD" unique_id=117912231]
 layout_mode = 1
 offset_left = 20.0
 offset_top = 20.0
@@ -112,44 +111,51 @@ offset_right = 380.0
 offset_bottom = 100.0
 mouse_filter = 2
 
-[node name="OnlinePlayersLabel" type="Label" parent="CanvasLayer/HUD/VBox"]
+[node name="OnlinePlayersLabel" type="Label" parent="CanvasLayer/HUD/VBox" unique_id=87326473]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "CONFERENCE · ONLINE PLAYERS"
 
-[node name="ButtonsHBox" type="HBoxContainer" parent="CanvasLayer/HUD"]
+[node name="ButtonsHBox" type="HBoxContainer" parent="CanvasLayer/HUD" unique_id=1378643449]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -220.0
 offset_top = 24.0
 offset_right = -20.0
 offset_bottom = 84.0
 grow_horizontal = 0
+grow_vertical = 0
 
-[node name="PTTButton" type="Button" parent="CanvasLayer/HUD/ButtonsHBox"]
+[node name="PTTButton" type="Button" parent="CanvasLayer/HUD/ButtonsHBox" unique_id=1905656131]
 custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Push to Talk (V)"
 
-[node name="MobilePortalButton" type="Button" parent="CanvasLayer/HUD"]
+[node name="MobilePortalButton" type="Button" parent="CanvasLayer/HUD" unique_id=982643364]
 visible = false
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -220.0
 offset_top = 96.0
 offset_right = -20.0
 offset_bottom = 156.0
 grow_horizontal = 0
-custom_minimum_size = Vector2(200, 60)
+grow_vertical = 0
 theme_override_font_sizes/font_size = 20
 text = "ENTER PORTAL"
 
-[node name="MobileJumpButton" type="Button" parent="CanvasLayer/HUD"]
+[node name="MobileJumpButton" type="Button" parent="CanvasLayer/HUD" unique_id=406817701]
+custom_minimum_size = Vector2(160, 100)
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -162,17 +168,14 @@ offset_right = -24.0
 offset_bottom = -20.0
 grow_horizontal = 0
 grow_vertical = 0
-custom_minimum_size = Vector2(160, 100)
 theme_override_font_sizes/font_size = 24
 text = "JUMP"
 
-[node name="MobileAimJoystick" type="Control" parent="CanvasLayer/HUD"]
+[node name="MobileAimJoystick" type="Control" parent="CanvasLayer/HUD" unique_id=1406676481]
 layout_mode = 1
-anchors_preset = 3
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.0
 offset_left = -184.0
 offset_top = 180.0
 offset_right = -24.0
@@ -181,13 +184,11 @@ grow_horizontal = 0
 grow_vertical = 0
 script = ExtResource("2_joystick")
 
-[node name="MobileAimLabel" type="Label" parent="CanvasLayer/HUD"]
+[node name="MobileAimLabel" type="Label" parent="CanvasLayer/HUD" unique_id=1516718251]
 layout_mode = 1
-anchors_preset = 3
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.0
 offset_left = -184.0
 offset_top = 158.0
 offset_right = -24.0
@@ -195,10 +196,10 @@ offset_bottom = 180.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 16
-horizontal_alignment = 1
 text = "AIM / CAMERA"
+horizontal_alignment = 1
 
-[node name="MobileJoystick" type="Control" parent="CanvasLayer/HUD"]
+[node name="MobileJoystick" type="Control" parent="CanvasLayer/HUD" unique_id=839706492]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -210,7 +211,7 @@ offset_bottom = -40.0
 grow_vertical = 0
 script = ExtResource("2_joystick")
 
-[node name="StatusLabel" type="Label" parent="CanvasLayer/HUD"]
+[node name="StatusLabel" type="Label" parent="CanvasLayer/HUD" unique_id=912535667]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5

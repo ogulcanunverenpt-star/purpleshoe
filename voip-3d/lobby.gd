@@ -549,7 +549,7 @@ func _on_request_room_btn_pressed() -> void:
 	var res := await MatrixClient.create_server_room(mode_str, invitees, minutes)
 	if res.get("success", false):
 		room_status_label.text = "Room created! Connecting..."
-		var host: String = String(res.get("host", "192.168.1.9"))
+		var host: String = String(res.get("host", "192.168.1.4"))
 		var port: int = int(res.get("port", 12810))
 		var token: String = String(res.get("token", ""))
 
@@ -722,7 +722,7 @@ func _join_current_invite(role: int, team: int) -> void:
 			return
 		_remove_pending_room_invite(invite_id)
 
-	var host: String = str(invite.get("host", "192.168.1.9"))
+	var host: String = str(invite.get("host", "192.168.1.4"))
 	var port: int = int(invite.get("port", NetJoin.DEFAULT_PORT))
 	var token: String = str(invite.get("token", ""))
 	var mode_str: String = str(invite.get("mode", "free_kick"))

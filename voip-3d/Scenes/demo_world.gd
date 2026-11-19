@@ -175,7 +175,7 @@ func _connect_to_plaza() -> void:
 
 	MatchManager.preferred_mode = MatchManager.MODE_CONFERENCE
 	var result := NetJoin.create_client(
-		String(room.get("host", "192.168.1.9")),
+		String(room.get("host", "192.168.1.4")),
 		int(room.get("port", 12810)),
 		MatchManager.TEAM_AUTO,
 		MatchManager.ROLE_PLAYER,
@@ -429,7 +429,7 @@ func _enter_portal(portal_id: String) -> void:
 	MatchManager.disconnect_client()
 	var mode_id := MatchManager.MODE_MATCH if portal_id == "match" else MatchManager.MODE_FREE_KICK
 	var result := NetJoin.create_client(
-		String(room.get("host", "192.168.1.9")),
+		String(room.get("host", "192.168.1.4")),
 		int(room.get("port", 12810)),
 		MatchManager.TEAM_AUTO,
 		MatchManager.ROLE_PLAYER,

@@ -14,6 +14,7 @@ var main: Node3D
 var voice: OverlandVoice
 var remotes: Dictionary = {}
 var _send_timer := 0.0
+var _web_voice_peers: Dictionary = {}
 
 
 func _ready() -> void:
@@ -28,6 +29,11 @@ func setup(main_node: Node3D) -> void:
 	voice.name = "OverlandVoice"
 	add_child(voice)
 	voice.voice_packet_ready.connect(_on_voice_packet_ready)
+	voice.web_voice_ready.connect(_on_web_voice_ready)
+	voice.web_voice_signal.connect(_on_web_voice_signal)
+	voice.web_voice_error.connect(_on_web_voice_error)
+	voice.web_voice_warning.connect(_on_web_voice_warning)
+	_refresh_names()
 
 
 func set_ptt_active(active: bool) -> void:
@@ -65,6 +71,10 @@ func _process(delta: float) -> void:
 		)
 	for id in remotes:
 		_follow(remotes[id], delta)
+		if OS.has_feature("web") and main.cam != null:
+			var remote: Node3D = remotes[id].node
+			var relative: Vector3 = main.cam.global_transform.basis.inverse() * (remote.global_position - main.player.global_position)
+			voice.set_web_position(id, relative)
 
 
 @rpc("any_peer", "call_remote", "unreliable_ordered")
@@ -134,9 +144,80 @@ func request_voice_relay(data: PackedByteArray) -> void:
 
 
 func _broadcast_voice_packet(sender_id: int, data: PackedByteArray) -> void:
+	if sender_id != 1 and MatchManager.roster.has(1) and voice != null:
+		voice.queue_voice_packet(sender_id, data)
 	for peer_id in multiplayer.get_peers():
-		if peer_id != sender_id:
+		if peer_id != sender_id and not (_web_voice_peers.has(sender_id) and _web_voice_peers.has(peer_id)):
 			relay_voice_packet.rpc_id(peer_id, sender_id, data)
+
+
+func _on_web_voice_ready() -> void:
+	if is_online() and not multiplayer.is_server():
+		join_web_voice.rpc_id(1)
+
+
+func _on_web_voice_signal(target: int, message: String) -> void:
+	if is_online() and message.length() <= 65536:
+		send_web_voice_signal.rpc_id(1, target, message)
+
+
+func _on_web_voice_error(message: String) -> void:
+	push_error("Web voice: %s" % message)
+	if main != null:
+		main._on_window_focus_exited()
+		main._flash_hint("Voice chat: %s" % message)
+
+
+func _on_web_voice_warning(message: String) -> void:
+	push_warning("Web voice: %s" % message)
+	if main != null:
+		main._flash_hint("Voice chat: %s" % message)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func join_web_voice() -> void:
+	if not multiplayer.is_server():
+		return
+	var sender := multiplayer.get_remote_sender_id()
+	if not MatchManager.roster.has(sender) or _web_voice_peers.has(sender):
+		return
+	_web_voice_peers[sender] = true
+	for peer_id in _web_voice_peers:
+		if peer_id != sender:
+			add_web_voice_peer.rpc_id(sender, peer_id)
+			add_web_voice_peer.rpc_id(peer_id, sender)
+
+
+@rpc("authority", "call_remote", "reliable")
+func add_web_voice_peer(peer_id: int) -> void:
+	if voice != null:
+		voice.add_web_peer(peer_id)
+
+
+@rpc("authority", "call_remote", "reliable")
+func remove_web_voice_peer(peer_id: int) -> void:
+	if voice != null:
+		voice.remove_web_peer(peer_id)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func send_web_voice_signal(target: int, message: String) -> void:
+	if not multiplayer.is_server() or message.length() > 65536:
+		return
+	var sender := multiplayer.get_remote_sender_id()
+	if sender == target or not _web_voice_peers.has(sender) or not _web_voice_peers.has(target):
+		return
+	if not MatchManager.roster.has(sender) or not MatchManager.roster.has(target):
+		return
+	if not JSON.parse_string(message) is Dictionary:
+		return
+	receive_web_voice_signal.rpc_id(target, sender, message)
+
+
+@rpc("authority", "call_remote", "reliable")
+func receive_web_voice_signal(sender: int, message: String) -> void:
+	if voice != null and message.length() <= 65536:
+		voice.receive_web_signal(sender, message)
 
 
 @rpc("authority", "call_remote", "unreliable_ordered")
@@ -279,10 +360,18 @@ func _refresh_names() -> void:
 		var label: Label3D = remotes[id].label
 		if label != null:
 			label.text = MatchManager.username_for_peer(id)
+	if OS.has_feature("web") and voice != null and is_online() and MatchManager.roster.has(multiplayer.get_unique_id()):
+		voice.initialize_web(multiplayer.get_unique_id())
 
 
 func _on_peer_disconnected(id: int) -> void:
+	_web_voice_peers.erase(id)
+	if multiplayer.is_server() and _web_voice_peers.has(id):
+		_web_voice_peers.erase(id)
+		for peer_id in _web_voice_peers:
+			remove_web_voice_peer.rpc_id(peer_id, id)
 	if voice != null:
+		voice.remove_web_peer(id)
 		voice.remove_remote(id)
 	if remotes.has(id):
 		var node: Node = remotes[id].node

@@ -30,6 +30,12 @@ func game_scene_for(mode: int) -> String:
 func websocket_url(host: String, port: int, secure: bool) -> String:
 	if host.begins_with("ws://") or host.begins_with("wss://"):
 		return host
+	if OS.has_feature("web") and bool(JavaScriptBridge.eval("window.PURPLESHOE_WEB_PROXY === true", true)):
+		return "%s//%s/game/%d" % [
+			"wss:" if secure else "ws:",
+			str(JavaScriptBridge.eval("window.location.host", true)),
+			port
+		]
 	return "%s://%s:%d" % ["wss" if secure else "ws", host, port]
 
 func _is_secure_page() -> bool:
@@ -39,7 +45,7 @@ func _is_secure_page() -> bool:
 
 var ssh_tunnel_pid := -1
 
-func start_ssh_tunnel(port: int, remote_host: String = "192.168.1.9", tunnel_user: String = "tunnel") -> int:
+func start_ssh_tunnel(port: int, remote_host: String = "192.168.1.4", tunnel_user: String = "tunnel") -> int:
 	stop_ssh_tunnel()
 	var args := PackedStringArray(["-N", "-T", "-o", "StrictHostKeyChecking=no", "-R", "%d:localhost:%d" % [port, port], "%s@%s" % [tunnel_user, remote_host]])
 	print("Starting SSH Reverse Tunnel: ssh ", " ".join(args))

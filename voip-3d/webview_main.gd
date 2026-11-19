@@ -1,6 +1,6 @@
 extends Control
 
-const DEBUG_PORTAL_URL := "http://192.168.1.9:5173/"
+const DEBUG_PORTAL_URL := "http://192.168.1.4:5173/"
 const PRODUCTION_PORTAL_URL := "https://gamebler.xyz/"
 const WEB_FRAME_ID := "purpleshoe-game-portal"
 
@@ -34,7 +34,7 @@ func _open_web_portal(url: String) -> void:
 	window.set("psGodotReturnCallback", callback)
 
 	var url_json := JSON.stringify(url)
-	var expected_origin := "http://192.168.1.9:5173" if OS.is_debug_build() else "https://gamebler.xyz"
+	var expected_origin := "http://192.168.1.4:5173" if OS.is_debug_build() else "https://gamebler.xyz"
 	var expected_origin_json := JSON.stringify(expected_origin)
 	var frame_id_json := JSON.stringify(WEB_FRAME_ID)
 	var script := """

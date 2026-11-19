@@ -4,7 +4,7 @@ extends Node3D
 ## Wires the streaming systems, keeps the player/camera/HUD PERSISTENT across cell streaming, and adds:
 ##   - the selected football avatar with shared locomotion clips
 ##   - GRAVITY so the player walks the rolling terrain, and a DRIVE mode (enter/exit a car via the DRIVE btn)
-##   - per-DISTRICT music + a live HUD + district-discovery persistence (local save, overland_save.gd)
+##   - a live HUD + district-discovery persistence (local save, overland_save.gd)
 ##   - MULTIPLAYER presence (overland_net.gd) and 15 portals across three activity hubs
 ## CHUNK MODE (world.mode=="chunk") replaces the one-resident zone streamer with ChunkManager (3x3 ring).
 
@@ -34,9 +34,8 @@ const CAR_PAINT_COLORS := [
 	Color("#6b42b5"), Color("#eeeeee"), Color("#24272b"), Color("#e36b1f")
 ]
 
-# The three districts the player can discover (drives the discovery count + music).
+# The three districts the player can discover.
 const DISTRICTS := {"downtown": "Downtown", "country": "Countryside", "oldtown": "Old-Town"}
-const DISTRICT_MUSIC := {"downtown": "music_city", "country": "music_country", "oldtown": "music_town"}
 const DISTRICT_COUNT := 3
 
 var origin := "res://openworld"
@@ -355,7 +354,7 @@ func _process(delta: float) -> void:
 	_refresh_stats()
 
 
-# ---------------- district discovery + music ----------------
+# ---------------- district discovery ----------------
 
 func _district_for(area_id: String) -> String:
 	# area_id is "c<gx>_<gz>"; classify by gz band (matches the authored layout).
@@ -375,9 +374,6 @@ func _on_area_entered(area_id: String) -> void:
 	if d == current_district:
 		return
 	current_district = d
-	var mk := String(DISTRICT_MUSIC.get(d, ""))
-	if mk != "" and ResourceLoader.exists("res://openworld/audio/%s.ogg" % mk):
-		AudioManager.play_music(load("res://openworld/audio/%s.ogg" % mk))
 	if not discovered.has(d):
 		discovered[d] = true
 		_flash_hint("Discovered %s!  (%d/%d districts)" % [DISTRICTS.get(d, d), discovered.size(), DISTRICT_COUNT])
@@ -1268,7 +1264,7 @@ func _accept_overland_invite() -> void:
 		invite_modal_overland.visible = false
 	if pending_overland_invite.is_empty():
 		return
-	var host: String = str(pending_overland_invite.get("host", pending_overland_invite.get("address", "192.168.1.9")))
+	var host: String = str(pending_overland_invite.get("host", pending_overland_invite.get("address", "192.168.1.4")))
 	var port: int = int(pending_overland_invite.get("port", NetJoin.DEFAULT_PORT))
 	var token: String = str(pending_overland_invite.get("token", ""))
 	var mode_str: String = str(pending_overland_invite.get("mode", "free_kick"))
