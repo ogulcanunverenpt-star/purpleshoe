@@ -2311,7 +2311,7 @@ func _on_match_state_changed(ready: bool):
 	
 	if waiting_label:
 		waiting_label.visible = not ready
-		waiting_label.text = "Waiting for a HUMAN player. The ROBOT team is controlled by the computer." if not ready else ""
+		waiting_label.text = ("Waiting for both team captains." if MatchManager.match_multiplayer else "Waiting for a HUMAN player. The ROBOT team is controlled by the computer.") if not ready else ""
 	if action_label:
 		if not ready:
 			action_label.text = ""

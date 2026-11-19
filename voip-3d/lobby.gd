@@ -121,12 +121,15 @@ func _check_cmdline_args() -> bool:
 	var minutes := 10
 	var transport_id := NetJoin.TRANSPORT_WEBSOCKET
 	var room_tokens: Array = []
+	var multiplayer_match := false
 
 	var i := 0
 	while i < args.size():
 		var arg := String(args[i])
 		if arg == "--server":
 			is_server = true
+		elif arg == "--match-pvp":
+			multiplayer_match = true
 		elif arg == "--port" and i + 1 < args.size():
 			port = int(args[i + 1])
 			i += 1
@@ -151,7 +154,7 @@ func _check_cmdline_args() -> bool:
 
 	if is_server:
 		print("[CLI] Headless/Server mode starting on port %d, mode %d..." % [port, mode_id])
-		var res := NetJoin.create_server(port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, "DedicatedServer", minutes, mode_id, transport_id, room_tokens, "", "", false)
+		var res := NetJoin.create_server(port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, "DedicatedServer", minutes, mode_id, transport_id, room_tokens, "", "", false, multiplayer_match)
 		if res.get("ok", false):
 			print("ROOM_SERVER_READY %d" % port)
 			get_tree().change_scene_to_file.call_deferred(NetJoin.game_scene_for(mode_id))
@@ -431,8 +434,7 @@ func _refresh_pending_requests() -> void:
 		accept_b.add_theme_font_size_override("font_size", 22)
 		accept_b.pressed.connect(func():
 			current_pending_invite = p
-			_prepare_role_modal_for_mode(str(p.get("mode", "free_kick")))
-			role_modal.popup_centered()
+			_on_accept_invite_pressed()
 		)
 		hbox.add_child(accept_b)
 
@@ -554,6 +556,9 @@ func _on_request_room_btn_pressed() -> void:
 		var token: String = String(res.get("token", ""))
 
 		await get_tree().create_timer(1.0).timeout
+		if selected_mode_id == MatchManager.MODE_MATCH:
+			_open_match_team_selection(host, port, token, NetJoin.TRANSPORT_WEBSOCKET)
+			return
 		var join_res := NetJoin.create_client(host, port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, MatrixClient.local_username(), selected_mode_id, NetJoin.TRANSPORT_WEBSOCKET, token)
 		if not join_res.get("ok", false):
 			room_status_label.text = "Connection Error: " + String(join_res.get("message", ""))
@@ -630,8 +635,7 @@ func _setup_top_banner() -> void:
 	btn.add_theme_font_size_override("font_size", 22)
 	btn.pressed.connect(func():
 		top_banner.visible = false
-		_prepare_role_modal_for_mode(str(current_pending_invite.get("mode", "free_kick")))
-		role_modal.popup_centered()
+		_on_accept_invite_pressed()
 	)
 	hbox.add_child(btn)
 
@@ -678,6 +682,8 @@ func _on_accept_invite_pressed() -> void:
 	var mode_str := str(current_pending_invite.get("mode", "free_kick"))
 	if mode_str == "overland":
 		_join_current_invite(MatchManager.ROLE_PLAYER, MatchManager.TEAM_BLUE)
+	elif NetJoin.parse_mode(mode_str) == MatchManager.MODE_MATCH:
+		_join_current_invite(MatchManager.ROLE_PLAYER, MatchManager.TEAM_AUTO)
 	else:
 		_prepare_role_modal_for_mode(mode_str)
 		role_modal.popup_centered()
@@ -731,9 +737,22 @@ func _join_current_invite(role: int, team: int) -> void:
 	var mode_id := NetJoin.parse_mode(mode_str)
 	var transport_id := NetJoin.parse_transport(transport_str)
 
-	NetJoin.create_client(host, port, team, role, MatrixClient.local_username(), mode_id, transport_id, token)
+	if mode_id == MatchManager.MODE_MATCH:
+		_open_match_team_selection(host, port, token, transport_id)
+	else:
+		var result := NetJoin.create_client(host, port, team, role, MatrixClient.local_username(), mode_id, transport_id, token)
+		if not result.get("ok", false):
+			room_status_label.text = "Connection Error: " + String(result.get("message", ""))
+			return
 	if String(current_pending_invite.get("invite_id", "")) == invite_id:
 		current_pending_invite.clear()
+
+func _open_match_team_selection(host: String, port: int, token: String, transport: int) -> void:
+	NetJoin.pending_match_connection = {"host": host, "port": port, "token": token, "transport": transport}
+	var result := get_tree().change_scene_to_file("res://match_team_select.tscn")
+	if result != OK:
+		room_status_label.text = "Could not open team selection: %s" % error_string(result)
+		request_room_btn.disabled = false
 
 
 func _decline_room_invite(invite: Dictionary) -> void:

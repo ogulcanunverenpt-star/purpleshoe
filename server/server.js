@@ -2648,6 +2648,7 @@ app.post('/api/rooms/create', async (req, res) => {
       '--minutes', minutesVal.toString(),
       '--transport', 'ws'
     ];
+    if (modeStr === 'match') args.push('--match-pvp');
 
     console.log(`[RoomManager] Spawning game server: ${launch.command} ${args.join(' ')}`);
 
@@ -3149,6 +3150,7 @@ wss.on('connection', (ws) => {
           '--minutes', minutesVal.toString(),
           '--transport', 'ws'
         ];
+        if (modeStr === 'match') args.push('--match-pvp');
 
         let proc = null;
         let ready;

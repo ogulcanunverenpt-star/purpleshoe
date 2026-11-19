@@ -19,6 +19,7 @@ signal status(message: String)
 var return_to_game_connection: Dictionary = {}
 var can_resume_previous_game := false
 var webview_return_scene := ""
+var pending_match_connection: Dictionary = {}
 
 func game_scene_for(mode: int) -> String:
 	if mode == MatchManager.MODE_CONFERENCE:
@@ -65,7 +66,7 @@ func stop_ssh_tunnel() -> void:
 ## (see MatchManager.request_join); each token is consumed on first successful join.
 func create_server(port: int, host_team: int, host_role: int, username: String, match_minutes: int,
 		selected_mode: int, transport: int, room_tokens: Array = [],
-		tls_cert_path: String = "", tls_key_path: String = "", enable_tunnel: bool = false) -> Dictionary:
+		tls_cert_path: String = "", tls_key_path: String = "", enable_tunnel: bool = false, multiplayer_match: bool = false) -> Dictionary:
 	username = username.strip_edges()
 	if username.is_empty():
 		return {"ok": false, "message": "Enter a username."}
@@ -99,7 +100,7 @@ func create_server(port: int, host_team: int, host_role: int, username: String, 
 		return {"ok": false, "message": error_message}
 	multiplayer.multiplayer_peer = peer
 	MatchManager.valid_room_tokens = room_tokens.duplicate()
-	MatchManager.start_server(host_team, host_role, username, DisplayServer.get_name() == "headless", match_minutes, selected_mode)
+	MatchManager.start_server(host_team, host_role, username, DisplayServer.get_name() == "headless", match_minutes, selected_mode, multiplayer_match)
 	var message = "Server listening on %s %d" % [transport_name, port]
 	status.emit(message)
 	return {"ok": true, "message": message}
@@ -107,7 +108,7 @@ func create_server(port: int, host_team: int, host_role: int, username: String, 
 ## Connects as a client and switches to the game scene for `selected_mode`. `room_token`
 ## (if the target room is locked) is forwarded to the server's request_join RPC.
 func create_client(host: String, port: int, team: int, role: int, username: String,
-		selected_mode: int, transport: int, room_token: String = "") -> Dictionary:
+		selected_mode: int, transport: int, room_token: String = "", multiplayer_match: bool = false, switch_scene: bool = true) -> Dictionary:
 	username = username.strip_edges()
 	if username.is_empty():
 		return {"ok": false, "message": "Enter a username."}
@@ -129,7 +130,7 @@ func create_client(host: String, port: int, team: int, role: int, username: Stri
 		var message := "Connect error to %s:%d: %s" % [target_host, port, error_string(err)]
 		push_error(message)
 		return {"ok": false, "message": message}
-	MatchManager.start_client(team, role, username, selected_mode, room_token)
+	MatchManager.start_client(team, role, username, selected_mode, room_token, multiplayer_match)
 	if selected_mode == MatchManager.MODE_FREE_KICK or selected_mode == MatchManager.MODE_MATCH:
 		return_to_game_connection = {
 			"host": target_host,
@@ -139,13 +140,15 @@ func create_client(host: String, port: int, team: int, role: int, username: Stri
 			"username": username,
 			"mode": selected_mode,
 			"transport": transport,
-			"room_token": room_token
+			"room_token": room_token,
+			"multiplayer_match": multiplayer_match
 		}
 		can_resume_previous_game = false
 	multiplayer.multiplayer_peer = peer
 	var message := "Connecting to %s:%d" % [target_host, port]
 	status.emit(message)
-	get_tree().change_scene_to_file.call_deferred(game_scene_for(selected_mode))
+	if switch_scene:
+		get_tree().change_scene_to_file.call_deferred(game_scene_for(selected_mode))
 	return {"ok": true, "message": message}
 
 func has_return_to_game() -> bool:
@@ -169,7 +172,8 @@ func return_to_game() -> Dictionary:
 		String(saved_connection.get("username", "")),
 		int(saved_connection.get("mode", MatchManager.MODE_FREE_KICK)),
 		int(saved_connection.get("transport", TRANSPORT_WEBSOCKET)),
-		String(saved_connection.get("room_token", ""))
+		String(saved_connection.get("room_token", "")),
+		bool(saved_connection.get("multiplayer_match", false))
 	)
 
 func return_from_webview() -> int:

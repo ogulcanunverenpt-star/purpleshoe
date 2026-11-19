@@ -65,6 +65,8 @@ func _ready():
 				createPlayer(peer_id, assignment.team, assignment.role, assignment.username)
 	else:
 		push_warning("CLIENT SESSION STARTED")
+		if MatchManager.game_mode == MatchManager.MODE_MATCH and MatchManager.match_multiplayer:
+			MatchManager.notify_match_scene_ready.rpc_id(1)
 
 func _setup_match_stadium_camera() -> void:
 	var camera := get_node_or_null("Camera3D") as Camera3D
@@ -207,10 +209,10 @@ func _sync_match_lineup() -> void:
 				captain_id = int(peer_id)
 				break
 		if captain_id < 0:
-			if team == MatchManager.TEAM_BLUE:
+			if team == MatchManager.TEAM_BLUE and not MatchManager.match_multiplayer:
 				captain_id = 1
 			else:
-				push_error("Match is ready without a HUMAN captain.")
+				push_error("Match is ready without a captain for team %d." % team)
 				return
 		for field_slot in range(MatchManager.MAX_FIELD_PLAYERS_PER_TEAM):
 			var player = playerScene.instantiate()

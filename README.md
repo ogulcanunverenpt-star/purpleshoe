@@ -9,8 +9,9 @@ The main game is in [`voip-3d/`](./voip-3d/), a Godot 4 project. Its default ent
 account and lobby flow in `lobby.tscn`.
 
 - **11-a-side football:** Each side has ten field players and a goalkeeper. A human player controls
-  their selected player while the ROBOT side and the remaining teammates are controlled by the
-  game's football AI.
+  their selected player while the remaining teammates are controlled by the game's football AI.
+  The match portal plays against the ROBOT team; lobby match invitations let two players control
+  the HUMAN and ROBOT teams against each other.
 - **Free kicks:** A two-player mode focused on aiming, shooting, goalkeeping, and competing to the
   target score.
 - **Open-world exploration:** Walk or drive between the city, countryside, and old town; discover
@@ -118,6 +119,13 @@ updating the project; previously exported executables do not include these fixes
 
 You can also open `voip-3d/project.godot` directly in Godot. To run the open-world scene on its own,
 select `voip-3d/openworld/main.tscn`.
+
+### Play a football match
+
+- **Against AI:** Enter the MATCH PORTAL in the world. You control the HUMAN team against ROBOT.
+- **Multiplayer:** Enter the GAME LOBBY portal, choose Match, invite a friend and create the room.
+  Both players choose opposite HUMAN or ROBOT teams; the match starts when both have joined. Each
+  player controls one footballer at a time, with AI controlling the remaining teammates.
 
 ## Networking and services
 

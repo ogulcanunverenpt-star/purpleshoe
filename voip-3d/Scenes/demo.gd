@@ -122,12 +122,15 @@ func _check_cmdline_args() -> bool:
 	var minutes := 10
 	var transport_id := NetJoin.TRANSPORT_WEBSOCKET
 	var room_tokens: Array = []
+	var multiplayer_match := false
 
 	var i := 0
 	while i < args.size():
 		var arg := String(args[i])
 		if arg == "--server":
 			is_server = true
+		elif arg == "--match-pvp":
+			multiplayer_match = true
 		elif arg == "--port" and i + 1 < args.size():
 			port = int(args[i + 1])
 			i += 1
@@ -152,7 +155,7 @@ func _check_cmdline_args() -> bool:
 
 	if is_server:
 		print("[CLI] Headless/Server mode starting on port %d, mode %d..." % [port, mode_id])
-		var res := NetJoin.create_server(port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, "DedicatedServer", minutes, mode_id, transport_id, room_tokens, "", "", false)
+		var res := NetJoin.create_server(port, MatchManager.TEAM_AUTO, MatchManager.ROLE_PLAYER, "DedicatedServer", minutes, mode_id, transport_id, room_tokens, "", "", false, multiplayer_match)
 		if res.get("ok", false):
 			print("ROOM_SERVER_READY %d" % port)
 			get_tree().change_scene_to_file.call_deferred(NetJoin.game_scene_for(mode_id))

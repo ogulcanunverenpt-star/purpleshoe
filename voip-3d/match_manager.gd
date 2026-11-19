@@ -21,8 +21,7 @@ const MODE_CONFERENCE := 3
 const MAX_FREE_KICK_PLAYERS := 2
 const MAX_OVERLAND_PLAYERS := 32
 const MAX_CONFERENCE_PLAYERS := 20
-const MAX_MATCH_PLAYERS := 1
-const MIN_MATCH_PLAYERS := 1
+const MAX_MATCH_PLAYERS := 2
 const MAX_FIELD_PLAYERS_PER_TEAM := 10
 const MAX_PLAYERS_PER_TEAM := MAX_FIELD_PLAYERS_PER_TEAM + 1
 const MATCH_FORMATION_433 := [
@@ -47,10 +46,12 @@ var match_ready := false
 var match_duration_minutes := 5
 var game_mode := MODE_FREE_KICK
 var preferred_mode := MODE_MATCH
+var match_multiplayer := false
+var match_scene_ready: Dictionary = {}
 var valid_room_tokens: Array = []
 var matrix_ids: Dictionary = {}
 
-func start_server(host_team: int, host_role: int, username: String, dedicated: bool, duration_minutes: int = 5, selected_mode: int = MODE_FREE_KICK):
+func start_server(host_team: int, host_role: int, username: String, dedicated: bool, duration_minutes: int = 5, selected_mode: int = MODE_FREE_KICK, multiplayer_match: bool = false):
 	if selected_mode != MODE_FREE_KICK and selected_mode != MODE_MATCH and selected_mode != MODE_OVERLAND and selected_mode != MODE_CONFERENCE:
 		push_error("Invalid game mode.")
 		return
@@ -59,9 +60,11 @@ func start_server(host_team: int, host_role: int, username: String, dedicated: b
 		return
 	roster.clear()
 	matrix_ids.clear()
+	match_scene_ready.clear()
 	match_ready = false
 	match_duration_minutes = duration_minutes
 	game_mode = selected_mode
+	match_multiplayer = multiplayer_match and selected_mode == MODE_MATCH
 	requested_role = ROLE_PLAYER if selected_mode == MODE_MATCH else host_role
 	requested_team = TEAM_RED if selected_mode == MODE_MATCH else _resolve_team(host_team, requested_role)
 	requested_username = _sanitize_username(username)
@@ -71,15 +74,17 @@ func start_server(host_team: int, host_role: int, username: String, dedicated: b
 
 var requested_room_token := ""
 
-func start_client(team: int, role: int, username: String, selected_mode: int = MODE_FREE_KICK, room_token: String = ""):
+func start_client(team: int, role: int, username: String, selected_mode: int = MODE_FREE_KICK, room_token: String = "", multiplayer_match: bool = false):
 	roster.clear()
 	matrix_ids.clear()
+	match_scene_ready.clear()
 	match_ready = false
 	requested_role = role
 	requested_team = team
 	requested_username = _sanitize_username(username)
 	requested_room_token = room_token
 	game_mode = selected_mode
+	match_multiplayer = multiplayer_match and selected_mode == MODE_MATCH
 	last_rejection = ""
 	if not multiplayer.connected_to_server.is_connected(_on_connected_to_server):
 		multiplayer.connected_to_server.connect(_on_connected_to_server, CONNECT_ONE_SHOT)
@@ -108,14 +113,13 @@ func request_join(team: int, role: int, username: String, selected_mode: int, ro
 	if selected_mode != game_mode:
 		_reject_role(peer_id, "You must select the same game mode as the server.")
 		return
-	if game_mode == MODE_MATCH and team == TEAM_BLUE:
+	if game_mode == MODE_MATCH and not match_multiplayer and team == TEAM_BLUE:
 		_reject_role(peer_id, "The ROBOT team is controlled by the computer. Select the HUMAN (Red) team.")
 		return
 	if game_mode != MODE_OVERLAND and not valid_room_tokens.is_empty():
 		if not valid_room_tokens.has(room_token):
 			_reject_role(peer_id, "The invite is invalid or has expired.")
 			return
-		valid_room_tokens.erase(room_token)   # kişiye özel, tek kullanımlık davet
 	if roster.size() >= max_players_for_mode():
 		_reject_role(peer_id, "The player limit for this mode has been reached.")
 		return
@@ -137,6 +141,8 @@ func request_join(team: int, role: int, username: String, selected_mode: int, ro
 		if assigned_team < 0:
 			_reject_role(peer_id, "This team already has a captain. Select the other team.")
 			return
+	if game_mode != MODE_OVERLAND and not valid_room_tokens.is_empty():
+		valid_room_tokens.erase(room_token)
 	_assign_peer(peer_id, assigned_team, assigned_role, clean_username)
 
 func _resolve_team(requested: int, role: int) -> int:
@@ -145,9 +151,13 @@ func _resolve_team(requested: int, role: int) -> int:
 	if game_mode == MODE_FREE_KICK:
 		return TEAM_BLUE if role == ROLE_GOALKEEPER else TEAM_RED
 	if game_mode == MODE_MATCH:
-		if requested == TEAM_BLUE:
-			return -1
-		return TEAM_RED if _team_has_room(TEAM_RED, role) else -1
+		if not match_multiplayer:
+			return TEAM_RED if requested != TEAM_BLUE and _team_has_room(TEAM_RED, role) else -1
+		if requested in [TEAM_BLUE, TEAM_RED]:
+			return requested if _team_has_room(requested, role) else -1
+		if requested == TEAM_AUTO:
+			return TEAM_RED if _team_has_room(TEAM_RED, role) else (TEAM_BLUE if _team_has_room(TEAM_BLUE, role) else -1)
+		return -1
 	if requested == TEAM_BLUE or requested == TEAM_RED:
 		return requested if _team_has_room(requested, role) else -1
 	var blue_size := _team_size(TEAM_BLUE)
@@ -179,6 +189,8 @@ func _team_size(team: int) -> int:
 	return count
 
 func max_players_for_mode() -> int:
+	if game_mode == MODE_MATCH and not match_multiplayer:
+		return 1
 	return max_players_for_mode_id(game_mode)
 
 func max_players_for_mode_id(mode: int) -> int:
@@ -192,7 +204,7 @@ func _assign_peer(peer_id: int, team: int, role: int, username: String):
 	roster[peer_id] = {"team": team, "role": role, "username": username}
 	for assigned_peer_id in roster:
 		var assignment: Dictionary = roster[assigned_peer_id]
-		sync_player_state.rpc(assigned_peer_id, assignment.team, assignment.role, assignment.username)
+		sync_player_state.rpc(assigned_peer_id, assignment.team, assignment.role, assignment.username, match_multiplayer)
 	roster_changed.emit()
 	_update_match_state()
 
@@ -268,7 +280,8 @@ func _reject_role(peer_id: int, message: String):
 	reject_role.rpc_id(peer_id, message)
 
 @rpc("authority", "call_local", "reliable")
-func sync_player_state(peer_id: int, team: int, role: int, username: String):
+func sync_player_state(peer_id: int, team: int, role: int, username: String, multiplayer_match: bool):
+	match_multiplayer = multiplayer_match
 	if team < 0:
 		roster.erase(peer_id)
 	else:
@@ -286,6 +299,7 @@ func reject_role(message: String):
 
 func release_player(peer_id: int):
 	if multiplayer.is_server() and roster.has(peer_id):
+		match_scene_ready.erase(peer_id)
 		var existing: Dictionary = roster[peer_id]
 		player_disconnected_event.rpc(peer_id, existing.username)
 		assign_player_state.rpc(peer_id, -1, -1, existing.username)
@@ -341,6 +355,8 @@ func field_player_count(team: int) -> int:
 	return _team_role_count(team, ROLE_PLAYER)
 
 func _update_match_state():
+	if game_mode == MODE_MATCH and match_multiplayer and not multiplayer.is_server():
+		return
 	var ready := false
 	#var game_mode = "asdasdsad"
 	if game_mode == MODE_OVERLAND or game_mode == MODE_CONFERENCE:
@@ -348,7 +364,12 @@ func _update_match_state():
 	elif game_mode == MODE_FREE_KICK:
 		ready = roster.size() == MAX_FREE_KICK_PLAYERS and _role_count(ROLE_GOALKEEPER) == 1 and _role_count(ROLE_PLAYER) == 1
 	elif game_mode == MODE_MATCH:
-		ready = roster.size() == MIN_MATCH_PLAYERS and _team_size(TEAM_RED) == 1 and _team_size(TEAM_BLUE) == 0
+		ready = _team_size(TEAM_RED) == 1 and _team_size(TEAM_BLUE) == (1 if match_multiplayer else 0)
+		if ready and match_multiplayer:
+			for peer_id in roster:
+				if not match_scene_ready.has(peer_id):
+					ready = false
+					break
 	else:
 		ready = false
 			
@@ -356,6 +377,23 @@ func _update_match_state():
 		return
 	match_ready = ready
 	match_state_changed.emit(match_ready)
+	if game_mode == MODE_MATCH and match_multiplayer and multiplayer.is_server():
+		sync_match_readiness.rpc(match_ready)
+
+@rpc("any_peer", "call_remote", "reliable")
+func notify_match_scene_ready() -> void:
+	if not multiplayer.is_server() or not match_multiplayer:
+		return
+	var peer_id := multiplayer.get_remote_sender_id()
+	if roster.has(peer_id):
+		match_scene_ready[peer_id] = true
+		_update_match_state()
+
+@rpc("authority", "call_remote", "reliable")
+func sync_match_readiness(ready: bool) -> void:
+	if match_ready != ready:
+		match_ready = ready
+		match_state_changed.emit(ready)
 
 func local_role() -> int:
 	return role_for_peer(multiplayer.get_unique_id())
@@ -428,5 +466,8 @@ func make_plaza_button() -> Button:
 
 func disconnect_client():
 	roster.clear()
-	_update_match_state()
+	match_scene_ready.clear()
+	if match_ready:
+		match_ready = false
+		match_state_changed.emit(false)
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
