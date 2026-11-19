@@ -843,7 +843,7 @@ func _build_player() -> void:
 	cap.radius = 0.4
 	cap.height = 1.7
 	cs.shape = cap
-	cs.position.y = 0.9
+	cs.position.y = 0.85
 	player.add_child(cs)
 	# placeholder capsule body (hidden once the avatar loads)
 	body_mesh = MeshInstance3D.new()

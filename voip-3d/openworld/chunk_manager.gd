@@ -550,23 +550,8 @@ func _place_road(root: Node, spec: Dictionary, centre: Vector3, half: float) -> 
 
 func _road_strip(root: Node, centre: Vector3, dir: String, width: float) -> void:
 	var ew := dir != "ns"
-	# TERRAIN-FOLLOWING: lay the asphalt as SHORT segments each dropped onto the heightfield.
-	var asphalt := GSurf.surface("asphalt")
-	var seg_len := 2.5
-	var segs := maxi(1, int(cell_size / seg_len))
-	seg_len = cell_size / float(segs)
-	for i in range(segs):
-		var t := -cell_size * 0.5 + seg_len * (float(i) + 0.5)
-		var sp: Vector3 = centre + (Vector3(t, 0.0, 0.0) if ew else Vector3(0.0, 0.0, t))
-		var sy := _ground_y(sp.x, sp.z) + 0.05
-		var mi := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3(seg_len + 0.06, 0.08, width) if ew else Vector3(width, 0.08, seg_len + 0.06)
-		mi.mesh = bm
-		mi.material_override = asphalt
-		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		mi.position = Vector3(sp.x, sy, sp.z)
-		root.add_child(mi)
+	var road_size := Vector2(cell_size, width) if ew else Vector2(width, cell_size)
+	_add_ground_overlay(root, centre, road_size, 0.015, GSurf.surface("asphalt"))
 	var line_mat := StandardMaterial3D.new()
 	line_mat.albedo_color = Color(0.95, 0.86, 0.35)
 	line_mat.emission_enabled = true
@@ -577,14 +562,34 @@ func _road_strip(root: Node, centre: Vector3, dir: String, width: float) -> void
 	for i in range(n):
 		var t := -cell_size * 0.5 + step * (float(i) + 0.5)
 		var lp: Vector3 = centre + (Vector3(t, 0.0, 0.0) if ew else Vector3(0.0, 0.0, t))
-		var mi := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3(1.6, 0.04, 0.22) if ew else Vector3(0.22, 0.04, 1.6)
-		mi.mesh = bm
-		mi.material_override = line_mat
-		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		mi.position = Vector3(lp.x, _ground_y(lp.x, lp.z) + 0.11, lp.z)
-		root.add_child(mi)
+		var line_size := Vector2(1.6, 0.22) if ew else Vector2(0.22, 1.6)
+		_add_ground_overlay(root, lp, line_size, 0.025, line_mat)
+
+
+func _add_ground_overlay(root: Node, centre: Vector3, size: Vector2, height_offset: float, material: Material) -> void:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var nx := maxi(1, ceili(size.x / 0.5))
+	var nz := maxi(1, ceili(size.y / 0.5))
+	for iz in range(nz):
+		for ix in range(nx):
+			var x0 := centre.x - size.x * 0.5 + size.x * float(ix) / nx
+			var x1 := centre.x - size.x * 0.5 + size.x * float(ix + 1) / nx
+			var z0 := centre.z - size.y * 0.5 + size.y * float(iz) / nz
+			var z1 := centre.z - size.y * 0.5 + size.y * float(iz + 1) / nz
+			var a := Vector3(x0, _ground_y(x0, z0) + height_offset, z0)
+			var b := Vector3(x1, _ground_y(x1, z0) + height_offset, z0)
+			var c := Vector3(x1, _ground_y(x1, z1) + height_offset, z1)
+			var d := Vector3(x0, _ground_y(x0, z1) + height_offset, z1)
+			for vertex in [a, b, c, a, c, d]:
+				surface.set_normal(Vector3.UP)
+				surface.set_uv(Vector2(vertex.x, vertex.z) * 0.05)
+				surface.add_vertex(vertex)
+	var mesh := MeshInstance3D.new()
+	mesh.mesh = surface.commit()
+	mesh.material_override = material
+	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(mesh)
 
 
 # ---------------- structures ----------------

@@ -23,6 +23,18 @@ The game does not play background music; sound effects and ambient sounds remain
 
 ## Screenshots
 
+### Login
+
+![PurpleShoe login screen](./screenshots/login.png)
+
+### Character selection
+
+![Character selection with the goalkeeper selected](./screenshots/character-selection.png)
+
+### Game lobby
+
+![Game lobby match invitation setup](./screenshots/game-lobby.png)
+
 ### Football match
 
 ![HUMAN versus ROBOT football match](./screenshots/football-match.png)
@@ -31,9 +43,17 @@ The game does not play background music; sound effects and ambient sounds remain
 
 ![Free-kick striker facing the goal](./screenshots/free-kick.png)
 
+### Goalkeeper
+
+![Goalkeeper defending a free kick](./screenshots/goalkeeper.png)
+
 ### Open world
 
 ![Exploring the downtown open world](./screenshots/open-world.png)
+
+### Lamborghini
+
+![Driving the Lamborghini through downtown](./screenshots/lamborghini.png)
 
 ## Highlights
 
