@@ -21,6 +21,20 @@ account and lobby flow in `lobby.tscn`.
 
 The game does not play background music; sound effects and ambient sounds remain enabled.
 
+## Screenshots
+
+### Football match
+
+![HUMAN versus ROBOT football match](./screenshots/football-match.png)
+
+### Free kick
+
+![Free-kick striker facing the goal](./screenshots/free-kick.png)
+
+### Open world
+
+![Exploring the downtown open world](./screenshots/open-world.png)
+
 ## Highlights
 
 - Football movement, dribbling, passing, shooting, tackling, formations, restart situations, and
