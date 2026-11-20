@@ -601,16 +601,16 @@ func _resolve_keeper_ball_collision() -> bool:
 		var amount := clampf((ball.global_position - start).dot(segment) / segment.length_squared(), 0.0, 1.0)
 		closest_point = start + segment * amount
 		closest_distance = ball.global_position.distance_to(closest_point)
-		contact_radius = BALL_RADIUS + 0.42
+		contact_radius = BALL_RADIUS + 0.25
 		if closest_distance > contact_radius:
 			return false
 	else:
 		for bone_index in range(keeper_skeleton.get_bone_count()):
 			var bone_name = keeper_skeleton.get_bone_name(bone_index)
-			if bone_name.contains("Toe") or bone_name.contains("Thumb") or bone_name.contains("Index") or bone_name.contains("Middle") or bone_name.contains("Ring"):
+			var radius = _keeper_bone_radius(bone_name)
+			if radius <= 0.0:
 				continue
 			var bone_position = keeper_skeleton.global_transform * keeper_skeleton.get_bone_global_pose(bone_index).origin
-			var radius = _keeper_bone_radius(bone_name)
 			var distance = ball.global_position.distance_to(bone_position)
 			if distance < closest_distance and distance <= BALL_RADIUS + radius:
 				closest_distance = distance
@@ -676,15 +676,24 @@ func _set_keeper_catch_pose():
 		)
 
 func _keeper_bone_radius(bone_name: String) -> float:
-	if bone_name.contains("Head"):
-		return 0.25
-	if bone_name.contains("Hand"):
+	var name := _normalized_keeper_bone_name(bone_name)
+	if name.contains("Thumb") or name.contains("Index") or name.contains("Middle") or name.contains("Ring") or name.contains("Pinky"):
+		return 0.0
+	if name == "Hips" or name.begins_with("Spine"):
 		return 0.2
-	if bone_name.contains("Arm") or bone_name.contains("ForeArm"):
-		return 0.22
-	if bone_name.contains("Leg") or bone_name.contains("Foot"):
-		return 0.24
-	return 0.36
+	if name == "Head" or name == "HeadTop_End":
+		return 0.16
+	if name == "Neck" or name.contains("Shoulder"):
+		return 0.12
+	if name.ends_with("Hand") or name.ends_with("Foot") or name.contains("Toe"):
+		return 0.12
+	if name.contains("Arm"):
+		return 0.11
+	if name.contains("UpLeg"):
+		return 0.15
+	if name.ends_with("Leg"):
+		return 0.12
+	return 0.0
 
 func _distance_to_segment(point: Vector3, start: Vector3, end: Vector3) -> float:
 	var segment = end - start

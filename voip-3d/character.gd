@@ -1263,6 +1263,8 @@ func set_diving_local(active: bool, side: int):
 			match_keeper_model.scale = Vector3(absf(match_keeper_base_scale.x) * mirror, match_keeper_base_scale.y, match_keeper_base_scale.z)
 			match_keeper_model.position = match_keeper_base_position + Vector3(float(side) * 0.9, 0.0, 0.0)
 			match_keeper_model.rotation.z = float(side) * 0.3
+			$CollisionShape3D.position.x = float(side) * 0.9
+			$CollisionShape3D.rotation.z = float(side) * 0.3
 			if match_keeper_animation and match_keeper_animation.has_animation(&"mixamo_com"):
 				match_keeper_animation.play(&"mixamo_com")
 				dive_timer = match_keeper_animation.get_animation(&"mixamo_com").length
@@ -1271,6 +1273,8 @@ func set_diving_local(active: bool, side: int):
 			match_keeper_model.position = match_keeper_base_position
 			match_keeper_model.rotation = Vector3(0.0, PI, 0.0)
 			match_keeper_model.scale = match_keeper_base_scale
+			$CollisionShape3D.position.x = 0.0
+			$CollisionShape3D.rotation.z = 0.0
 			_reset_match_keeper_pose()
 			_reset_match_keeper_footwork()
 		return

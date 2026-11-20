@@ -430,9 +430,37 @@ func _run() -> void:
 		await physics_frame
 	if not _check(game.ball.get_colliding_bodies().has(test_keeper), "Test ball did not contact the goalkeeper."):
 		return
+	game.diving_peers[test_keeper.name] = Time.get_ticks_msec() + 750
+	test_keeper.is_diving = true
+	game._on_ball_body_entered(test_keeper)
+	if not _check(not game.ball.freeze and game.set_piece_timer <= 0.0, "A diving goalkeeper automatically stopped the ball on contact."):
+		return
+	test_keeper.is_diving = false
+	game.diving_peers.clear()
 	game._handle_ball_action(1, test_keeper.name, Vector3.FORWARD, 1.0, 0.0, "clearance")
 	if not _check(game.ball.linear_velocity.length() > 10.0, "Goalkeeper could not clear a ball on contact."):
 		return
+	game._clear_kicker_collision_exception()
+	var keeper_rotation := test_keeper.rotation
+	test_keeper.rotation = Vector3.ZERO
+	test_keeper.set_diving_local(true, 1)
+	game.ball.gravity_scale = 0.0
+	game.ball.collision_mask = 2
+	for shot in [{"x": 20.0, "should_bounce": false}, {"x": 20.9, "should_bounce": true}]:
+		game.ball.freeze = true
+		game.ball.global_position = Vector3(shot.x, 0.9, 3.0)
+		game.ball.linear_velocity = Vector3.ZERO
+		await physics_frame
+		game.ball.freeze = false
+		game.ball.linear_velocity = Vector3.FORWARD * 10.0
+		for _frame in range(35):
+			await physics_frame
+		if not _check(not game.ball.freeze and (game.ball.linear_velocity.z > 0.0) == shot.should_bounce, "Dive collision did not match the goalkeeper's position: %s" % shot):
+			return
+	test_keeper.set_diving_local(false, 0)
+	test_keeper.rotation = keeper_rotation
+	game.ball.gravity_scale = 1.0
+	game.ball.collision_mask = 1 | 2
 	for player_name in saved_positions:
 		players.get_node(String(player_name)).global_position = saved_positions[player_name]
 	game._set_local_selection(actor)

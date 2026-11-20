@@ -1343,9 +1343,8 @@ func _on_ball_body_entered(body: Node):
 	if player.role == MatchManager.ROLE_PLAYER and _is_player_selected(player):
 		return
 	if player.role == MatchManager.ROLE_GOALKEEPER:
-		broadcast_player_action.rpc(player.name, "keeper_save")
-		if int(diving_peers.get(player.name, 0)) > Time.get_ticks_msec():
-			_stop_ball("SAVE")
+		if not player.is_diving:
+			broadcast_player_action.rpc(player.name, "keeper_save")
 		return
 
 func _on_fast_pitch_bounce() -> void:
@@ -1640,9 +1639,6 @@ func broadcast_keeper_dive(actor_name: String, side: int):
 	var player = players.get_node_or_null(actor_name)
 	if player:
 		player.set_diving_local(true, side)
-
-func _stop_ball(message: String):
-	reset_ball.rpc(ball.global_position, message)
 
 @rpc("authority", "call_local", "reliable")
 func reset_ball(position: Vector3, message: String):
