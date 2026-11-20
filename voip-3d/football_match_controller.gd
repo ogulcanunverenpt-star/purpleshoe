@@ -348,7 +348,7 @@ func _add_goal_frame(defending_team: int, goal_z: float):
 	area_material.emission_enabled = true
 	area_material.emission = color * 0.35
 	area_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_add_goal_bar("GoalTeamMarker%s" % defending_team, Vector3(0, 0.035, goal_z + field_sign * 5.2), Vector3(7.0, 0.03, 0.12), area_material, false)
+	#_add_goal_bar("GoalTeamMarker%s" % defending_team, Vector3(0, 0.035, goal_z + field_sign * 5.2), Vector3(7.0, 0.03, 0.12), area_material, false)
 
 func _invisible_material() -> StandardMaterial3D:
 	var material = StandardMaterial3D.new()

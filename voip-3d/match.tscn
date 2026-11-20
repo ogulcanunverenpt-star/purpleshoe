@@ -41,8 +41,8 @@ size = Vector3(68, 0.025, 0.12)
 size = Vector3(68, 0.025, 0.12)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_centerwhite"]
-shading_mode = 0
 cull_mode = 2
+shading_mode = 0
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_ioo17"]
 _surfaces = [{
