@@ -601,7 +601,9 @@ func _resolve_keeper_ball_collision() -> bool:
 		var amount := clampf((ball.global_position - start).dot(segment) / segment.length_squared(), 0.0, 1.0)
 		closest_point = start + segment * amount
 		closest_distance = ball.global_position.distance_to(closest_point)
-		contact_radius = 0.42
+		contact_radius = BALL_RADIUS + 0.42
+		if closest_distance > contact_radius:
+			return false
 	else:
 		for bone_index in range(keeper_skeleton.get_bone_count()):
 			var bone_name = keeper_skeleton.get_bone_name(bone_index)
@@ -636,6 +638,8 @@ func _resolve_keeper_ball_collision() -> bool:
 		normal = normal.normalized()
 	if ball_velocity.dot(normal) >= 0.0:
 		return false
+	if _try_keeper_catch():
+		return true
 	ball.global_position = closest_point + normal * (contact_radius + 0.015)
 	ball_velocity = ball_velocity.bounce(normal) * 0.72
 	if ball_velocity.z > 0.5:
@@ -1102,8 +1106,7 @@ func _physics_process(delta: float):
 
 	if not shot_result_reported:
 		if not keeper_save_confirmed:
-			if not _try_keeper_catch():
-				_resolve_keeper_ball_collision()
+			_resolve_keeper_ball_collision()
 		else:
 			keeper_save_timer -= delta
 			if keeper_save_timer <= 0.0:

@@ -1195,6 +1195,8 @@ func _handle_ball_action(peer_id: int, actor_name: String, direction: Vector3, p
 		return
 	if player.global_position.distance_to(ball.global_position) > 2.7:
 		return
+	if is_keeper and not is_taker and not ball.get_colliding_bodies().has(player):
+		return
 	if not is_keeper and action == "clearance" and not can_player_clear(player):
 		return
 	if kickoff_team >= 0 and not is_keeper and player.team != kickoff_team:

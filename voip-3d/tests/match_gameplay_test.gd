@@ -405,6 +405,34 @@ func _run() -> void:
 	game.diving_peers.clear()
 	test_keeper.set_diving_local(false, 0)
 	ai_keeper.set_diving_local(false, 0)
+	test_keeper.global_position = Vector3(20, 0, 0)
+	game.ball.freeze = true
+	game.ball.global_position = Vector3(20, 0.9, 1.3)
+	game.ball.linear_velocity = Vector3.ZERO
+	await physics_frame
+	game.ball.freeze = false
+	await physics_frame
+	ai_keeper.global_position = Vector3(20, 0, 0)
+	var action_serial: int = game.ball_action_serial
+	game._handle_ball_action(0, ai_keeper.name, Vector3.FORWARD, 1.0, 0.0, "clearance", true)
+	if not _check(game.ball_action_serial == action_serial, "AI goalkeeper cleared a ball without touching it."):
+		return
+	ai_keeper.global_position = saved_positions[ai_keeper.name]
+	game._handle_ball_action(1, test_keeper.name, Vector3.FORWARD, 1.0, 0.0, "clearance")
+	if not _check(game.ball.linear_velocity.length() < 2.0, "Goalkeeper cleared a ball without touching it."):
+		return
+	game.ball.freeze = true
+	game.ball.global_position = Vector3(20, 0.9, 0.4)
+	game.ball.linear_velocity = Vector3.ZERO
+	await physics_frame
+	game.ball.freeze = false
+	for _frame in range(3):
+		await physics_frame
+	if not _check(game.ball.get_colliding_bodies().has(test_keeper), "Test ball did not contact the goalkeeper."):
+		return
+	game._handle_ball_action(1, test_keeper.name, Vector3.FORWARD, 1.0, 0.0, "clearance")
+	if not _check(game.ball.linear_velocity.length() > 10.0, "Goalkeeper could not clear a ball on contact."):
+		return
 	for player_name in saved_positions:
 		players.get_node(String(player_name)).global_position = saved_positions[player_name]
 	game._set_local_selection(actor)
