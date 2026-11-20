@@ -24,6 +24,7 @@ boot_splash/bg_color.web=Color(0.055, 0.031, 0.102, 1)
 
 [audio]
 
+buses/default_bus_layout="uid://kbsk1tp0qxmt"
 driver/enable_input=true
 
 [autoload]
@@ -32,6 +33,10 @@ MatchManager="*res://match_manager.gd"
 AudioManager="*res://openworld/audio_manager.gd"
 NetJoin="*res://net_join.gd"
 MatrixClient="*res://matrix_client.gd"
+
+[display]
+
+window/size/mode=3
 
 [dotnet]
 

@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ty88sy5xtk0u" path="res://match_preview.gd" id="1_0wfp1"]
 [ext_resource type="PackedScene" uid="uid://brq2cgdfdh8ft" path="res://football_goal.glb" id="2_fj7yv"]
 [ext_resource type="PackedScene" uid="uid://chsi55w43euwd" path="res://gdbot.glb" id="3_player_preview"]
+[ext_resource type="PackedScene" uid="uid://7b1603bdrpd5" path="res://low_poly_football_stadium.glb" id="4_xkuxl"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_t1cdb"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -693,3 +694,6 @@ transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 14
 
 [node name="Preview" parent="MatchEnvironment/PlayerSpawns/RedFieldPlayer9" unique_id=2041204228 instance=ExtResource("3_player_preview")]
 transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0, 0, 0)
+
+[node name="Sketchfab_Scene" parent="MatchEnvironment" unique_id=1368733967 instance=ExtResource("4_xkuxl")]
+transform = Transform3D(2.5218184, 0, 0, 0, 1, 0, 0, 0, 2.300734, -0.123025894, -4.683176, -0.22898483)
