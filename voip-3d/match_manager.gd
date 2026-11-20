@@ -101,6 +101,8 @@ func _on_connection_failed():
 	push_error("Could not connect to the game server.")
 	last_rejection = "Could not connect to the game server."
 	disconnect_client()
+	if game_mode == MODE_OVERLAND and get_tree().current_scene != null and get_tree().current_scene.scene_file_path == "res://character_select.tscn":
+		return
 	get_tree().change_scene_to_file.call_deferred("res://lobby.tscn")
 
 @rpc("any_peer", "call_remote", "reliable")

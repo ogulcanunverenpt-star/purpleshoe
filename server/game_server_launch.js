@@ -4,6 +4,12 @@ const fs = require('node:fs');
 const net = require('node:net');
 const path = require('node:path');
 
+function sharedRoomHost(configuredHost, requestHost) {
+  const host = String(configuredHost || '').trim() || String(requestHost || '').trim();
+  if (!host) throw new Error('Cannot determine an address for the shared game room.');
+  return host;
+}
+
 function ensurePortAvailable(port) {
   return new Promise((resolve, reject) => {
     const probe = net.createServer();
@@ -65,4 +71,4 @@ function gameServerLaunch() {
   return { command, prefixArgs: ['--headless', '--path', projectDir, '--'], cwd: projectDir };
 }
 
-module.exports = { gameServerLaunch, ensurePortAvailable, waitForGameServer };
+module.exports = { gameServerLaunch, ensurePortAvailable, waitForGameServer, sharedRoomHost };

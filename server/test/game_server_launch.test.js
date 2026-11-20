@@ -5,7 +5,14 @@ const { EventEmitter } = require('node:events');
 const net = require('node:net');
 const { PassThrough } = require('node:stream');
 const test = require('node:test');
-const { ensurePortAvailable, waitForGameServer } = require('../game_server_launch');
+const { ensurePortAvailable, waitForGameServer, sharedRoomHost } = require('../game_server_launch');
+
+test('shared rooms use the API request host unless explicitly configured', () => {
+  assert.equal(sharedRoomHost('', '192.168.1.4'), '192.168.1.4');
+  assert.equal(sharedRoomHost(undefined, 'localhost'), 'localhost');
+  assert.equal(sharedRoomHost('game.example.test', '192.168.1.4'), 'game.example.test');
+  assert.throws(() => sharedRoomHost('', ''), /Cannot determine an address/);
+});
 
 function fakeChild() {
   const child = new EventEmitter();

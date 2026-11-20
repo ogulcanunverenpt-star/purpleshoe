@@ -9,6 +9,9 @@ const FARM_PORTAL_POSITION := Vector2(-53.0, 28.0)
 @onready var status_label: Label = $CanvasLayer/HUD/StatusLabel
 @onready var mobile_jump_button: Button = $CanvasLayer/HUD/MobileJumpButton
 @onready var mobile_portal_button: Button = $CanvasLayer/HUD/MobilePortalButton
+@onready var ptt_buttons: HBoxContainer = $CanvasLayer/HUD/ButtonsHBox
+@onready var ptt_button: Button = $CanvasLayer/HUD/ButtonsHBox/PTTButton
+@onready var mobile_joystick: MobileVirtualJoystick = $CanvasLayer/HUD/MobileJoystick
 @onready var mobile_aim_joystick: MobileVirtualJoystick = $CanvasLayer/HUD/MobileAimJoystick
 @onready var mobile_aim_label: Label = $CanvasLayer/HUD/MobileAimLabel
 
@@ -26,6 +29,10 @@ func _ready() -> void:
 	mobile_aim_joystick.visible = touch_device
 	mobile_aim_label.visible = touch_device
 	mobile_portal_button.visible = false
+	get_window().focus_exited.connect(_on_ptt_button_up)
+	if touch_device:
+		get_viewport().size_changed.connect(_layout_mobile_controls)
+		_layout_mobile_controls()
 
 	await get_tree().physics_frame
 	_build_game_huts()
@@ -133,6 +140,58 @@ func _is_touch_device() -> bool:
 	return OS.has_feature("mobile") or OS.get_name() == "Android" or DisplayServer.is_touchscreen_available()
 
 
+func _layout_mobile_controls() -> void:
+	status_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	var status_half_width := minf(240.0, get_viewport().get_visible_rect().size.x * 0.5 - 8.0)
+	status_label.offset_left = -status_half_width
+	status_label.offset_right = status_half_width
+	status_label.offset_top = 116
+	status_label.offset_bottom = 156
+	status_label.add_theme_font_size_override("font_size", 15)
+	status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mobile_aim_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	ptt_button.custom_minimum_size = Vector2(148, 48)
+	ptt_button.add_theme_font_size_override("font_size", 15)
+	ptt_buttons.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	ptt_buttons.offset_left = -156
+	ptt_buttons.offset_top = 8
+	ptt_buttons.offset_right = -8
+	ptt_buttons.offset_bottom = 56
+
+	mobile_portal_button.custom_minimum_size = Vector2(148, 48)
+	mobile_portal_button.add_theme_font_size_override("font_size", 15)
+	mobile_portal_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	mobile_portal_button.offset_left = -156
+	mobile_portal_button.offset_top = 64
+	mobile_portal_button.offset_right = -8
+	mobile_portal_button.offset_bottom = 112
+
+	mobile_joystick.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	mobile_joystick.offset_left = 8
+	mobile_joystick.offset_top = -128
+	mobile_joystick.offset_right = 128
+	mobile_joystick.offset_bottom = -8
+	mobile_aim_joystick.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	mobile_aim_joystick.offset_left = -128
+	mobile_aim_joystick.offset_top = -128
+	mobile_aim_joystick.offset_right = -8
+	mobile_aim_joystick.offset_bottom = -8
+	mobile_aim_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	mobile_aim_label.offset_left = -128
+	mobile_aim_label.offset_top = -150
+	mobile_aim_label.offset_right = -8
+	mobile_aim_label.offset_bottom = -130
+
+	mobile_jump_button.custom_minimum_size = Vector2(80, 48)
+	mobile_jump_button.add_theme_font_size_override("font_size", 18)
+	mobile_jump_button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	mobile_jump_button.offset_left = -218
+	mobile_jump_button.offset_top = -56
+	mobile_jump_button.offset_right = -138
+	mobile_jump_button.offset_bottom = -8
+
+
 func _on_mobile_jump_button_pressed() -> void:
 	var player := players.get_node_or_null(str(multiplayer.get_unique_id()))
 	if player and player.has_method("jump"):
@@ -148,12 +207,17 @@ func _on_ptt_button_down() -> void:
 	var player := players.get_node_or_null(str(multiplayer.get_unique_id()))
 	if player and "ptt_touch_active" in player:
 		player.set("ptt_touch_active", true)
+		if OS.get_name() == "Android" and not OS.get_granted_permissions().has("android.permission.RECORD_AUDIO"):
+			status_label.text = "Allow microphone access, then hold Push to Talk again."
 
 
 func _on_ptt_button_up() -> void:
 	var player := players.get_node_or_null(str(multiplayer.get_unique_id()))
 	if player and "ptt_touch_active" in player:
 		player.set("ptt_touch_active", false)
+		var audio_manager := player.get_node_or_null("audioManager")
+		if audio_manager:
+			audio_manager.set("ptt_active", false)
 
 
 func _connect_to_plaza() -> void:
@@ -380,7 +444,7 @@ func _on_portal_body_entered(body: Node3D, portal_id: String) -> void:
 	elif portal_id == "messages":
 		title = "messages"
 	status_label.text = "E · Enter %s" % title
-	mobile_portal_button.text = "ENTER %s" % title.to_upper()
+	mobile_portal_button.text = "E · ENTER %s" % title.to_upper()
 	mobile_portal_button.visible = _is_touch_device()
 
 

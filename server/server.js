@@ -18,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const { spawn } = require('child_process');
-const { gameServerLaunch, ensurePortAvailable, waitForGameServer } = require('./game_server_launch');
+const { gameServerLaunch, ensurePortAvailable, waitForGameServer, sharedRoomHost } = require('./game_server_launch');
 
 const net = require('net');
 const http = require('http');
@@ -2850,7 +2850,10 @@ app.post('/api/rooms/shared', async (req, res) => {
           }
         });
       });
-      return res.json(sharedRoom);
+      return res.json({
+        ...sharedRoom,
+        host: sharedRoomHost(process.env.SERVER_HOST, req.hostname)
+      });
     }
 
     let roomInfo = sharedRooms[roomKey];
@@ -2914,7 +2917,7 @@ app.post('/api/rooms/shared', async (req, res) => {
       success: true,
       message: 'Ortak oda hazır.',
       roomId: roomInfo.id,
-      host: roomInfo.host,
+      host: sharedRoomHost(process.env.SERVER_HOST, req.hostname),
       port: roomInfo.port,
       token: roomInfo.token,
       mode: roomInfo.mode

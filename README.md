@@ -140,6 +140,22 @@ allow the required TCP ports through the firewall. `GODOT_PATH` or `VOIP_3D_EXE`
 Godot path saved by the installer. If using an export, rebuild it after updating the project so it
 includes the room-readiness protocol. Restart the service after changing configuration.
 
+For Android on the same LAN, the debug build's API URL must point to the server's LAN address on
+TCP 3000 (not the phone's `127.0.0.1`). The shared open world uses WebSocket TCP 12897; allow both
+ports through the firewall. When `SERVER_HOST` is unset, shared-room replies use the API request's
+host; set `SERVER_HOST` explicitly to a reachable address for private invitations or deployments
+where the API and game servers have different addresses. TCP 8000 is the legacy agent protocol,
+not the HTTP API or a WebSocket endpoint. Restart the Node server and export and install a new APK
+after updating; an existing APK does not contain client fixes.
+The generated `voip-3d/android/` build directory is ignored by Git; install the Android build
+template from Godot's **Project > Install Android Build Template** menu before exporting.
+Character selection waits for the game server to accept the player before opening the world. If
+the connection fails, its address and the error remain visible there for troubleshooting.
+
+In the voice room, hold **Push to Talk (V)** and grant microphone access when prompted; if a
+permission prompt appears, release and press the button again after granting it. Approach a portal
+to reveal its **E · Enter** button, including **Enter Lobby** at the game-lobby portal.
+
 Windows release exports use the production API by default. To test an export against the local
 service, start it from PowerShell with:
 

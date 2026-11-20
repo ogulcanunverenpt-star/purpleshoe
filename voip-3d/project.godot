@@ -15,6 +15,9 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="voip-3d"
+config/name.web="PurpleShoe"
+boot_splash/image.web="res://branding/purpleshoe-splash.png"
+boot_splash/bg_color.web=Color(0.055, 0.031, 0.102, 1)
 run/main_scene="res://lobby.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"

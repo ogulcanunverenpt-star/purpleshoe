@@ -73,7 +73,8 @@ this purpose. Port `12806` is a manual hosting default and is not the shared ope
   and room WebSockets through the same HTTPS origin. Its injected opt-in marker makes the web
   export use that origin; other web deployments and native clients retain their existing settings.
   Re-export the Web preset after changing game scripts, and follow the HTTPS server's README for
-  certificates and network exposure.
+  certificates and network exposure. The web-only PurpleShoe loading splash is configured in
+  `project.godot` and uses `branding/purpleshoe-splash.png`; re-export to publish changes to it.
 
 ## Restoring world assets
 

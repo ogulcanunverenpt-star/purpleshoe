@@ -148,6 +148,8 @@ var _prev_scale_aspect := Window.CONTENT_SCALE_ASPECT_KEEP
 func _exit_tree() -> void:
 	if net != null:
 		net.set_ptt_active(false)
+	if weather != null:
+		AudioManager.stop_weather()
 	# the free-kick game and menu use the project's default window scaling
 	var w := get_window()
 	if w != null:

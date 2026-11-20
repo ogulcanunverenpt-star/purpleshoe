@@ -26,9 +26,6 @@ func setupAudio(id: int):
 	input = $input
 	set_multiplayer_authority(id)
 	if is_multiplayer_authority():
-		if OS.get_name() == "Android" and not OS.get_granted_permissions().has("android.permission.RECORD_AUDIO"):
-			push_warning("Microphone permission was not granted")
-			return
 		input.stream = AudioStreamMicrophone.new()
 		index = AudioServer.get_bus_index("Record")
 		if index >= 0 and AudioServer.get_bus_effect_count(index) > 0:
@@ -61,6 +58,10 @@ func processMic():
 		if microphone_start_attempted:
 			return
 		microphone_start_attempted = true
+		if OS.get_name() == "Android" and not OS.get_granted_permissions().has("android.permission.RECORD_AUDIO"):
+			OS.request_permissions()
+			push_warning("Android microphone permission requested; press Push to Talk again after granting it.")
+			return
 		if AudioServer.get_input_device_list().is_empty():
 			push_warning("No microphone input device is available")
 			return

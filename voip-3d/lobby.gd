@@ -79,8 +79,12 @@ func _ready() -> void:
 		auth_status_label.text = "Log in or register."
 
 	if not MatchManager.last_rejection.is_empty():
-		auth_status_label.text = MatchManager.last_rejection
-		MatchManager.last_rejection = ""
+		if MatrixClient.open_lobby_from_game:
+			room_status_label.text = MatchManager.last_rejection
+			MatchManager.last_rejection = ""
+		elif not MatrixClient.is_logged_in():
+			auth_status_label.text = MatchManager.last_rejection
+			MatchManager.last_rejection = ""
 
 
 func _apply_large_theme(node: Node) -> void:
