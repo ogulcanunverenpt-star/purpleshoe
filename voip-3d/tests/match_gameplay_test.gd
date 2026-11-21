@@ -102,11 +102,15 @@ func _run() -> void:
 			for child in players.get_children():
 				if child is CharacterBody3D:
 					child.global_position = Vector3(0, 0, -game._own_half_sign(child.team) * 2.0)
-			game._keep_opponents_out_of_center_circle()
+			game._enforce_kickoff_positions()
 			for child in players.get_children():
 				if child is CharacterBody3D:
 					var position: Vector3 = child.global_position
-					if not _check(position.z * game._own_half_sign(child.team) >= 0.0 and (child.team == kicking_team or Vector2(position.x, position.z).length() >= game.CENTER_CIRCLE_RADIUS - 0.001), "Kickoff allowed a player across halfway or inside the opponents' center circle."):
+					var is_taker: bool = child.team == kicking_team and child.role == manager.ROLE_PLAYER and child.field_slot == 8
+					if not _check(position.z * game._own_half_sign(child.team) >= 0.0 and (is_taker or Vector2(position.x, position.z).length() >= game.CENTER_CIRCLE_RADIUS + game.KICKOFF_CIRCLE_MARGIN - 0.001), "Kickoff allowed a player across halfway or inside the center circle."):
+						return
+					var kickoff_input: Dictionary = game.ai_input_for(child, 1.0 / 60.0)
+					if not _check(kickoff_input.get("world_move", Vector3.ZERO) == Vector3.ZERO and not kickoff_input.get("sprint", false), "An AI player moved during kickoff."):
 						return
 	game.second_half = false
 	game.kickoff_team = manager.TEAM_RED
@@ -659,6 +663,7 @@ func _run() -> void:
 	game._on_ball_body_entered(receiver)
 	if not _check(receiver.contact_impulse.is_zero_approx(), "Receiving a pass knocked over the teammate."):
 		return
+	game._set_local_selection(actor)
 	game.ball.global_position = Vector3(0, game.BALL_RADIUS, 0)
 	game.ball.linear_velocity = Vector3.ZERO
 	receiver.velocity = Vector3(0, 0, -5)

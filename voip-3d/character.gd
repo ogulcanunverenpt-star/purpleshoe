@@ -16,6 +16,7 @@ const mouse_sensitivity = 0.003
 const KEEPER_COLOR := Color(1.0, 0.78, 0.05)
 const ROBOT_TEAM_TINT := Color(0.48, 0.68, 1.0)
 const HUMAN_TEAM_KIT_COLOR := Color(0.88, 0.08, 0.1)
+const HUMAN_MATCH_JERSEY_COLOR := Color(1.0, 0.82, 0.05)
 const PLAYER_HEIGHT := 1.87
 const MAX_ACTION_CHARGE_SECONDS := 1.5
 const MATCH_KEEPER_SCENE = preload("res://goalkeeper_stylized.glb")
@@ -23,10 +24,9 @@ const KEEPER_DIVE_SCENE = preload("res://goalkeeper_diving_save_requested.glb")
 const HUMAN_MODEL_SCENE = preload("res://Assets/FootballHuman/Soccer Pass.fbx")
 const KICK_SOCCERBALL_ANIMATION_SCENE = preload("res://Assets/FootballHuman/Kick Soccerball.fbx")
 const FALL_FLAT_ANIMATION_SCENE = preload("res://Assets/FootballHuman/Fall Flat.fbx")
-const GOAL_FLIP_ANIMATION_SCENE = preload("res://Assets/MatchCelebrations/Running Forward Flip.fbx")
-const HUMAN_GOAL_CELEBRATION_SCENE = preload("res://Assets/MatchCelebrations/Slide Hip Hop Dance.fbx")
-const ROBOT_GOAL_CELEBRATION_SCENE = preload("res://Assets/MatchCelebrations/Hip Hop Dancing.fbx")
 const FOOTBALL_MODEL_UTILS = preload("res://football_model_utils.gd")
+
+static var _match_animation_cache: Dictionary = {}
 
 @export var team := MatchManager.TEAM_AUTO:
 	set(value):
@@ -918,6 +918,8 @@ func _configure_team_model() -> void:
 			human_model.rotation.y = PI
 			add_child(human_model)
 			AvatarCatalog.apply_male_textures(human_model, HUMAN_TEAM_KIT_COLOR)
+			if MatchManager.game_mode == MatchManager.MODE_MATCH:
+				FOOTBALL_MODEL_UTILS.apply_match_jersey(human_model, HUMAN_MATCH_JERSEY_COLOR)
 			_fit_model_height(human_model, PLAYER_HEIGHT)
 		active_model = human_model
 		bot.visible = false
@@ -1204,6 +1206,8 @@ func play_action_local(animation_name: String):
 			clip_name = "kick"
 		"through", "lofted_through":
 			clip_name = "pass"
+		"header":
+			clip_name = "jump"
 		"slide_tackle":
 			clip_name = "tackle"
 	if animation_player != null and animation_player.has_animation(clip_name):
@@ -1214,38 +1218,36 @@ func play_action_local(animation_name: String):
 	elif clip_name == "tackle":
 		_play_animation("fall")
 
-func goal_celebration_duration(flip_animation: StringName, dance_animation: StringName) -> float:
+func goal_celebration_duration(animation: StringName) -> float:
 	if animation_player == null:
 		push_error("Cannot play a goal celebration without an AnimationPlayer.")
 		return 0.0
-	if not animation_player.has_animation(flip_animation) or not animation_player.has_animation(dance_animation):
-		push_error("Goal celebration animations are not installed on player %s." % name)
+	if not animation_player.has_animation(animation):
+		push_error("Goal celebration animation %s is not installed on player %s." % [animation, name])
 		return 0.0
-	return (
-		animation_player.get_animation(flip_animation).length
-		+ animation_player.get_animation(dance_animation).length
-	)
+	return animation_player.get_animation(animation).length
 
-func start_goal_celebration_local(flip_animation: StringName, dance_animation: StringName) -> void:
-	if goal_celebration_duration(flip_animation, dance_animation) <= 0.0:
+func start_goal_celebration_local(animation: StringName) -> void:
+	if goal_celebration_duration(animation) <= 0.0:
 		return
 	goal_celebration_active = true
-	_play_animation(String(flip_animation))
-	_play_goal_dance_after_flip(
-		animation_player.get_animation(flip_animation).length,
-		dance_animation
-	)
+	kick_animation_time = 0.0
+	_play_animation(String(animation))
 
 func pause_for_goal_celebration_local() -> void:
 	goal_celebration_active = true
 	_play_animation("Idle")
 
-func _play_goal_dance_after_flip(flip_duration: float, dance_animation: StringName) -> void:
-	await get_tree().create_timer(flip_duration).timeout
-	if not is_inside_tree() or not goal_celebration_active:
+func stop_goal_celebration_local() -> void:
+	if not goal_celebration_active:
 		return
-	_play_animation(String(dance_animation))
-	await get_tree().create_timer(animation_player.get_animation(dance_animation).length).timeout
+	goal_celebration_active = false
+	if bot_skeleton != null:
+		bot_skeleton.reset_bone_poses()
+	if animation_player != null:
+		animation_player.stop()
+		current_animation = ""
+		_play_animation("Idle")
 
 func set_diving_local(active: bool, side: int):
 	is_diving = active
@@ -1364,19 +1366,13 @@ func _setup_animations():
 				&"kick"
 			)
 			_install_match_fall_flat_animation()
-			_install_match_animation(GOAL_FLIP_ANIMATION_SCENE, &"mixamo_com", &"goal_flip")
-			if team == MatchManager.TEAM_RED:
+			for celebration_name in FOOTBALL_MODEL_UTILS.GOAL_CELEBRATION_SCENES:
 				_install_match_animation(
-					HUMAN_GOAL_CELEBRATION_SCENE,
+					FOOTBALL_MODEL_UTILS.GOAL_CELEBRATION_SCENES[celebration_name],
 					&"mixamo_com",
-					&"human_goal_celebration"
+					celebration_name
 				)
-			elif team == MatchManager.TEAM_BLUE:
-				_install_match_animation(
-					ROBOT_GOAL_CELEBRATION_SCENE,
-					&"mixamo_com",
-					&"robot_goal_celebration"
-				)
+			_install_match_animation(FOOTBALL_MODEL_UTILS.GOAL_TEAMMATE_ANIMATION, &"mixamo_com", &"goal_victory")
 		FOOTBALL_MODEL_UTILS.configure_locomotion_loops(animation_player)
 		_play_animation("Idle")
 	var skeletons = active_model.find_children("*", "Skeleton3D", true, false)
@@ -1401,36 +1397,47 @@ func _install_match_animation(
 	source_animation_name: StringName,
 	target_animation_name: StringName
 ) -> void:
-	var target_skeletons := active_model.find_children("*", "Skeleton3D", true, false)
-	if target_skeletons.is_empty():
-		push_error("The match player model has no Skeleton3D for animation %s." % target_animation_name)
-		return
-	var source_model := animation_scene.instantiate() as Node3D
-	var source_players := source_model.find_children("*", "AnimationPlayer", true, false)
-	if source_players.is_empty():
+	var cache_key := "%s:%s" % ["human" if human_model_active else "robot", target_animation_name]
+	var animation: Animation = _match_animation_cache.get(cache_key)
+	if animation == null:
+		var target_skeletons := active_model.find_children("*", "Skeleton3D", true, false)
+		if target_skeletons.is_empty():
+			push_error("The match player model has no Skeleton3D for animation %s." % target_animation_name)
+			return
+		var source_model := animation_scene.instantiate() as Node3D
+		var source_players := source_model.find_children("*", "AnimationPlayer", true, false)
+		if source_players.is_empty():
+			source_model.free()
+			push_error("Animation asset %s has no AnimationPlayer." % target_animation_name)
+			return
+		var source_player := source_players[0] as AnimationPlayer
+		if not source_player.has_animation(source_animation_name):
+			source_model.free()
+			push_error(
+				"Animation asset %s has no %s clip."
+				% [target_animation_name, source_animation_name]
+			)
+			return
+		var target_skeleton := target_skeletons[0] as Skeleton3D
+		if FOOTBALL_MODEL_UTILS.GOAL_CELEBRATION_SCENES.has(target_animation_name):
+			animation = FOOTBALL_MODEL_UTILS.retarget_goal_dance(
+				source_player.get_animation(source_animation_name), source_model, active_model, target_skeleton, animation_player
+			)
+		else:
+			animation = FOOTBALL_MODEL_UTILS.retarget_animation(
+				source_player.get_animation(source_animation_name), active_model, target_skeleton, true
+			)
 		source_model.free()
-		push_error("Animation asset %s has no AnimationPlayer." % target_animation_name)
-		return
-	var source_player := source_players[0] as AnimationPlayer
-	if not source_player.has_animation(source_animation_name):
-		source_model.free()
-		push_error(
-			"Animation asset %s has no %s clip."
-			% [target_animation_name, source_animation_name]
-		)
-		return
-	var target_skeleton := target_skeletons[0] as Skeleton3D
-	var animation := FOOTBALL_MODEL_UTILS.retarget_animation(
-		source_player.get_animation(source_animation_name),
-		active_model,
-		target_skeleton,
-		true
-	)
-	source_model.free()
-	if animation.get_track_count() == 0:
-		push_error("Animation %s has no bones compatible with the match player model." % target_animation_name)
-		return
-	animation.loop_mode = Animation.LOOP_NONE
+		if animation == null or animation.get_track_count() == 0:
+			push_error("Animation %s has no bones compatible with the match player model." % target_animation_name)
+			return
+		if target_animation_name == &"goal_victory" or FOOTBALL_MODEL_UTILS.GOAL_CELEBRATION_SCENES.has(target_animation_name):
+			for track in range(animation.get_track_count()):
+				if animation.track_get_type(track) == Animation.TYPE_POSITION_3D \
+						and FOOTBALL_MODEL_UTILS._normalized_bone_name(String(animation.track_get_path(track).get_subname(0))) == "hips":
+					FOOTBALL_MODEL_UTILS.remove_locomotion_root_motion(animation, track)
+		animation.loop_mode = Animation.LOOP_NONE
+		_match_animation_cache[cache_key] = animation
 	var library: AnimationLibrary
 	if animation_player.has_animation_library(&""):
 		library = animation_player.get_animation_library(&"")
@@ -1497,6 +1504,11 @@ func _enable_match_animation_sync() -> void:
 
 @rpc("authority", "call_local", "unreliable_ordered")
 func sync_animation(animation_name: String, speed_scale: float):
+	if goal_celebration_active and animation_name != current_animation:
+		return
+	if not goal_celebration_active and (animation_name == "goal_victory" \
+			or FOOTBALL_MODEL_UTILS.GOAL_CELEBRATION_SCENES.has(StringName(animation_name))):
+		return
 	if animation_player and animation_player.has_animation(animation_name):
 		if current_animation != animation_name:
 			current_animation = animation_name
