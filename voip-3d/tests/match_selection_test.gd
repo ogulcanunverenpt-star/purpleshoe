@@ -135,7 +135,24 @@ func _run() -> void:
 	game._physics_process(30.0)
 	if not _check(game.set_piece_active and game.ball.freeze, "A human set piece was taken automatically after the timeout."):
 		return
+	var human_taker := players.get_node(game.set_piece_taker_name) as CharacterBody3D
+	var human_camera := human_taker.get_node("Camera3D") as Camera3D
+	human_taker._refresh_match_spawn_properties()
+	if not _check(human_taker.set_piece_aiming and human_camera.is_current(), "The human set-piece camera did not stay active after a player refresh."):
+		return
 	game._clear_set_piece()
+	if not _check(world.stadium_camera.is_current(), "The stadium camera was not restored after the human set piece."):
+		return
+	game._start_free_kick(Vector3(0, game.BALL_RADIUS, 0), manager.TEAM_RED, "FREE KICK")
+	var ai_taker := players.get_node(game.set_piece_taker_name) as CharacterBody3D
+	if not _check(is_instance_valid(world.set_piece_view_camera) and world.set_piece_view_camera.is_current() \
+			and world.set_piece_view_camera.get_parent() == ai_taker \
+			and world.set_piece_view_camera.position == ai_taker.SET_PIECE_CAMERA_POSITION \
+			and world.set_piece_view_camera.rotation.is_equal_approx(ai_taker.SET_PIECE_CAMERA_ROTATION), "The AI set piece did not use the behind-player camera."):
+		return
+	game._clear_set_piece()
+	if not _check(world.stadium_camera.is_current(), "The stadium camera was not restored after the AI set piece."):
+		return
 	game.kickoff_team = manager.TEAM_RED
 	game.ball.freeze = true
 	game.ball.global_position = game.BALL_START

@@ -34,10 +34,6 @@ AudioManager="*res://openworld/audio_manager.gd"
 NetJoin="*res://net_join.gd"
 MatrixClient="*res://matrix_client.gd"
 
-[display]
-
-window/size/mode=3
-
 [dotnet]
 
 project/assembly_name="voip-3d"

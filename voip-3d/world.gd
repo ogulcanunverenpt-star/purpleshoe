@@ -13,6 +13,7 @@ var game_notification_panel: PanelContainer
 var game_notification_label: Label
 var game_notification_timer: Timer
 var stadium_camera: Camera3D
+var set_piece_view_camera: Camera3D
 var match_camera_focus := Vector3.ZERO
 var goal_camera_target: Node3D
 var camera_shake_remaining := 0.0
@@ -124,6 +125,24 @@ func focus_goal_scorer(player_name: String) -> void:
 func restore_stadium_camera() -> void:
 	goal_camera_target = null
 	goal_camera_hold = 0.0
+
+func show_set_piece_view(taker: CharacterBody3D) -> void:
+	clear_set_piece_view()
+	set_piece_view_camera = Camera3D.new()
+	taker.add_child(set_piece_view_camera)
+	set_piece_view_camera.position = taker.SET_PIECE_CAMERA_POSITION
+	set_piece_view_camera.rotation = taker.SET_PIECE_CAMERA_ROTATION
+	set_piece_view_camera.fov = (taker.get_node("Camera3D") as Camera3D).fov
+	set_piece_view_camera.make_current()
+
+func clear_set_piece_view() -> void:
+	if not is_instance_valid(set_piece_view_camera):
+		return
+	var was_current := set_piece_view_camera.is_current()
+	set_piece_view_camera.queue_free()
+	set_piece_view_camera = null
+	if was_current and is_instance_valid(stadium_camera):
+		stadium_camera.make_current()
 
 func _on_power_shot_triggered() -> void:
 	camera_shake_remaining = 0.25

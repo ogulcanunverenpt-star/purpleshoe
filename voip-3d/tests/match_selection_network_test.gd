@@ -94,6 +94,26 @@ func _run() -> void:
 			_fail("The host did not gain control after intercepting the ball.")
 			return
 		print("PASS server synchronized client possession and host interception")
+		game.reset_ball.rpc(game.BALL_START, "FREE KICK")
+		game.begin_set_piece.rpc(host_receiver.name, Vector3(0, 0, 1.5), Vector3.FORWARD, "free_kick")
+		if not host_receiver.set_piece_aiming or not host_receiver.get_node("Camera3D").is_current():
+			_fail("Host set-piece camera did not activate.")
+			return
+		await create_timer(0.5).timeout
+		game.reset_ball.rpc(game.BALL_START, "FREE KICK")
+		game.begin_set_piece.rpc(receiver.name, Vector3(0, 0, 1.5), Vector3.FORWARD, "free_kick")
+		if game.selected_entity_by_peer.get(receiver.controller_peer_id, "") != receiver.name \
+				or not is_instance_valid(world.set_piece_view_camera) or not world.set_piece_view_camera.is_current():
+			_fail("Client taker was not selected on the server or the host spectator camera was not active.")
+			return
+		for _attempt in range(300):
+			if not game.set_piece_active:
+				break
+			await create_timer(0.05).timeout
+		if game.set_piece_active or not world.stadium_camera.is_current():
+			_fail("Client set-piece action failed or the host camera was not restored.")
+			return
+		print("PASS host and client set-piece cameras")
 		await create_timer(2.0).timeout
 		quit(0)
 	else:
@@ -135,6 +155,30 @@ func _run() -> void:
 			game.submit_controller_input(next_receiver, Vector2.DOWN, 0.0, false, false)
 			await create_timer(0.05).timeout
 		print("PASS client automatic possession selection and input")
+		for _attempt in range(300):
+			if game.set_piece_active and game.set_piece_taker_name == host_receiver.name:
+				break
+			await create_timer(0.05).timeout
+		if not is_instance_valid(world.set_piece_view_camera) or not world.set_piece_view_camera.is_current() \
+				or world.set_piece_view_camera.get_parent() != host_receiver:
+			_fail("Client did not see the host's set piece from behind the taker.")
+			return
+		for _attempt in range(300):
+			if game.set_piece_active and game.set_piece_taker_name == receiver.name:
+				break
+			await create_timer(0.05).timeout
+		if game.get_local_selected_player() != receiver or not receiver.set_piece_aiming \
+				or not receiver.get_node("Camera3D").is_current():
+			_fail("Client set-piece taker or aiming camera did not activate.")
+			return
+		game.request_ball_action(Vector3.FORWARD, 0.5, 0.0, "shot", receiver.name)
+		for _attempt in range(300):
+			if not game.set_piece_active:
+				break
+			await create_timer(0.05).timeout
+		if game.set_piece_active or not world.stadium_camera.is_current():
+			_fail("Client shot failed or the stadium camera was not restored.")
+			return
 		world.queue_free()
 		await process_frame
 		quit(0)

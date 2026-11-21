@@ -2274,15 +2274,20 @@ func begin_set_piece(taker_name: String, taker_position: Vector3, direction: Vec
 	if multiplayer.is_server() and (restart_kind == "corner" or (restart_kind == "free_kick" and ball.global_position.z * _attack_sign(taker.team) > 0.0)):
 		_setup_set_piece_formation(taker, restart_kind)
 		_enforce_set_piece_spacing()
+	if multiplayer.is_server():
+		_select_possession_holder(taker)
 	if taker.controller_peer_id == multiplayer.get_unique_id() and taker.team == MatchManager.local_team():
 		_set_local_selection(taker)
 		taker.begin_set_piece_aim()
+	else:
+		get_parent().show_set_piece_view(taker)
 
 func _clear_set_piece() -> void:
 	if set_piece_active:
 		var taker := players.get_node_or_null(set_piece_taker_name) as CharacterBody3D
 		if taker != null:
 			taker.end_set_piece_aim()
+		get_parent().clear_set_piece_view()
 	set_piece_active = false
 	set_piece_taker_name = ""
 	set_piece_kind = ""

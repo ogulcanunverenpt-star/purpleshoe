@@ -69,6 +69,23 @@ func _run() -> void:
 	if max_ball_distance < 5.0 or robot.global_position.distance_to(robot_start) < 1.0 or touched_actors.size() < 2:
 		_fail("AI match did not progress: ball distance=%s robot movement=%s actors=%s" % [max_ball_distance, robot.global_position.distance_to(robot_start), touched_actors.keys()])
 		return
+	game.kickoff_team = -1
+	game._start_free_kick(Vector3(0, game.BALL_RADIUS, 0), manager.TEAM_RED, "FREE KICK")
+	var human_taker := players.get_node(game.set_piece_taker_name) as CharacterBody3D
+	if game.get_local_selected_player() != human_taker or not human_taker.set_piece_aiming \
+			or not human_taker.get_node("Camera3D").is_current():
+		_fail("Human set-piece camera did not activate in the AI match.")
+		return
+	game._start_free_kick(Vector3(0, game.BALL_RADIUS, 0), manager.TEAM_BLUE, "FREE KICK")
+	var ai_taker := players.get_node(game.set_piece_taker_name) as CharacterBody3D
+	if not is_instance_valid(world.set_piece_view_camera) or not world.set_piece_view_camera.is_current() \
+			or world.set_piece_view_camera.get_parent() != ai_taker:
+		_fail("AI set-piece camera did not activate in the AI match.")
+		return
+	game._clear_set_piece()
+	if not world.stadium_camera.is_current():
+		_fail("The stadium camera did not return after the AI set piece.")
+		return
 	print("PASS human-versus-AI match: ball distance=%s actors=%s" % [max_ball_distance, touched_actors.keys()])
 	world.queue_free()
 	await process_frame

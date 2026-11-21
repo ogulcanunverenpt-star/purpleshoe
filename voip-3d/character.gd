@@ -19,6 +19,8 @@ const HUMAN_TEAM_KIT_COLOR := Color(0.88, 0.08, 0.1)
 const HUMAN_MATCH_JERSEY_COLOR := Color(1.0, 0.82, 0.05)
 const PLAYER_HEIGHT := 1.87
 const MAX_ACTION_CHARGE_SECONDS := 1.5
+const SET_PIECE_CAMERA_POSITION := Vector3(0.0, 3.0, 5.5)
+const SET_PIECE_CAMERA_ROTATION := Vector3(deg_to_rad(-12.0), 0.0, 0.0)
 const MATCH_KEEPER_SCENE = preload("res://goalkeeper_stylized.glb")
 const KEEPER_DIVE_SCENE = preload("res://goalkeeper_diving_save_requested.glb")
 const HUMAN_MODEL_SCENE = preload("res://Assets/FootballHuman/Soccer Pass.fbx")
@@ -254,7 +256,8 @@ func _set_local_selected(selected: bool) -> void:
 		selected_curve = 0.0
 	is_local_selected = selected
 	var camera := $Camera3D as Camera3D
-	camera.current = false
+	if not selected or not set_piece_aiming:
+		camera.current = false
 	mobile_ui.visible = selected and (OS.has_feature("mobile") or OS.get_name() == "Android" or DisplayServer.is_touchscreen_available())
 	if active_model:
 		active_model.visible = role != MatchManager.ROLE_GOALKEEPER
@@ -264,7 +267,8 @@ func _set_local_selected(selected: bool) -> void:
 		match_keeper_model.visible = true
 	name_tag.visible = true
 	if selected:
-		_apply_match_camera()
+		if not set_piece_aiming:
+			_apply_match_camera()
 		if selection_ring == null:
 			selection_ring = MeshInstance3D.new()
 			selection_ring.name = "LocalSelectionRing"
@@ -679,8 +683,8 @@ func begin_set_piece_aim() -> void:
 	shot_charging = false
 	selected_curve = 0.0
 	var camera := $Camera3D as Camera3D
-	camera.position = Vector3(0.0, 3.0, 5.5)
-	camera.rotation = Vector3(deg_to_rad(-12.0), 0.0, 0.0)
+	camera.position = SET_PIECE_CAMERA_POSITION
+	camera.rotation = SET_PIECE_CAMERA_ROTATION
 	camera.make_current()
 	if not mobile_ui.visible:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
