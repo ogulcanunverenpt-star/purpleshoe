@@ -133,6 +133,7 @@ func _ready():
 func _fit_goal(team: int) -> Array[Node3D]:
 	var goal_name := "BlueGoal" if team == MatchManager.TEAM_BLUE else "RedGoal"
 	var goal := match_environment.get_node_or_null(goal_name)
+
 	if goal == null:
 		push_error("Match scene is missing %s." % goal_name)
 		return []
@@ -621,7 +622,7 @@ func select_nearest_local_player() -> void:
 
 func select_pass_receiver_or_nearest() -> void:
 	if ball_owner_name.is_empty() and Time.get_ticks_msec() < pass_selection_until:
-		var receiver := players.get_node_or_null(pass_receiver_name) as CharacterBody3D
+		var receiver := get_player_node(pass_receiver_name) as CharacterBody3D
 		if receiver != null and receiver != get_local_selected_player() \
 				and receiver.team == MatchManager.local_team() \
 				and receiver.controller_peer_id == multiplayer.get_unique_id():
@@ -677,7 +678,7 @@ func _select_possession_holder(player: CharacterBody3D, ball_touch := false) -> 
 
 @rpc("authority", "call_remote", "reliable")
 func select_possession_holder(player_name: String, revision: int, ball_touch: bool) -> void:
-	var player := players.get_node_or_null(player_name) as CharacterBody3D
+	var player := get_player_node(player_name) as CharacterBody3D
 	if player == null or player.controller_peer_id != multiplayer.get_unique_id() or player.team != MatchManager.local_team():
 		push_error("Cannot select possession holder: %s" % player_name)
 		return
@@ -694,7 +695,7 @@ func request_entity_selection(entity_name: String, revision := 0) -> void:
 	var peer_id := multiplayer.get_remote_sender_id()
 	if revision != int(possession_selection_revision_by_peer.get(peer_id, 0)):
 		return
-	var entity := players.get_node_or_null(entity_name) as CharacterBody3D
+	var entity := get_player_node(entity_name) as CharacterBody3D
 	if entity == null or entity.controller_peer_id != peer_id or entity.team != MatchManager.team_for_peer(peer_id):
 		return
 	selected_entity_by_peer[peer_id] = entity_name
@@ -716,7 +717,7 @@ func submit_controller_input_rpc(entity_name: String, state: Dictionary) -> void
 	if not multiplayer.is_server():
 		return
 	var peer_id := multiplayer.get_remote_sender_id()
-	var entity := players.get_node_or_null(entity_name) as CharacterBody3D
+	var entity := get_player_node(entity_name) as CharacterBody3D
 	if entity == null or entity.controller_peer_id != peer_id or entity.team != MatchManager.team_for_peer(peer_id) or selected_entity_by_peer.get(peer_id, "") != entity_name:
 		return
 	var move: Vector2 = state.get("move", Vector2.ZERO)
@@ -753,7 +754,7 @@ func can_player_clear(player: CharacterBody3D) -> bool:
 	return false
 
 func _team_has_ball_control(team: int) -> bool:
-	var owner := players.get_node_or_null(ball_owner_name) as CharacterBody3D
+	var owner := get_player_node(ball_owner_name) as CharacterBody3D
 	if owner != null:
 		return owner.team == team
 	var nearest := _nearest_player_to_ball()
@@ -891,7 +892,7 @@ func _ai_tactical_state(player: CharacterBody3D) -> AIState:
 	var press_position := ball.global_position
 	if moving_loose_ball:
 		press_position += Vector3(ball.linear_velocity.x, 0.0, ball.linear_velocity.z) * 0.3
-	var carrier := players.get_node_or_null(ball_owner_name) as CharacterBody3D
+	var carrier := get_player_node(ball_owner_name) as CharacterBody3D
 	if _ai_press_candidate(player.team, press_position, carrier) == player:
 		return AIState.PRESS
 	return AIState.COVER
@@ -921,13 +922,13 @@ func _ai_press_candidate(team: int, position: Vector3, carrier: CharacterBody3D)
 	return nearest
 
 func _ball_carrier(team: int) -> CharacterBody3D:
-	var owner := players.get_node_or_null(ball_owner_name) as CharacterBody3D
+	var owner := get_player_node(ball_owner_name) as CharacterBody3D
 	if owner != null and owner.team == team:
 		return owner
 	return _nearest_player_to_ball(team)
 
 func _ai_press_target(player: CharacterBody3D, attack_sign: float) -> Vector3:
-	var owner := players.get_node_or_null(ball_owner_name) as CharacterBody3D
+	var owner := get_player_node(ball_owner_name) as CharacterBody3D
 	if owner != null and owner.team != player.team:
 		var predicted: Vector3 = owner.global_position + owner.velocity * 0.2
 		var own_goal := Vector3(0.0, 0.0, -attack_sign * FIELD_HALF_LENGTH)
@@ -938,7 +939,7 @@ func _ai_press_target(player: CharacterBody3D, attack_sign: float) -> Vector3:
 	return ball.global_position + horizontal_velocity * lookahead
 
 func _ai_marking_target(player: CharacterBody3D, formation_target: Vector3, attack_sign: float) -> Vector3:
-	var carrier := players.get_node_or_null(ball_owner_name) as CharacterBody3D
+	var carrier := get_player_node(ball_owner_name) as CharacterBody3D
 	if carrier == null or carrier.team == player.team:
 		return formation_target
 	var presser := _ai_press_candidate(player.team, ball.global_position, carrier)
@@ -1013,19 +1014,39 @@ func _teammate_avoidance(player: CharacterBody3D) -> Vector3:
 	return avoidance.limit_length(1.0)
 
 func _ai_dribble_target(player: CharacterBody3D, attack_sign: float) -> Vector3:
-	var forward := Vector3(0.0, 0.0, attack_sign)
-	var target := player.global_position + forward * 6.0
-	var nearest_opponent := _nearest_player_to_ball(
-		MatchManager.TEAM_RED if player.team == MatchManager.TEAM_BLUE else MatchManager.TEAM_BLUE
-	)
-	if nearest_opponent != null and nearest_opponent.global_position.distance_to(player.global_position) < 5.0:
+	var enemy_goal := Vector3(0.0, 0.0, attack_sign * FIELD_HALF_LENGTH)
+	var dist_to_goal := player.global_position.distance_to(enemy_goal)
+	var is_wide := absf(player.global_position.x) > 15.0
+	var other_team := MatchManager.TEAM_RED if player.team == MatchManager.TEAM_BLUE else MatchManager.TEAM_BLUE
+	
+	var target := enemy_goal
+	
+	# 1. KANAT OYUNCUSU MANTIĞI (Sıfıra inme veya İçe Kat Etme - Cut Inside)
+	if is_wide:
+		if dist_to_goal > 20.0:
+			# Çizgiye paralel hızla sıfıra in (Byline run)
+			target = Vector3(signf(player.global_position.x) * (FIELD_HALF_WIDTH - 3.5), 0.0, attack_sign * (FIELD_HALF_LENGTH - 8.0))
+		else:
+			# Ceza sahası yan çizgisine geldiyse içe kat et (Cut-back / Plase açısı)
+			target = Vector3(signf(player.global_position.x) * 11.0, 0.0, attack_sign * (FIELD_HALF_LENGTH - 11.0))
+	# 2. MERKEZ HÜCUM MANTIĞI (Ceza sahasına sızma)
+	elif dist_to_goal > 18.0:
+		target = Vector3(player.global_position.x * 0.6, 0.0, attack_sign * (FIELD_HALF_LENGTH - 14.0))
+	
+	# 3. RAKİP EKARTASYONU (Çalım / Boş Koridora Kaçış)
+	var nearest_opponent := _nearest_player_to_ball(other_team)
+	if nearest_opponent != null and nearest_opponent.global_position.distance_to(player.global_position) < 5.5:
 		var toward_opponent := nearest_opponent.global_position - player.global_position
 		toward_opponent.y = 0.0
 		var left := Vector3(-toward_opponent.z, 0.0, toward_opponent.x).normalized()
 		var right := -left
-		var left_space := _nearest_player_distance(nearest_opponent.team, player.global_position + left * 4.0)
-		var right_space := _nearest_player_distance(nearest_opponent.team, player.global_position + right * 4.0)
-		target += (left if left_space >= right_space else right) * 4.0
+		var left_space := _nearest_player_distance(other_team, player.global_position + left * 4.5)
+		var right_space := _nearest_player_distance(other_team, player.global_position + right * 4.5)
+		var evade_dir := left if left_space >= right_space else right
+		target = player.global_position + (target - player.global_position).normalized() * 4.0 + evade_dir * 3.5
+		
+	target.x = clampf(target.x, -FIELD_HALF_WIDTH + 2.0, FIELD_HALF_WIDTH - 2.0)
+	target.z = clampf(target.z, -FIELD_HALF_LENGTH + 2.0, FIELD_HALF_LENGTH - 2.0)
 	return target
 
 func _nearest_player_distance(team: int, position: Vector3) -> float:
@@ -1084,11 +1105,11 @@ func try_ai_ball_action(player: CharacterBody3D) -> void:
 		if bool(selected_input.get("contain", false)) and not _team_has_ball_control(player.team):
 			_try_contain_poke(player, other_team)
 		return
-	var owner := players.get_node_or_null(ball_owner_name) as CharacterBody3D
+	var owner := get_player_node(ball_owner_name)
 	if owner != null and owner.team == other_team:
 		_try_ai_tackle(player, other_team)
 		return
-	if player.role == MatchManager.ROLE_PLAYER and ball_owner_name != player.name:
+	if player.role == MatchManager.ROLE_PLAYER and ball_owner_name != String(player.name):
 		return
 	if player.global_position.distance_to(ball.global_position) > 2.25 or not _team_has_ball_control(player.team):
 		return
@@ -1098,48 +1119,95 @@ func try_ai_ball_action(player: CharacterBody3D) -> void:
 		return
 	if int(ai_action_cooldowns.get(player.name, 0)) > Time.get_ticks_msec():
 		return
+
 	var attack_sign := _attack_sign(player.team)
 	var goal_distance := absf(attack_sign * FIELD_HALF_LENGTH - ball.global_position.z)
 	var direction := Vector3.ZERO
 	var action := ""
 	var receiver_name := ""
-	var power := 0.62
+	var power := 0.65
+	var curve := 0.0
+
 	if player.role == MatchManager.ROLE_GOALKEEPER:
 		action = "clearance"
 		direction = Vector3(match_rng.randf_range(-0.55, 0.55), 0.25, attack_sign)
 	else:
 		var receiver := _best_forward_teammate(player)
 		var roll := match_rng.randf()
-		var shot_chance := clampf(0.42 + (25.0 - goal_distance) * 0.025, 0.42, 0.82)
-		var cross_receiver := _best_cross_teammate(player) if goal_distance < 30.0 and absf(player.global_position.x) > 17.0 else null
-		if cross_receiver != null:
+		var is_wide := absf(player.global_position.x) > 15.5
+		var cross_receiver := _best_cross_teammate(player) if goal_distance < 26.0 and is_wide else null
+		
+		# 1. ORTA VARYASYONLARI (Yüksek Orta veya Yerden Cut-Back)
+		if cross_receiver != null and (goal_distance < 14.0 or _has_nearby_opponent(player, 4.0) or roll < 0.65):
 			receiver = cross_receiver
-			action = "cross"
-			direction = receiver.global_position + receiver.velocity * 0.2 - ball.global_position
+			var lead_pos := receiver.global_position + receiver.velocity * 0.28
+			direction = lead_pos - ball.global_position
 			direction.y = 0.0
-		elif goal_distance < 25.0 and absf(player.global_position.x) < 28.0 and roll < shot_chance:
-			action = "shot"
-			direction = _ai_shot_direction(player, attack_sign)
-		elif receiver != null and _has_nearby_opponent(player, 8.0) and (_has_nearby_opponent(player, 4.5) or match_rng.randf() < 0.62):
-			direction = receiver.global_position + receiver.velocity * 0.2 - ball.global_position
-			action = "through" if goal_distance > 32.0 else "pass"
-		elif receiver != null and goal_distance > 24.0 and match_rng.randf() < 0.12:
-			direction = receiver.global_position - ball.global_position
-			action = "through"
-		if action == "through":
-			var target := _through_target(receiver)
-			direction = target - ball.global_position
+			if goal_distance < 11.0 and absf(receiver.global_position.x) < 10.0:
+				# Sıfıra inildiyse penaltı noktasına yerden sert pas (FIFA Cut-Back)
+				action = "pass"
+				power = 0.72
+			else:
+				# Klasik kavisli orta
+				action = "cross"
+				power = clampf(direction.length() / 28.0, 0.48, 0.88)
+				curve = -signf(player.global_position.x) * attack_sign * 0.45
+				
+		# 2. ŞUT VARYASYONLARI (Plase Şut / Sert Şut / Uzaktan Şut)
+		elif goal_distance < 27.0 and absf(player.global_position.x) < 24.0:
+			var shot_chance := clampf(0.45 + (26.0 - goal_distance) * 0.03, 0.35, 0.90)
+			if goal_distance < 15.0 or roll < shot_chance:
+				direction = _ai_shot_direction(player, attack_sign)
+				if goal_distance > 19.0 and not _has_nearby_opponent(player, 3.5) and match_rng.randf() < 0.4:
+					action = "power_shot"
+					power = 0.85
+				else:
+					action = "shot"
+					power = clampf(0.55 + (goal_distance / 35.0), 0.58, 0.92)
+					# Uzak köşeye plase falso (Finesse Shot)
+					curve = signf(player.global_position.x) * attack_sign * 0.55
+					
+		# 3. HÜCUM PAS VE VERKAÇ VARYASYONLARI
+		if action.is_empty() and receiver != null:
+			var dist_to_rec := player.global_position.distance_to(receiver.global_position)
+			var rec_progress := attack_sign * (receiver.global_position.z - player.global_position.z)
+			var under_pressure := _has_nearby_opponent(player, 5.5)
+			
+			if rec_progress > 5.0 and dist_to_rec > 14.0 and goal_distance > 22.0 and match_rng.randf() < 0.38:
+				# Savunma arkasına havadan ara pas (L1+Üçgen / Q+W)
+				action = "lofted_through"
+				var target := _through_target(receiver)
+				direction = target - ball.global_position
+				power = clampf(direction.length() / 32.0, 0.45, 0.85)
+			elif rec_progress > 3.0 and (under_pressure or match_rng.randf() < 0.45):
+				# Yerden ara pas (Through Ball)
+				action = "through"
+				var target := _through_target(receiver)
+				direction = target - ball.global_position
+				power = clampf((direction.length() - 6.0) / 16.0, 0.35, 0.82)
+			elif under_pressure or match_rng.randf() < 0.55:
+				# Kısa pas + Verkaç koşusu (Give and Go)
+				action = "pass"
+				direction = (receiver.global_position + receiver.velocity * 0.2) - ball.global_position
+				power = clampf((direction.length() - 5.0) / 18.0, 0.3, 0.78)
+				# Pası veren oyuncu boş alana kaçsın (1-2 Verkaç)
+				if goal_distance < 38.0 and not _is_player_selected(player):
+					var run_spot := player.global_position + Vector3(match_rng.randf_range(-4.0, 4.0), 0.0, attack_sign * 10.0)
+					cross_run_assignments[String(player.name)] = {"position": run_spot, "expires": Time.get_ticks_msec() + 2200}
+
+		if action in ["through", "lofted_through"] and receiver != null:
+			var run_target := _through_target(receiver)
 			if not _is_player_selected(receiver):
-				cross_run_assignments[receiver.name] = {"position": target, "expires": Time.get_ticks_msec() + 2500}
-		if action in ["pass", "through", "cross"] and receiver != null:
-			receiver_name = receiver.name
-		if action in ["pass", "through"]:
-			power = clampf((direction.length() - 8.0) / 14.0, 0.2, 0.8)
+				cross_run_assignments[String(receiver.name)] = {"position": run_target, "expires": Time.get_ticks_msec() + 2600}
+		if action in ["pass", "through", "lofted_through", "cross"] and receiver != null:
+			receiver_name = String(receiver.name)
+
 	if action.is_empty():
 		return
-	ai_ball_action_cooldown_until = Time.get_ticks_msec() + 800
-	ai_action_cooldowns[player.name] = Time.get_ticks_msec() + 1400
-	_handle_ball_action(0, player.name, direction, power, 0.0, action, true, false, receiver_name)
+	ai_ball_action_cooldown_until = Time.get_ticks_msec() + 650
+	ai_action_cooldowns[player.name] = Time.get_ticks_msec() + 1150
+	_handle_ball_action(0, String(player.name), direction, power, curve, action, true, false, receiver_name)
+
 
 func _ai_shot_direction(player: CharacterBody3D, attack_sign: float) -> Vector3:
 	var target_x := 0.0
@@ -1165,7 +1233,7 @@ func _has_nearby_opponent(player: CharacterBody3D, radius: float) -> bool:
 func _try_ai_tackle(player: CharacterBody3D, opponent_team: int) -> void:
 	if not multiplayer.is_server() or _is_player_selected(player) or player.role != MatchManager.ROLE_PLAYER:
 		return
-	var opponent := players.get_node_or_null(ball_owner_name) as CharacterBody3D
+	var opponent := get_player_node(ball_owner_name) as CharacterBody3D
 	if opponent == null or opponent.team != opponent_team or opponent.role != MatchManager.ROLE_PLAYER:
 		return
 	if player.global_position.distance_to(opponent.global_position) > 2.4 or ball.global_position.distance_to(opponent.global_position) > 2.7:
@@ -1240,21 +1308,33 @@ func _best_cross_teammate(player: CharacterBody3D) -> CharacterBody3D:
 	var other_team := MatchManager.TEAM_RED if player.team == MatchManager.TEAM_BLUE else MatchManager.TEAM_BLUE
 	var best: CharacterBody3D
 	var best_score := -INF
+	var ball_side := signf(player.global_position.x)
+	
 	for child in players.get_children():
 		var teammate := child as CharacterBody3D
 		if teammate == null or teammate == player or teammate.team != player.team or teammate.role != MatchManager.ROLE_PLAYER:
 			continue
-		var position := teammate.global_position
-		var distance := player.global_position.distance_to(position)
-		if absf(position.x) > PENALTY_AREA_HALF_WIDTH or attack_sign * position.z < FIELD_HALF_LENGTH - PENALTY_AREA_DEPTH \
-				or distance < 5.0 or distance > 35.0 or _is_offside_position(teammate, player.team, ball.global_position):
+		var pos := teammate.global_position + teammate.velocity * 0.25
+		var distance := player.global_position.distance_to(pos)
+		var depth_from_goal := absf(attack_sign * FIELD_HALF_LENGTH - pos.z)
+		
+		if absf(pos.x) > PENALTY_AREA_HALF_WIDTH - 1.5 or depth_from_goal > PENALTY_AREA_DEPTH + 2.0 \
+				or distance < 6.0 or distance > 36.0 or _is_offside_position(teammate, player.team, ball.global_position):
 			continue
-		var space := _nearest_player_distance(other_team, position)
-		var score := minf(space, 12.0) - absf(position.x) * 0.2 - distance * 0.1
+			
+		var space := _nearest_player_distance(other_team, pos)
+		var is_far_post := signf(pos.x) != ball_side and absf(pos.x) > 3.0
+		var score := minf(space, 10.0) * 1.4 - absf(pos.x) * 0.15
+		# Arka direğe sarkan ve penaltı noktası civarındaki oyunculara bonus ver
+		if is_far_post:
+			score += 3.5
+		if depth_from_goal > 5.0 and depth_from_goal < 13.0:
+			score += 2.5
 		if score > best_score:
 			best = teammate
 			best_score = score
 	return best
+
 
 func _ai_pass_lane_clearance(player: CharacterBody3D, target: Vector3) -> float:
 	var start := Vector3(ball.global_position.x, 0.0, ball.global_position.z)
@@ -1393,7 +1473,7 @@ func _handle_offside_involvement(player: CharacterBody3D) -> bool:
 		_clear_offside_state()
 		return false
 	for candidate_name in offside_candidates:
-		var candidate := players.get_node_or_null(candidate_name) as CharacterBody3D
+		var candidate := get_player_node(candidate_name) as CharacterBody3D
 		if candidate != null and candidate.global_position.distance_to(player.global_position) < 1.15:
 			var defending_team := MatchManager.TEAM_RED if offside_team == MatchManager.TEAM_BLUE else MatchManager.TEAM_BLUE
 			_start_free_kick(
@@ -1434,7 +1514,7 @@ func request_action(actor_name: String, direction: Vector3, power: float, curve:
 func _handle_ball_action(peer_id: int, actor_name: String, direction: Vector3, power: float, curve: float, action: String, ai_action := false, power_shot_ready := false, ai_receiver_name := ""):
 	if not game_started or (kickoff_delay > 0.0 and not set_piece_active) or ball == null:
 		return
-	var player := players.get_node_or_null(actor_name) as CharacterBody3D
+	var player := get_player_node(actor_name) as CharacterBody3D
 	if player == null or player.role not in [MatchManager.ROLE_PLAYER, MatchManager.ROLE_GOALKEEPER]:
 		return
 	if ai_action:
@@ -1494,7 +1574,7 @@ func _handle_ball_action(peer_id: int, actor_name: String, direction: Vector3, p
 	direction = direction.normalized()
 	var intended_receiver: CharacterBody3D
 	if ai_action and not ai_receiver_name.is_empty():
-		var ai_receiver := players.get_node_or_null(ai_receiver_name) as CharacterBody3D
+		var ai_receiver := get_player_node(ai_receiver_name) as CharacterBody3D
 		if ai_receiver != null and ai_receiver.team == player.team and ai_receiver.role == MatchManager.ROLE_PLAYER:
 			intended_receiver = ai_receiver
 	if not ai_action and action in ["pass", "through", "lofted_through"]:
@@ -1562,7 +1642,7 @@ func start_ball_action(kick_velocity: Vector3, curve: float, action: String, act
 	kickoff_team = -1
 	kickoff_wait = 0.0
 	_clear_set_piece()
-	var actor = players.get_node_or_null(actor_name)
+	var actor = get_player_node(actor_name)
 	if actor:
 		if action == "power_shot":
 			var camera_callback := Callable(get_parent(), "_on_power_shot_triggered")
@@ -1601,7 +1681,7 @@ func _on_ball_body_entered(body: Node):
 			play_match_sound.rpc("post" if body_name.contains("post") or body_name.contains("crossbar") else "bounce")
 		return
 	var player := body as CharacterBody3D
-	var passer := players.get_node_or_null(pass_origin_name) as CharacterBody3D
+	var passer := get_player_node(pass_origin_name) as CharacterBody3D
 	if passer != null and player.team != passer.team:
 		clear_pass_selection.rpc()
 	if _handle_offside_involvement(player):
@@ -1672,7 +1752,7 @@ func _apply_first_touch(player: CharacterBody3D) -> void:
 func _update_ball_trap(delta: float) -> void:
 	if ball_trap_time <= 0.0:
 		return
-	var player := players.get_node_or_null(ball_trap_player) as CharacterBody3D
+	var player := get_player_node(ball_trap_player) as CharacterBody3D
 	if player == null or player.global_position.distance_to(ball.global_position) > 2.7 or _nearest_player_to_ball() != player:
 		ball_trap_time = 0.0
 		return
@@ -1717,7 +1797,7 @@ func player_action_rpc(actor_name: String, action: String):
 func _handle_player_action(peer_id: int, actor_name: String, action: String):
 	if action not in ["tackle", "slide_tackle"]:
 		return
-	var player := players.get_node_or_null(actor_name) as CharacterBody3D
+	var player := get_player_node(actor_name) as CharacterBody3D
 	if player == null or player.role != MatchManager.ROLE_PLAYER or player.controller_peer_id != peer_id or selected_entity_by_peer.get(peer_id, "") != actor_name:
 		return
 	_handle_tackle(peer_id, actor_name, action == "slide_tackle")
@@ -1730,7 +1810,7 @@ func request_tackle_rpc(actor_name: String):
 func _handle_tackle(peer_id: int, actor_name: String, slide := false):
 	if not game_started or kickoff_delay > 0.0 or ball == null or ball.freeze:
 		return
-	var player := players.get_node_or_null(actor_name) as CharacterBody3D
+	var player := get_player_node(actor_name) as CharacterBody3D
 	if player == null or player.team != MatchManager.team_for_peer(peer_id) or player.role != MatchManager.ROLE_PLAYER:
 		return
 	var opponent := _nearest_opponent_to_player(player)
@@ -1794,7 +1874,7 @@ func _resolve_tackle_contact(tackler: CharacterBody3D, opponent: CharacterBody3D
 
 @rpc("authority", "call_local", "reliable")
 func broadcast_player_action(actor_name: String, animation_name: String):
-	var player = players.get_node_or_null(actor_name)
+	var player = get_player_node(actor_name)
 	if player:
 		player.play_action_local(animation_name)
 	if animation_name == "slide_tackle":
@@ -1809,7 +1889,7 @@ func play_match_sound(event: String) -> void:
 	match_audio.play_event(event)
 
 func _call_foul(offender_name: String, foul_position: Vector3):
-	var offender := players.get_node_or_null(offender_name) as CharacterBody3D
+	var offender := get_player_node(offender_name) as CharacterBody3D
 	if offender == null or set_piece_active or set_piece_timer > 0.0 or kickoff_delay > 0.0:
 		return
 	if Time.get_ticks_msec() < foul_cooldown_until:
@@ -1915,7 +1995,7 @@ func keeper_dive_rpc(actor_name: String, side: int):
 		_start_keeper_dive(multiplayer.get_remote_sender_id(), actor_name, side)
 
 func _start_keeper_dive(peer_id: int, actor_name: String, side: int):
-	var player := players.get_node_or_null(actor_name) as CharacterBody3D
+	var player := get_player_node(actor_name) as CharacterBody3D
 	if player == null or player.role != MatchManager.ROLE_GOALKEEPER or player.controller_peer_id != peer_id or selected_entity_by_peer.get(peer_id, "") != actor_name:
 		return
 	if not _ball_in_keeper_six_yard_box(player):
@@ -1940,7 +2020,7 @@ func _ball_in_keeper_six_yard_box(keeper: CharacterBody3D) -> bool:
 
 @rpc("authority", "call_local", "reliable")
 func broadcast_keeper_dive(actor_name: String, side: int):
-	var player = players.get_node_or_null(actor_name)
+	var player = get_player_node(actor_name)
 	if player:
 		player.set_diving_local(true, side)
 
@@ -1974,34 +2054,87 @@ func _take_ai_set_piece(taker: CharacterBody3D) -> void:
 	var goal := Vector3(0.0, ball.global_position.y, attack_sign * FIELD_HALF_LENGTH)
 	var direction := set_piece_direction
 	var action := "pass"
-	var power := 0.6
+	var power := 0.65
+	var curve := 0.0
 	var receiver: CharacterBody3D
+	
 	match set_piece_kind:
 		"goal_kick":
-			action = "clearance"
-			power = 0.8
+			# Kısa pasla oyun kurma veya ileri uzun top varyasyonu
+			var short_option := _best_forward_teammate(taker)
+			if short_option != null and taker.global_position.distance_to(short_option.global_position) < 24.0 and match_rng.randf() < 0.45:
+				receiver = short_option
+				action = "pass"
+			else:
+				action = "clearance"
+				direction = Vector3(match_rng.randf_range(-0.45, 0.45), 0.28, attack_sign)
+				power = 0.85
+				
 		"penalty":
 			action = "shot"
-			direction = goal - ball.global_position
-			power = 0.75
+			var corner_side := 1.0 if match_rng.randf() < 0.5 else -1.0
+			var target_spot := Vector3(corner_side * (GOAL_HALF_WIDTH - 0.65), 0.8, attack_sign * FIELD_HALF_LENGTH)
+			direction = target_spot - ball.global_position
+			power = match_rng.randf_range(0.72, 0.88)
+			curve = -corner_side * attack_sign * 0.25
+			
 		"corner":
-			action = "cross"
-			direction = Vector3(0.0, ball.global_position.y, attack_sign * (FIELD_HALF_LENGTH - 10.0)) - ball.global_position
-			power = 0.8
+			var tactic := match_rng.randi_range(0, 2)
+			var side_sign := signf(ball.global_position.x)
+			if tactic == 0:
+				# Taktik 1: Altıpas / Ön Direk Kesme Orta (In-swinger)
+				action = "cross"
+				var near_post := Vector3(side_sign * 3.5, 0.0, attack_sign * (FIELD_HALF_LENGTH - 6.5))
+				direction = near_post - ball.global_position
+				power = 0.78
+				curve = -side_sign * attack_sign * 0.65
+			elif tactic == 1:
+				# Taktik 2: Arka Direk / Penaltı Noktası Havadan Orta
+				action = "cross"
+				var far_post := Vector3(-side_sign * 4.5, 0.0, attack_sign * (FIELD_HALF_LENGTH - 10.5))
+				direction = far_post - ball.global_position
+				power = 0.85
+				curve = -side_sign * attack_sign * 0.4
+			else:
+				# Taktik 3: Ceza Sahası Yayı Dışına Yerden Pas (Şut Organizasyonu)
+				receiver = _best_forward_teammate(taker)
+				if receiver != null:
+					action = "pass"
+				else:
+					action = "cross"
+					direction = Vector3(0.0, 0.0, attack_sign * (FIELD_HALF_LENGTH - 11.0)) - ball.global_position
+					power = 0.8
+					
 		"free_kick":
-			if ball.global_position.distance_to(goal) < 28.0:
+			var dist_to_goal := ball.global_position.distance_to(goal)
+			if dist_to_goal < 29.0:
+				# Doğrudan Kaleye Baraj Üstünden Falsolu Frikik
 				action = "shot"
-				direction = goal - ball.global_position
-				power = 0.8
+				var aim_side := -signf(ball.global_position.x) if absf(ball.global_position.x) > 2.0 else (1.0 if match_rng.randf() < 0.5 else -1.0)
+				var target_corner := Vector3(aim_side * (GOAL_HALF_WIDTH - 0.7), 1.2, attack_sign * FIELD_HALF_LENGTH)
+				direction = target_corner - ball.global_position
+				power = clampf(dist_to_goal / 34.0, 0.62, 0.88)
+				curve = -aim_side * attack_sign * 0.75
+			elif dist_to_goal < 44.0:
+				# Ceza Sahası İçine Doldurma (Set Piece Cross)
+				action = "cross"
+				var box_target := Vector3(match_rng.randf_range(-6.0, 6.0), 0.0, attack_sign * (FIELD_HALF_LENGTH - 11.0))
+				direction = box_target - ball.global_position
+				power = 0.82
+				curve = -signf(ball.global_position.x) * attack_sign * 0.4
 			else:
 				receiver = _best_forward_teammate(taker)
+				
 		"throw_in":
 			receiver = _best_forward_teammate(taker)
+			
 	if receiver != null:
-		direction = receiver.global_position - ball.global_position
+		var lead := receiver.global_position + Vector3(0.0, 0.0, attack_sign * 2.0)
+		direction = lead - ball.global_position
 		direction.y = 0.0
-		power = clampf((direction.length() - 8.0) / 14.0, 0.2, 0.8)
-	_handle_ball_action(taker.controller_peer_id, taker.name, direction, power, 0.0, action, true, false, String(receiver.name) if receiver else "")
+		power = clampf((direction.length() - 6.0) / 16.0, 0.35, 0.82)
+		
+	_handle_ball_action(taker.controller_peer_id, String(taker.name), direction, power, curve, action, true, false, String(receiver.name) if receiver else "")
 
 func _physics_process(delta: float):
 	if last_kicker_collision != null and Time.get_ticks_msec() >= last_kick_control_until:
@@ -2020,20 +2153,20 @@ func _physics_process(delta: float):
 	if set_piece_timer > 0.0:
 		set_piece_timer = maxf(0.0, set_piece_timer - delta)
 		if set_piece_active and ball.freeze and set_piece_timer <= 10.0:
-			var ai_taker := players.get_node_or_null(set_piece_taker_name) as CharacterBody3D
+			var ai_taker := get_player_node(set_piece_taker_name) as CharacterBody3D
 			if ai_taker != null and not _has_human_controller(ai_taker) \
 					and not _is_player_selected(ai_taker):
 				_take_ai_set_piece(ai_taker)
 				if not set_piece_active:
 					return
 		if set_piece_timer == 0.0 and ball.freeze:
-			var human_taker := players.get_node_or_null(set_piece_taker_name) as CharacterBody3D
+			var human_taker := get_player_node(set_piece_taker_name) as CharacterBody3D
 			if set_piece_active and human_taker != null and _has_human_controller(human_taker):
 				return
 			var shot_direction := set_piece_direction + Vector3(match_rng.randf_range(-0.3, 0.3), match_rng.randf_range(0.15, 0.48), 0.0) if set_piece_active else Vector3(match_rng.randf_range(-0.45, 0.45), match_rng.randf_range(0.15, 0.48), -signf(restart_position.z))
 			var shot_velocity = shot_direction.normalized() * match_rng.randf_range(15.0, 23.0)
 			if set_piece_active:
-				var taker := players.get_node_or_null(set_piece_taker_name) as CharacterBody3D
+				var taker := get_player_node(set_piece_taker_name) as CharacterBody3D
 				var taker_action := "clearance" if taker != null and taker.role == MatchManager.ROLE_GOALKEEPER else "shot"
 				if taker != null:
 					_capture_offside_positions(taker)
@@ -2125,7 +2258,7 @@ func _process_selection_keys() -> void:
 func _follow_pass_receiver_selection() -> void:
 	if ball_owner_name.is_empty():
 		return
-	var holder := players.get_node_or_null(ball_owner_name) as CharacterBody3D
+	var holder := get_player_node(ball_owner_name) as CharacterBody3D
 	if holder == null:
 		return
 	if holder.name == pass_origin_name:
@@ -2193,7 +2326,7 @@ func _restart_at_six_yard(out_position: Vector3):
 		return
 	var end_sign := -1.0 if out_position.z < 0.0 else 1.0
 	var defending_team := MatchManager.TEAM_BLUE if _own_half_sign(MatchManager.TEAM_BLUE) == end_sign else MatchManager.TEAM_RED
-	var last_touch := players.get_node_or_null(last_ball_actor_name) as CharacterBody3D
+	var last_touch := get_player_node(last_ball_actor_name) as CharacterBody3D
 	if last_touch != null and last_touch.team == defending_team:
 		_start_corner_kick(out_position, defending_team)
 		return
@@ -2215,7 +2348,7 @@ func _restart_at_six_yard(out_position: Vector3):
 	kickoff_delay = 1.0
 
 func _start_throw_in(out_position: Vector3) -> void:
-	var last_touch := players.get_node_or_null(last_ball_actor_name) as CharacterBody3D
+	var last_touch := get_player_node(last_ball_actor_name) as CharacterBody3D
 	var restarting_team := MatchManager.TEAM_RED if last_touch == null or last_touch.team == MatchManager.TEAM_BLUE else MatchManager.TEAM_BLUE
 	var side_sign := signf(out_position.x)
 	var location := Vector3(
@@ -2261,7 +2394,7 @@ func begin_set_piece(taker_name: String, taker_position: Vector3, direction: Vec
 	set_piece_taker_name = taker_name
 	set_piece_direction = direction
 	set_piece_kind = restart_kind
-	var taker := players.get_node_or_null(taker_name) as CharacterBody3D
+	var taker := get_player_node(taker_name) as CharacterBody3D
 	if taker == null:
 		push_error("Set piece references missing player %s." % taker_name)
 		set_piece_active = false
@@ -2284,7 +2417,7 @@ func begin_set_piece(taker_name: String, taker_position: Vector3, direction: Vec
 
 func _clear_set_piece() -> void:
 	if set_piece_active:
-		var taker := players.get_node_or_null(set_piece_taker_name) as CharacterBody3D
+		var taker := get_player_node(set_piece_taker_name) as CharacterBody3D
 		if taker != null:
 			taker.end_set_piece_aim()
 		get_parent().clear_set_piece_view()
@@ -2380,7 +2513,7 @@ func _setup_free_kick_wall(taker: CharacterBody3D) -> void:
 func _enforce_set_piece_spacing() -> void:
 	if not set_piece_active:
 		return
-	var taker := players.get_node_or_null(set_piece_taker_name) as CharacterBody3D
+	var taker := get_player_node(set_piece_taker_name) as CharacterBody3D
 	if taker == null:
 		return
 	var restart := ball.global_position
@@ -2472,7 +2605,7 @@ func _resolve_player_contacts():
 			_apply_player_impulse(second_id, shove)
 
 func _apply_player_impulse(actor_name: String, impulse: Vector3):
-	var player := players.get_node_or_null(actor_name) as CharacterBody3D
+	var player := get_player_node(actor_name) as CharacterBody3D
 	if player == null:
 		return
 	player.apply_contact_impulse_local(impulse)
@@ -2507,7 +2640,7 @@ func _score_goal(team: int):
 	var goal_side := MatchManager.TEAM_BLUE if _attack_sign(team) > 0.0 else MatchManager.TEAM_RED
 	shake_nets.rpc(goal_side)
 	show_score.rpc(blue_score, red_score, "GOOOL!")
-	var scorer := players.get_node_or_null(last_ball_actor_name) as CharacterBody3D
+	var scorer := get_player_node(last_ball_actor_name) as CharacterBody3D
 	if scorer == null or scorer.team != team or scorer.role != MatchManager.ROLE_PLAYER:
 		scorer = _nearest_field_player(ball.global_position, team)
 	if scorer != null:
@@ -2601,8 +2734,8 @@ func start_goal_celebration(team: int, scorer_name: String, animation: StringNam
 func _celebration_teammate_arrived(player_name: String, scorer_name: String) -> void:
 	if not goal_celebration_active:
 		return
-	var player := players.get_node_or_null(player_name) as CharacterBody3D
-	var scorer := players.get_node_or_null(scorer_name) as CharacterBody3D
+	var player := get_player_node(player_name) as CharacterBody3D
+	var scorer := get_player_node(scorer_name) as CharacterBody3D
 	if player == null or scorer == null:
 		return
 	var direction := scorer.global_position - player.global_position
@@ -2613,7 +2746,7 @@ func _celebration_teammate_arrived(player_name: String, scorer_name: String) -> 
 
 @rpc("authority", "call_local", "reliable")
 func play_teammate_victory(player_name: String) -> void:
-	var player := players.get_node_or_null(player_name) as CharacterBody3D
+	var player := get_player_node(player_name) as CharacterBody3D
 	if player != null and goal_celebration_active:
 		player.start_goal_celebration_local(&"goal_victory")
 
@@ -2636,6 +2769,7 @@ func reset_players_for_kickoff(team_with_kickoff: int):
 		var is_kickoff_player: bool = player_team == team_with_kickoff and player.field_slot == 8
 		var team_name := "Blue" if player_team == MatchManager.TEAM_BLUE else "Red"
 		var spawn_marker := get_node_or_null("../MatchEnvironment/PlayerSpawns/%sFieldPlayer%d" % [team_name, player.field_slot]) as Marker3D
+
 		var formation_spawn := MatchManager.match_formation_position(player_team, player.field_slot)
 		if spawn_marker:
 			formation_spawn = spawn_marker.global_position
@@ -2799,3 +2933,11 @@ func update_charge(amount: float, charging: bool, curve: float, action: String =
 		action_label.text = "%s POWER: %d%%" % [action_names.get(action, "KICK"), roundi(amount / 1.5 * 100.0)]
 	if action_label and charging and absf(curve) > 0.05:
 		action_label.text = "CURVE: %s" % ("RIGHT" if curve > 0.0 else "LEFT")
+
+func get_player_node(node_id: Variant) -> CharacterBody3D:
+	if node_id == null:
+		return null
+	var id_str := String(node_id)
+	if id_str.is_empty():
+		return null
+	return players.get_node_or_null(NodePath(id_str)) as CharacterBody3D
